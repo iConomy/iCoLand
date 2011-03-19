@@ -1,7 +1,7 @@
 /**
  * 
  */
-package me.slaps.DMWrapper;
+package me.slaps.iConomyLand;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -14,34 +14,37 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.gmail.haloinverse.DynamicMarket.DynamicMarket;
+import com.nijiko.coelho.iConomy.iConomy;
 import com.nijikokun.bukkit.Permissions.Permissions;
+
+//import com.nijiko.coelho.iConomy.*;
 
 
 /**
  * @author magik
  *
  */
-public class DMWrapper extends JavaPlugin {
+public class iConomyLand extends JavaPlugin {
 
-	public static String name; // = "DMWrapper";
-	public static String codename = "Botswana";
-	public static String version; // = "0.03";
+	public static String name; // = "iConomyLand";
+	public static String codename = "initial";
+	public static String version; // = "0.0.0001";
 	
-	public static Boolean debugMode = false;
+	public static boolean debugMode = false;
 	
 	public static Logger logger = Logger.getLogger("Minecraft");
 	public static PluginDescriptionFile desc;
 	
 	public static Permissions perms;
-	public static DynamicMarket dm;
+	public static iConomy ic;
 	
-	public static DMWrapperBlockListener blockListener;
-	public static DMWrapperPlayerListener playerListener;
-	public static DMWrapperPluginListener pluginListener;
+	public static iConomyLandBlockListener blockListener;
+	public static iConomyLandPlayerListener playerListener;
+	public static iConomyLandPluginListener pluginListener;
+	public static iConomyLandCommandListener commandListener;
 	
-	protected static LocationManager locMgr;
-	protected static HashMap<String, ShopLocation> tmpShop = new HashMap<String, ShopLocation>();
+	protected static LandManager landMgr;
+	//protected static HashMap<String, ShopLocation> tmpShop = new HashMap<String, ShopLocation>();
     protected static HashMap<String, String> cmdMap = new HashMap<String, String>();
 
     public static void info(String msg) {
@@ -51,13 +54,11 @@ public class DMWrapper extends JavaPlugin {
     	logger.warning("["+name+"] "+ msg);
     }
 
-	@Override
 	public void onDisable() {
 		info("Version ["+version+"] ("+codename+") disabled");
 	}
 
-	@Override
-    public void onEnable() {
+	public void onEnable() {
 		desc = getDescription();
 		name = desc.getName();
 		version = desc.getVersion();
@@ -68,20 +69,21 @@ public class DMWrapper extends JavaPlugin {
 		getConfig();
 		
         // setup location manager
-        locMgr = new LocationManager(this);
+		landMgr = new LandManager(this);
         
         //clear command list
         cmdMap.clear();
 		
 		// setup listeners
-		blockListener =  new DMWrapperBlockListener(this);
-		playerListener = new DMWrapperPlayerListener(this);
-	  	pluginListener = new DMWrapperPluginListener(this);
+	  	getCommand("icl").setExecutor(new iConomyLandCommandListener());        
+		blockListener =  new iConomyLandBlockListener(this);
+		playerListener = new iConomyLandPlayerListener(this);
+	  	pluginListener = new iConomyLandPluginListener(this);
 	  	
 	  	// try to check for if external plugins already enabled
 	  	pluginListener.tryEnablePlugins(getServer().getPluginManager());
 
-		info("Version ["+version+"] ("+codename+") enabled" + (DMWrapper.debugMode?" **DEBUG MODE ENABLED**":""));
+		info("Version ["+version+"] ("+codename+") enabled" + (iConomyLand.debugMode?" **DEBUG MODE ENABLED**":""));
     }
     
 	private void getConfig() {
@@ -97,12 +99,12 @@ public class DMWrapper extends JavaPlugin {
 	private void loadConfig(File configFile) {
         Configuration config = new Configuration(configFile);
         config.load();
-        DMWrapper.debugMode = config.getBoolean("debug", false);
+        iConomyLand.debugMode = config.getBoolean("debug", false);
 	}
 	
 	private void saveConfig(File configFile) {
         Configuration config = new Configuration(configFile);
-        config.setProperty("debug", DMWrapper.debugMode);
+        config.setProperty("debug", iConomyLand.debugMode);
         config.save();
 	}
 	
@@ -115,7 +117,8 @@ public class DMWrapper extends JavaPlugin {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-	    return playerListener.onCommand( sender, cmd, commandLabel, args);
+	    //return playerListener.onCommand( sender, cmd, commandLabel, args);
+		return false;
 	}
 	
 	

@@ -1,43 +1,47 @@
-package me.slaps.DMWrapper;
+package me.slaps.iConomyLand;
 
 import org.bukkit.Location;
 
-public class ShopLocation {
-	public boolean set = false;
-	
-	Integer id;
-	
+public class Cuboid {
 	public Location setLoc1;
 	public Location setLoc2;
 	private Location LocMin;
 	private Location LocMax;
+	private boolean valid = false;
 	
-	public ShopLocation() {
+	public Cuboid() {
 		
 	}
 	
-	public ShopLocation(Location loc) {
+	public Cuboid(Cuboid other) {
+	    setLoc1 = other.setLoc1;
+	    setLoc2 = other.setLoc2;
+	    computeNewBlock();
+	}
+	
+	public Cuboid(Location loc) {
 		setLoc1 = loc;
 	}
 	
-	public ShopLocation(Integer id, Location loc1, Location loc2) {
-		this.id = id;
+	public Cuboid(Location loc1, Location loc2) {
 		setLoc1 = loc1;
 		setLoc2 = loc2;
 		computeNewBlock();
 	}
 	
-	public boolean setLocation(Integer i, Location loc) {
-		if ( i == 1 ) {
+	public boolean setLocation(Location loc) {
+		if ( setLoc1 == null ) {
 		    setLoc1 = loc;
-		} else if ( i == 2 ) {
+	        return computeNewBlock();
+		} else if ( setLoc2 == null ) {
 		    setLoc2 = loc;
-		}
-		
-		return computeNewBlock();
+	        return computeNewBlock();
+		} else {
+		    return false;
+		}		
 	}
 	
-	public boolean isInShop(Location loc) {
+	public boolean isIn(Location loc) {
 		if (( LocMin == null ) && (LocMax == null)) return false;
         if ( !loc.getWorld().equals(LocMin.getWorld()) ) return false;
 		return 
@@ -49,21 +53,21 @@ public class ShopLocation {
 			 (loc.getBlockZ() <= LocMax.getBlockZ()) );
 	}
 	
-	public boolean intersectsShop(ShopLocation other) {
+	public boolean intersects(Cuboid other) {
 		double maxX = other.LocMax.getBlockX();
 		double maxY = other.LocMax.getBlockX();
 		double maxZ = other.LocMax.getBlockZ();
 		double minX = other.LocMin.getBlockX();
 		double minY = other.LocMin.getBlockY();
 		double minZ = other.LocMin.getBlockZ();
-		if ( isInShop(new Location(other.setLoc1.getWorld(), maxX, maxY, maxZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), maxX, maxY, minZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), maxX, minY, maxZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), maxX, minY, minZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), minX, maxY, maxZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), minX, maxY, minZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), minX, minY, maxZ)) ) return true;
-		if ( isInShop(new Location(other.setLoc1.getWorld(), minX, minY, minZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), maxX, maxY, maxZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), maxX, maxY, minZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), maxX, minY, maxZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), maxX, minY, minZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), minX, maxY, maxZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), minX, maxY, minZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), minX, minY, maxZ)) ) return true;
+		if ( isIn(new Location(other.setLoc1.getWorld(), minX, minY, minZ)) ) return true;
 		
 		maxX = LocMax.getBlockX();
 		maxY = LocMax.getBlockX();
@@ -71,14 +75,14 @@ public class ShopLocation {
 		minX = LocMin.getBlockX();
 		minY = LocMin.getBlockY();
 		minZ = LocMin.getBlockZ();
-		if ( other.isInShop(new Location(setLoc1.getWorld(), maxX, maxY, maxZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), maxX, maxY, minZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), maxX, minY, maxZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), maxX, minY, minZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), minX, maxY, maxZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), minX, maxY, minZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), minX, minY, maxZ)) ) return true;
-		if ( other.isInShop(new Location(setLoc1.getWorld(), minX, minY, minZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), maxX, maxY, maxZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), maxX, maxY, minZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), maxX, minY, maxZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), maxX, minY, minZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), minX, maxY, maxZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), minX, maxY, minZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), minX, minY, maxZ)) ) return true;
+		if ( other.isIn(new Location(setLoc1.getWorld(), minX, minY, minZ)) ) return true;
 		
 		return false;
 	}
@@ -102,12 +106,16 @@ public class ShopLocation {
         		LocMin = new Location(setLoc1.getWorld(), minX, minY, minZ);
         		LocMax = new Location(setLoc1.getWorld(), maxX, maxY, maxZ);
         		
-        		set = true;
+        		valid = true;
         		return true;
 		    } else {
 		        return false;
 		    }
 		}
+	}
+	
+	public boolean isValid() {
+	    return valid;
 	}
 	
 }

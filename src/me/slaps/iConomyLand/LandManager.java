@@ -3,12 +3,14 @@ package me.slaps.iConomyLand;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 public class LandManager {
@@ -19,12 +21,12 @@ public class LandManager {
 	
 	Boolean shopLocationsEnabled = false;
 	
-	private ArrayList<Land> lands;
+	private HashMap<Integer,Land> lands;
 	private Configuration ShopConfig;
 	
 	public LandManager(iConomyLand plug) {
 		parent = plug;
-		lands = new ArrayList<Land>();
+		lands = new HashMap<Integer,Land>();
 
 		shopFile = new File(parent.getDataFolder() + File.separator + "lands.yml");
 		
@@ -74,10 +76,8 @@ public class LandManager {
             String perms = shopkeys.get("perms");
             String dateCreated = shopkeys.get("dateCreated");
             String dateTaxed = shopkeys.get("dateTaxed");
-            
-            if ( !lands.add(new Land(id, loc, owner, perms, dateCreated, dateTaxed)) ) {
-                iConomyLand.warning("Error reading land.yml! Corrupted data?");
-            }
+
+            lands.put(id, new Land(id, loc, owner, perms, dateCreated, dateTaxed));
 
 		}
 		
@@ -89,8 +89,7 @@ public class LandManager {
 		ShopConfig = new Configuration(shopFile);
 		
 		ArrayList<LinkedHashMap<String,Object>> tmpshops = new ArrayList<LinkedHashMap<String,Object>>();
-		
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 			Land shop = itr.next();
 			LinkedHashMap<String,Object> tmpmap = new LinkedHashMap<String,Object>();
@@ -129,14 +128,15 @@ public class LandManager {
 	    if ( !sl.isValid() ) return false;
 		if ( intersectsExistingLand(sl) ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
-		lands.add( new Land(getNextID(), sl, owner, perms, now.toString(), now.toString()) );
+		Integer id = getNextID();
+		lands.put( id, new Land(id, sl, owner, perms, now.toString(), now.toString()) );
 		saveConfigFile();
 		return true;
 	}
 	
 	public boolean removeLandByID(Integer id) {
 		int i = 0;
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.getID() == id ) {
@@ -152,7 +152,7 @@ public class LandManager {
 	
 	public String listLand() {
 		String out = "";
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			out += tmp.getID();
@@ -163,7 +163,7 @@ public class LandManager {
 	
 	// just gets corner 1 for now
 	public Location getCenterOfLand(Integer id) {
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( id.equals(tmp.getID()) ) {
@@ -178,7 +178,7 @@ public class LandManager {
 	
 	public Integer getNextID() {
 		Integer i = 0;
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.getID() > i ) i = tmp.getID();
@@ -186,8 +186,18 @@ public class LandManager {
 		return i+1;
 	}
 	
+	public boolean hasPermission(String playerName, Location loc) {
+	    Integer id = getLandID(loc);
+	    if ( id > 0 ) {
+	        Land land = lands.get(id);
+	        return land.hasPermission(playerName);
+	    } else { 
+	        return true;
+	    }
+	}
+	
 	public boolean inLand(Location loc) {
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.contains(loc) ) return true;
@@ -196,7 +206,7 @@ public class LandManager {
 	}
 	
 	public Integer getLandID(Location loc) {
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.contains(loc) ) return tmp.getID();
@@ -205,7 +215,7 @@ public class LandManager {
 	}
 	
 	public boolean intersectsExistingLand(Cuboid loc) {
-		Iterator<Land> itr = lands.iterator();
+		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.intersects(loc) ) return true;

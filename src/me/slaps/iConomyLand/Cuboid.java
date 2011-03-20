@@ -100,9 +100,6 @@ public class Cuboid {
         		double minY = Math.min(setLoc1.getBlockY(),setLoc2.getBlockY());
         		double minZ = Math.min(setLoc1.getBlockZ(),setLoc2.getBlockZ());
         		
-        		// make it at least player height
-        		if ( maxY - minY < 2) maxY += 2;
-        		
         		LocMin = new Location(setLoc1.getWorld(), minX, minY, minZ);
         		LocMax = new Location(setLoc1.getWorld(), maxX, maxY, maxZ);
         		

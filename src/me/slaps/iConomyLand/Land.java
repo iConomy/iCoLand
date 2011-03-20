@@ -9,6 +9,7 @@ public class Land {
     public Cuboid location;    // cuboid describing location
     public String owner;       //
     public String perms;
+    public String addons;
     public Timestamp dateCreated;
     public Timestamp dateTaxed;
     private boolean valid = false;
@@ -56,5 +57,17 @@ public class Land {
     
     public boolean intersects(Cuboid other) {
         return location.intersects(other);
+    }
+    
+    public boolean hasPermission(String playerName) {
+        Boolean ret = false;
+        if (playerName.equals(owner)) ret = true;
+        else { 
+            String[] split = perms.split("");
+            for( String perm : split )
+                if ( perm.equals(playerName) ) ret = true;
+        }
+        if (iConomyLand.debugMode) iConomyLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
+        return ret;
     }
 }

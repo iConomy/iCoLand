@@ -51,6 +51,8 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    int locFrom = locMap.get(playerName);
 		int locTo = iConomyLand.landMgr.getLandID(player.getLocation());
 		
+		locMap.put(playerName, locTo);
+		
 		if ( locFrom != locTo ) {
 		    if ( locFrom != 0 ) {
 		        player.sendMessage("Leaving ...");

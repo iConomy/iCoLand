@@ -115,4 +115,17 @@ public class Cuboid {
 	    return valid;
 	}
 	
+	public String toDimString() {
+	    return (1+LocMax.getBlockX()-LocMin.getBlockX())+"x"+
+	           (1+LocMax.getBlockY()-LocMin.getBlockY())+"x"+
+	           (1+LocMax.getBlockZ()-LocMin.getBlockZ());
+	}
+	
+	public Integer volume() {
+	    return (1+LocMax.getBlockX()-LocMin.getBlockX())*
+	           (1+LocMax.getBlockY()-LocMin.getBlockY())*
+	           (1+LocMax.getBlockZ()-LocMin.getBlockZ());
+	}
+	
+	
 }

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 public class LandManager {
@@ -17,8 +19,6 @@ public class LandManager {
     iConomyLand parent;
 	
 	File shopFile;
-	
-	Boolean shopLocationsEnabled = false;
 	
 	private HashMap<Integer,Land> lands;
 	private Configuration ShopConfig;
@@ -41,7 +41,6 @@ public class LandManager {
 	public void loadConfigFile() {
 		ShopConfig.load();
 		
-		//shopLocationsEnabled = ShopConfig.getBoolean("enabled", false);
 		List<String> oList = ShopConfig.getStringList("lands", null);
 		
 		iConomyLand.warning("Found " + oList.size() + " lands to protect ( loaded from file )");
@@ -57,8 +56,6 @@ public class LandManager {
                 String[] ls = line.trim().split("=");
                 shopkeys.put(ls[0].trim(), (ls.length>1)?ls[1].trim():"");
             }
-			
-			
 
             int id = Integer.parseInt(shopkeys.get("id"));
             
@@ -115,15 +112,6 @@ public class LandManager {
 		ShopConfig.save();
 	}
 	
-	public void enableShopLocations() {
-		shopLocationsEnabled = true;
-		saveConfigFile();
-	}
-
-	public void disableShopLocations() {
-		shopLocationsEnabled = false;
-		saveConfigFile();
-	}	
 	
 	public boolean add(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
@@ -212,7 +200,7 @@ public class LandManager {
 		    Land tmp = itr.next();
 			if ( tmp.contains(loc) ) return tmp.getID();
 		}
-		return -1;
+		return 0;
 	}
 	
 	public boolean intersectsExistingLand(Cuboid loc) {
@@ -223,6 +211,51 @@ public class LandManager {
 		}
 		return false;
 	}
+	
+	public Integer intersectsExistingLandID(Cuboid loc) {
+        Iterator<Land> itr = lands.values().iterator();
+        while(itr.hasNext()) {
+            Land tmp = itr.next();
+            if ( tmp.intersects(loc) ) return tmp.getID();
+        }
+        return 0;
+	}
+	
+	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
+	    Messaging mess = new Messaging(sender);
+	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
+	    if ( id > 0 ) {
+	        mess.send("{ERR}Intersects existing land ID# "+id);
+	        iConomyLand.tmpCuboidMap.remove(((Player)sender).getName());
+	        return;
+	    } else {
+	    
+            mess.send(Misc.headerify("{PRM}Unclaimed Land"));
+            
+            mess.send("Dimensoins: " + select.toDimString() );
+            mess.send("Volume: " + select.volume() );
+	    }
+	    
+	    
+	}
+	
+	public void showSelectLandInfo(CommandSender sender, Integer id) {
+	    showExistingLandInfo(sender, lands.get(id));
+	}
+	
+	public void showExistingLandInfo(CommandSender sender, Land land) {
+	    Messaging mess = new Messaging(sender);
+	    mess.send(Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{}"));
+        mess.send("{CMD}Owner: {}"+land.owner);
+        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
+            mess.send("{CMD}Perms: {}"+land.perms);            
+            mess.send("{CMD}Addons: {}"+land.addons);            
+            mess.send("{CMD}Created: {}"+land.dateCreated);            
+            mess.send("{CMD}Taxed: {}"+land.dateTaxed);            
+        }
+	}
+	
+	
 	
 	
 }

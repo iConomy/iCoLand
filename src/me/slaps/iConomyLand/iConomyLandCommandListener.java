@@ -1,6 +1,7 @@
 package me.slaps.iConomyLand;
 
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -62,10 +63,17 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 }
                 return true;
                 
-            // /icl survey
-            } else if (args[0].equalsIgnoreCase("survey") ) {
-                if ( iConomyLand.hasPermission(sender, "survey") ) { 
-
+            // /icl info
+            } else if (args[0].equalsIgnoreCase("info") ) {
+                if ( iConomyLand.hasPermission(sender, "info") ) {
+                    if ( args.length == 1 ) {
+                        if ( sender instanceof Player )
+                            showLandInfo((Player)sender, "");
+                        else
+                            mess.send("{ERR}Console needs to supply arguments for this command");
+                    } else {
+                        showLandInfo(sender, args[1]);
+                    }
                 } else {
                     mess.send("{ERR}No access for that...");
                 }
@@ -74,6 +82,15 @@ public class iConomyLandCommandListener implements CommandExecutor {
             // /icl buy
             } else if (args[0].equalsIgnoreCase("buy") ) {
                 if ( iConomyLand.hasPermission(sender, "buy") ) { 
+                
+                } else {
+                    mess.send("{ERR}No access for that...");
+                }
+                return true;
+                
+            // /icl modify
+            } else if (args[0].equalsIgnoreCase("modify") ) {
+                if ( iConomyLand.hasPermission(sender, "modify") ) { 
                 
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -94,9 +111,41 @@ public class iConomyLandCommandListener implements CommandExecutor {
 
     }
     
+    public void showLandInfo(Player sender, String... args) {
+        Messaging mess = new Messaging(sender);
+        
+        if ( args[0].isEmpty() ) {
+            // use location search or selected search
+            String playerName = sender.getName();
+            if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
+                Cuboid select = iConomyLand.tmpCuboidMap.get(playerName);
+                if ( select.isValid() ) {
+                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, select);
+                } else {
+                    mess.send("{ERR}Current selection invalid! Use {CMD}/lwc select{} to cancel");
+                }
+            } else {
+                Location loc = sender.getLocation();
+                Integer landid = iConomyLand.landMgr.getLandID(loc);
+                if ( landid > 0 ) {
+                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, landid);
+                } else {
+                    mess.send("{ERR}No current selection, not on owned land");
+                }
+            }
+            
+        } else {
+            
+        }
+    }
+    
+    public void showLandInfo(CommandSender sender, String... args) {
+        
+    }
+    
     public void showHelp(CommandSender sender, String topic) {
         Messaging mess = new Messaging(sender);
-        mess.send("{}" + Misc.headerify("{CMD} " + iConomyLand.name + " {BKT}({CMD}" + iConomyLand.codename + "{BKT}){} "));
+        mess.send(Misc.headerify("{CMD} " + iConomyLand.name + " {BKT}({CMD}" + iConomyLand.codename + "{BKT}) "));
     	if ( topic == null || topic.isEmpty() ) {
     	    
     	    mess.send(" {CMD}/icl {}- main command");
@@ -104,8 +153,9 @@ public class iConomyLandCommandListener implements CommandExecutor {
     	    String topics = "";
             if ( iConomyLand.hasPermission(sender, "list") ) topics += "list";
             if ( iConomyLand.hasPermission(sender, "select") ) topics += " select";
-            if ( iConomyLand.hasPermission(sender, "survey") ) topics += " survey";
+            if ( iConomyLand.hasPermission(sender, "info") ) topics += " info";
             if ( iConomyLand.hasPermission(sender, "buy") ) topics += " buy";
+            if ( iConomyLand.hasPermission(sender, "modify") ) topics += " modify";
     	    
     	    mess.send(" {} help topics: {CMD}" + topics);
     	    
@@ -118,15 +168,21 @@ public class iConomyLandCommandListener implements CommandExecutor {
             if ( iConomyLand.hasPermission(sender, "select") ) { 
                 mess.send(" {CMD}/icl {PRM}select {}- select land");
             }
-        } else if ( topic.equalsIgnoreCase("survey") ) {
-            if ( iConomyLand.hasPermission(sender, "survey") ) { 
-                mess.send(" {CMD}/icl {PRM}survey {}- get land info");
+        } else if ( topic.equalsIgnoreCase("info") ) {
+            if ( iConomyLand.hasPermission(sender, "info") ) { 
+                mess.send(" {CMD}/icl {PRM}info {}- get land info");
             }
             
         } else if ( topic.equalsIgnoreCase("buy") ) {
             if ( iConomyLand.hasPermission(sender, "buy") ) { 
                 mess.send(" {CMD}/icl {PRM}buy {}- purchase selected land");
             }
+            
+        } else if ( topic.equalsIgnoreCase("modify") ) {
+            if ( iConomyLand.hasPermission(sender, "modify") ) { 
+                mess.send(" {CMD}/icl {PRM}modify {}- modify land settings");
+            }
+            
         }
     }
     

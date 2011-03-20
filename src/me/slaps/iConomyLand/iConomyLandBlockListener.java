@@ -39,7 +39,9 @@ public class iConomyLandBlockListener extends BlockListener {
             Messaging mess = new Messaging((CommandSender)player);
 	        
 	        if ( newCuboid.isValid() ) {
+//	            mess.send("{}Land selected! {CMD}/lwc info {}for more info");
 	            mess.send("{}Land selected!");
+	            iConomyLand.landMgr.showSelectLandInfo(player, newCuboid);
 	            if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
 	                iConomyLand.cmdMap.remove(playerName);
 	            }
@@ -52,18 +54,35 @@ public class iConomyLandBlockListener extends BlockListener {
 	
 	public void onBlockBreak( BlockBreakEvent event ) {
 	    Location loc = event.getBlock().getLocation();
-	    String playerName = event.getPlayer().getName();
-        if ( !iConomyLand.landMgr.hasPermission(playerName, loc) ) {
+	    Player player = event.getPlayer();
+        if ( !iConomyLand.landMgr.hasPermission(player.getName(), loc) ) {
             event.setCancelled(true);
+            Messaging mess = new Messaging((CommandSender)player);
+            mess.send("{ERR}You can't do that here.");
         }
 	}
 	
 	public void onBlockPlace( BlockPlaceEvent event )    {
-	    
+        Location loc = event.getBlock().getLocation();
+        Player player = event.getPlayer();
+        if ( !iConomyLand.landMgr.hasPermission(player.getName(), loc) ) {
+            event.setCancelled(true);
+            Messaging mess = new Messaging((CommandSender)player);
+            mess.send("{ERR}You can't do that here.");
+        }
 	}
 	
 	public void onBlockIgnite( BlockIgniteEvent event )  {
-
+	    
+	    if ( event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) ) {
+            Location loc = event.getBlock().getLocation();
+            Player player = event.getPlayer();
+            if ( !iConomyLand.landMgr.hasPermission(player.getName(), loc) ) {
+                event.setCancelled(true);
+                Messaging mess = new Messaging((CommandSender)player);
+                mess.send("{ERR}You can't do that here.");
+            }
+	    }
 	}
 	
 

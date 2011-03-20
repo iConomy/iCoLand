@@ -203,6 +203,10 @@ public class LandManager {
 		return 0;
 	}
 	
+	public Land getLandByID(Integer id) {
+	    return lands.get(id);
+	}
+	
 	public boolean intersectsExistingLand(Cuboid loc) {
 		Iterator<Land> itr = lands.values().iterator();
 		while(itr.hasNext()) {
@@ -224,18 +228,20 @@ public class LandManager {
 	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
 	    Messaging mess = new Messaging(sender);
 	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
-	    if ( id > 0 ) {
-	        mess.send("{ERR}Intersects existing land ID# "+id);
-	        iConomyLand.tmpCuboidMap.remove(((Player)sender).getName());
-	        return;
-	    } else {
 	    
-            mess.send(Misc.headerify("{PRM}Unclaimed Land"));
-            
+	    if ( id > 0 && !iConomyLand.landMgr.getLandByID(id).location.equals(select) ) {
+	        showExistingLandInfo(sender, lands.get(id));
+	    } else if ( id > 0 ) {
+            mess.send("{ERR}Intersects existing land ID# "+id);
+            mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
+            iConomyLand.tmpCuboidMap.put(((Player)sender).getName(), iConomyLand.landMgr.getLandByID(id).location );
+            showExistingLandInfo(sender, lands.get(id));
+	    } else {
+            mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
+            mess.send("Price: " );
 	    }
-	    
 	    
 	}
 	
@@ -245,7 +251,7 @@ public class LandManager {
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {
 	    Messaging mess = new Messaging(sender);
-	    mess.send(Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{}"));
+	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{}"));
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
             mess.send("{CMD}Perms: {}"+land.perms);            

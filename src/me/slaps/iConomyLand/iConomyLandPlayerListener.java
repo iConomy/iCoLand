@@ -15,7 +15,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
-    private static int checkDelay = 500; // milliseconds
+    private static int checkDelay = 200; // milliseconds
     
     
 	public iConomyLandPlayerListener(iConomyLand plug) {
@@ -44,7 +44,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    
         String playerName = player.getName();
 	    
-	    if ( iConomyLand.debugMode ) iConomyLand.info("onPlayerMove: "+playerName);
+	    //if ( iConomyLand.debugMode ) iConomyLand.info("onPlayerMove: "+playerName);
 	    
 	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iConomyLand.landMgr.getLandID(player.getLocation()) );
 	    

@@ -82,7 +82,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
             // /icl buy
             } else if (args[0].equalsIgnoreCase("buy") ) {
                 if ( iConomyLand.hasPermission(sender, "buy") ) { 
-                
+                    buyLand(sender);
                 } else {
                     mess.send("{ERR}No access for that...");
                 }
@@ -90,8 +90,31 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 
             // /icl modify
             } else if (args[0].equalsIgnoreCase("modify") ) {
-                if ( iConomyLand.hasPermission(sender, "modify") ) { 
-                
+                if ( iConomyLand.hasPermission(sender, "modify") ) {
+                    //icl modify <id> <perms/addons> <tags>
+                    if ( args.length > 3 ) {
+                        Integer id;
+                        try {
+                            id = Integer.parseInt(args[1]);
+                        } catch (NumberFormatException e) {
+                            id = -1;
+                        }
+                        if ( id <= 0 ) {
+                            mess.send("{ERR}Bad ID");
+                            showHelp(sender, "modify");
+                        } else {
+                            if ( Misc.isEither(args[2], "perms", "addons") ) {
+                                String tags = args[3];
+                                for(int i=4;i<args.length;i++) tags += " "+args[i]; 
+                                modifyLand(sender, id, args[2], tags);
+                            } else {
+                                mess.send("{ERR}Bad category");
+                                showHelp(sender, "modify");
+                            }
+                        }
+                    } else {
+                        showHelp(sender, "modify");
+                    }
                 } else {
                     mess.send("{ERR}No access for that...");
                 }
@@ -110,6 +133,40 @@ public class iConomyLandCommandListener implements CommandExecutor {
         }
 
     }
+    
+    public void modifyLand(CommandSender sender, Integer id, String category, String tags) {
+        Land land = iConomyLand.landMgr.getLandByID(id);
+        if ( category.equals("perms") ) {
+            land.perms = tags;
+        } else if ( category.equals("addons") ) {
+            land.addons = tags;
+        }
+    }
+    
+
+    public void buyLand(CommandSender sender) {
+        Messaging mess = new Messaging(sender);
+        if ( sender instanceof Player ) {
+            String playerName = ((Player)sender).getName();
+            if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
+                Cuboid newCuboid = iConomyLand.tmpCuboidMap.get(playerName);
+                if ( newCuboid.isValid() ) {
+                    if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
+                        iConomyLand.cmdMap.remove(playerName);
+                    } else {
+                        mess.send("{ERR}Error buying land");
+                    }
+                } else {
+                    mess.send("{ERR}Invalid selection");
+                }
+            } else {
+                mess.send("{ERR}Nothing selected");
+            }
+        } else {
+            mess.send("Console can't buy land");
+        }
+    }
+    
     
     public void showLandInfo(Player sender, String... args) {
         Messaging mess = new Messaging(sender);
@@ -140,12 +197,26 @@ public class iConomyLandCommandListener implements CommandExecutor {
     }
     
     public void showLandInfo(CommandSender sender, String... args) {
-        
+        if ( args.length == 0 ) {
+            showHelp(sender,"info");
+        } else {
+            Integer id;            
+            try {
+                id = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e ) {
+                id = -1;
+            }
+            if ( id > 0 ) {
+                iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
+            } else {
+                showHelp(sender,"info");
+            }
+        }
     }
     
     public void showHelp(CommandSender sender, String topic) {
         Messaging mess = new Messaging(sender);
-        mess.send(Misc.headerify("{CMD} " + iConomyLand.name + " {BKT}({CMD}" + iConomyLand.codename + "{BKT}) "));
+        mess.send("{}"+Misc.headerify("{CMD} " + iConomyLand.name + " {BKT}({CMD}" + iConomyLand.codename + "{BKT}){}"));
     	if ( topic == null || topic.isEmpty() ) {
     	    
     	    mess.send(" {CMD}/icl {}- main command");
@@ -192,12 +263,14 @@ public class iConomyLandCommandListener implements CommandExecutor {
         if ( iConomyLand.cmdMap.containsKey(playerName) ) {
             String action = iConomyLand.cmdMap.get(playerName);
             if ( action.equals("select") ) {
-                mess.send("{ERR}Cancelling current selection process and starting over");
+                mess.send("{}Cancelling current selection.");
                 iConomyLand.cmdMap.remove(playerName);
                 iConomyLand.tmpCuboidMap.remove(playerName);
+            } else {
+                mess.send("{ERR} Canceling "+action);
+                iConomyLand.cmdMap.remove(playerName);
             }
         }
-        
         mess.send("{}Select 1st Corner");
         iConomyLand.cmdMap.put(playerName,"select");
         return true;

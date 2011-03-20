@@ -39,12 +39,8 @@ public class iConomyLandBlockListener extends BlockListener {
             Messaging mess = new Messaging((CommandSender)player);
 	        
 	        if ( newCuboid.isValid() ) {
-//	            mess.send("{}Land selected! {CMD}/lwc info {}for more info");
 	            mess.send("{}Land selected!");
 	            iConomyLand.landMgr.showSelectLandInfo(player, newCuboid);
-	            if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
-	                iConomyLand.cmdMap.remove(playerName);
-	            }
 	        } else {
                 iConomyLand.tmpCuboidMap.put(playerName, newCuboid);
 	            mess.send("{}Select 2nd corner");

@@ -1,7 +1,6 @@
 package me.slaps.iConomyLand;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -41,7 +40,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	        
 	        if ( newCuboid.isValid() ) {
 	            mess.send("{}Land selected!");
-	            if ( iConomyLand.landMgr.add(newCuboid, playerName, " ") ) {
+	            if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
 	                iConomyLand.cmdMap.remove(playerName);
 	            }
 	        } else {

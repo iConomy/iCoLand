@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 public class LandManager {
@@ -74,10 +73,11 @@ public class LandManager {
             Cuboid loc = new Cuboid(loc1, loc2);
             String owner = shopkeys.get("owner");
             String perms = shopkeys.get("perms");
+            String addons = shopkeys.get("addons");
             String dateCreated = shopkeys.get("dateCreated");
             String dateTaxed = shopkeys.get("dateTaxed");
 
-            lands.put(id, new Land(id, loc, owner, perms, dateCreated, dateTaxed));
+            lands.put(id, new Land(id, loc, owner, perms, addons, dateCreated, dateTaxed));
 
 		}
 		
@@ -97,6 +97,7 @@ public class LandManager {
 			tmpmap.put("id", shop.getID());
 			tmpmap.put("owner", shop.owner);
 			tmpmap.put("perms", shop.perms);
+			tmpmap.put("addons", shop.addons);
             tmpmap.put("dateCreated", shop.dateCreated.toString() );
             tmpmap.put("dateTaxed", shop.dateTaxed.toString() );
 			tmpmap.put("world", shop.location.setLoc1.getWorld().getName());
@@ -124,12 +125,12 @@ public class LandManager {
 		saveConfigFile();
 	}	
 	
-	public boolean add(Cuboid sl, String owner, String perms) {
+	public boolean add(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
 		if ( intersectsExistingLand(sl) ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		Integer id = getNextID();
-		lands.put( id, new Land(id, sl, owner, perms, now.toString(), now.toString()) );
+		lands.put( id, new Land(id, sl, owner, perms, addons, now.toString(), now.toString()) );
 		saveConfigFile();
 		return true;
 	}

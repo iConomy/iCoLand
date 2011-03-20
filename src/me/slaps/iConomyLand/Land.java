@@ -14,11 +14,12 @@ public class Land {
     public Timestamp dateTaxed;
     private boolean valid = false;
     
-    public Land(int id, Cuboid loc, String owner, String perms, String dateCreated, String dateTaxed) {
+    public Land(int id, Cuboid loc, String owner, String perms, String addons, String dateCreated, String dateTaxed) {
         this.id = id;
         this.location = loc;
         this.owner = owner;
         this.perms = perms;
+        this.addons = addons;
         
         this.dateCreated = Timestamp.valueOf(dateCreated);
         this.dateTaxed = Timestamp.valueOf(dateTaxed);

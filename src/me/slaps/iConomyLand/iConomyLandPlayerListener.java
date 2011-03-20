@@ -55,10 +55,14 @@ public class iConomyLandPlayerListener extends PlayerListener {
 		
 		if ( locFrom != locTo ) {
 		    if ( locFrom != 0 ) {
-		        player.sendMessage("Leaving ...");
+		        if ( iConomyLand.landMgr.getLandByID(locFrom).hasAddon("announce") ) {
+		            player.sendMessage("Leaving ...");
+		        }
 		    }
 		    if ( locTo != 0 ) {
-		        player.sendMessage("Entering ...");
+                if ( iConomyLand.landMgr.getLandByID(locTo).hasAddon("announce") ) {
+                    player.sendMessage("Entering ...");
+                }
 		    }
 		}
 		

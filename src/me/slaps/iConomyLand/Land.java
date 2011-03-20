@@ -71,4 +71,13 @@ public class Land {
         if (iConomyLand.debugMode) iConomyLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
         return ret;
     }
+
+    public boolean hasAddon(String addon) {
+        String[] tokens = addons.split(" ");
+        for( String token : tokens ) {
+            if ( token.equals(addon) )
+                return true;
+        }
+        return false;
+    }
 }

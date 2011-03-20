@@ -10,17 +10,17 @@ import java.util.HashMap;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
-//import com.nijiko.coelho.iConomy.*;
 
 
 /**
+ * iConomyLand
+ * 
  * @author magik
  *
  */
@@ -43,13 +43,14 @@ public class iConomyLand extends JavaPlugin {
 	public static iConomyLandPluginListener pluginListener;
 	public static iConomyLandCommandListener commandListener;
 	
-	protected static LandManager landMgr;
-	//protected static HashMap<String, ShopLocation> tmpShop = new HashMap<String, ShopLocation>();
-    protected static HashMap<String, String> cmdMap = new HashMap<String, String>();
-
+	public static LandManager landMgr;
+    public static HashMap<String, String> cmdMap;
+    public static HashMap<String, Cuboid> tmpCuboidMap;
+    
     public static void info(String msg) {
     	logger.info("["+name+"] "+ msg);
     }
+    
     public static void warning(String msg) {
     	logger.warning("["+name+"] "+ msg);
     }
@@ -64,13 +65,16 @@ public class iConomyLand extends JavaPlugin {
 		version = desc.getVersion();
 
 		getDataFolder().mkdir();
-		//directory = getDataFolder() + File.separator;
 		
 		getConfig();
 		
         // setup location manager
 		landMgr = new LandManager(this);
-        
+
+		// setup command map
+        cmdMap = new HashMap<String, String>();
+        tmpCuboidMap = new HashMap<String, Cuboid>();
+
         //clear command list
         cmdMap.clear();
 		
@@ -108,19 +112,11 @@ public class iConomyLand extends JavaPlugin {
         config.save();
 	}
 	
-	public static boolean hasPermission(CommandSender sender, String permString)
-	{
-		if (sender instanceof Player)
-			return Permissions.Security.permission((Player)sender, name.toLowerCase()+"."+permString);
-		return true;
-	}	
-	
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-	    //return playerListener.onCommand( sender, cmd, commandLabel, args);
-		return false;
-	}
-	
+    public static boolean hasPermission(CommandSender sender, String permString) {
+        if (sender instanceof Player)
+            return Permissions.Security.permission((Player) sender, name.toLowerCase() + "." + permString);
+        return true;
+    }
 	
 	
 }

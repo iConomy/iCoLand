@@ -15,7 +15,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
-    private static int checkDelay = 2000; // milliseconds
+    private static int checkDelay = 500; // milliseconds
     
     
 	public iConomyLandPlayerListener(iConomyLand plug) {

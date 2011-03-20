@@ -10,7 +10,7 @@ public class Messaging {
     private CommandSender sender = null;
     public static String colNormal = "&e";  // {} - Normal text colour
     public static String colCmd = "&f";     // {CMD} - Command highlight colour
-    public static String colBracket = "&d"; // {PBK} - Highlighting of brackets around params/data
+    public static String colBracket = "&d"; // {BKT} - Highlighting of brackets around params/data
     public static String colParam = "&b";   // {PRM} - Highlighting of parameters.
     public static String colError = "&c";   // {ERR} - Highlighting for errors.
 

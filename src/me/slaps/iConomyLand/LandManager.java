@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import org.bukkit.Location;
 import org.bukkit.util.config.Configuration;
@@ -42,35 +41,43 @@ public class LandManager {
 		ShopConfig.load();
 		
 		//shopLocationsEnabled = ShopConfig.getBoolean("enabled", false);
-
 		List<String> oList = ShopConfig.getStringList("lands", null);
+		
+		iConomyLand.warning("Found " + oList.size() + " lands to protect ( loaded from file )");
 		
 		Iterator<String> itr = oList.iterator();
 		while(itr.hasNext()) {
 			String o = itr.next();
 			
 			LinkedHashMap<String,String> shopkeys = new LinkedHashMap<String,String>();
-			StringTokenizer st = new StringTokenizer(o, "{}=, ");
-			while (st.hasMoreTokens()) shopkeys.put(st.nextToken(),st.nextToken());
+            
+            String[] split = o.replaceFirst("\\{(.*)\\}","$1").split(",");
+            for( String line : split ) {
+                String[] ls = line.trim().split("=");
+                shopkeys.put(ls[0].trim(), (ls.length>1)?ls[1].trim():"");
+            }
 			
-			int id = Integer.parseInt(shopkeys.get("id"));
-			Location loc1 = new Location(parent.getServer().getWorld(shopkeys.get("world")), 
-					                     Double.parseDouble(shopkeys.get("corner1x")), 
-					                     Double.parseDouble(shopkeys.get("corner1y")), 
-					                     Double.parseDouble(shopkeys.get("corner1z")) );
-			Location loc2 = new Location(parent.getServer().getWorld(shopkeys.get("world")), 
+			
+
+            int id = Integer.parseInt(shopkeys.get("id"));
+            
+            Location loc1 = new Location(parent.getServer().getWorld(shopkeys.get("world")), 
+                                         Double.parseDouble(shopkeys.get("corner1x")), 
+                                         Double.parseDouble(shopkeys.get("corner1y")), 
+                                         Double.parseDouble(shopkeys.get("corner1z")) );
+            Location loc2 = new Location(parent.getServer().getWorld(shopkeys.get("world")), 
                                          Double.parseDouble(shopkeys.get("corner2x")), 
                                          Double.parseDouble(shopkeys.get("corner2y")), 
                                          Double.parseDouble(shopkeys.get("corner2z")) );
-			Cuboid loc = new Cuboid(loc1, loc2);
-			String owner = shopkeys.get("owner");
-			String perms = shopkeys.get("perms");
-			String dateCreated = shopkeys.get("dateCreated");
-			String dateTaxed = shopkeys.get("dateTaxed");
-			
-			if ( !lands.add(new Land(id, loc, owner, perms, dateCreated, dateTaxed)) ) {
-			    iConomyLand.warning("Error reading land.yml! Corrupted data?");
-			}
+            Cuboid loc = new Cuboid(loc1, loc2);
+            String owner = shopkeys.get("owner");
+            String perms = shopkeys.get("perms");
+            String dateCreated = shopkeys.get("dateCreated");
+            String dateTaxed = shopkeys.get("dateTaxed");
+            
+            if ( !lands.add(new Land(id, loc, owner, perms, dateCreated, dateTaxed)) ) {
+                iConomyLand.warning("Error reading land.yml! Corrupted data?");
+            }
 
 		}
 		
@@ -103,7 +110,7 @@ public class LandManager {
 
 			tmpshops.add(tmpmap);			
 		}
-		ShopConfig.setProperty("shops", tmpshops);
+		ShopConfig.setProperty("lands", tmpshops);
 		
 		ShopConfig.save();
 	}

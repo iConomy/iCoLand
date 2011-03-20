@@ -18,20 +18,20 @@ public class LandManager {
 	
     iConomyLand parent;
 	
-	File shopFile;
+	File landConfigFile;
 	
 	private HashMap<Integer,Land> lands;
-	private Configuration ShopConfig;
+	private Configuration LandConfig;
 	
 	public LandManager(iConomyLand plug) {
 		parent = plug;
 		lands = new HashMap<Integer,Land>();
 
-		shopFile = new File(parent.getDataFolder() + File.separator + "lands.yml");
+		landConfigFile = new File(parent.getDataFolder() + File.separator + "lands.yml");
 		
-		ShopConfig = new Configuration(shopFile);
+		LandConfig = new Configuration(landConfigFile);
 		
-		if ( !shopFile.exists() ) saveConfigFile();
+		if ( !landConfigFile.exists() ) saveConfigFile();
 		
 		loadConfigFile();
 	}
@@ -39,9 +39,9 @@ public class LandManager {
 
 	
 	public void loadConfigFile() {
-		ShopConfig.load();
+		LandConfig.load();
 		
-		List<String> oList = ShopConfig.getStringList("lands", null);
+		List<String> oList = LandConfig.getStringList("lands", null);
 		
 		iConomyLand.warning("Found " + oList.size() + " lands to protect ( loaded from file )");
 		
@@ -83,7 +83,7 @@ public class LandManager {
 	}
 	
 	public void saveConfigFile() {		
-		ShopConfig = new Configuration(shopFile);
+		LandConfig = new Configuration(landConfigFile);
 		
 		ArrayList<LinkedHashMap<String,Object>> tmpshops = new ArrayList<LinkedHashMap<String,Object>>();
 		Iterator<Land> itr = lands.values().iterator();
@@ -107,9 +107,9 @@ public class LandManager {
 
 			tmpshops.add(tmpmap);			
 		}
-		ShopConfig.setProperty("lands", tmpshops);
+		LandConfig.setProperty("lands", tmpshops);
 		
-		ShopConfig.save();
+		LandConfig.save();
 	}
 	
 	

@@ -93,7 +93,17 @@ public class iConomyLandCommandListener implements CommandExecutor {
                     mess.send("{ERR}No access for that...");
                 }
                 return true;
-                
+
+            // /icl sell
+            } else if (args[0].equalsIgnoreCase("sell") ) {
+                if ( iConomyLand.hasPermission(sender, "sell") ) { 
+                    // TODO: Add sell
+                    sellLand(sender);
+                } else {
+                    mess.send("{ERR}No access for that...");
+                }
+                return true;
+
             // /icl modify
             } else if (args[0].equalsIgnoreCase("modify") ) {
                 if ( iConomyLand.hasPermission(sender, "modify") ) {
@@ -235,6 +245,10 @@ public class iConomyLandCommandListener implements CommandExecutor {
         } else {
             mess.send("Console can't buy land");
         }
+    }
+    
+    public void sellLand(CommandSender sender) {
+        
     }
     
     

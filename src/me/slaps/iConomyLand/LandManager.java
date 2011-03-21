@@ -229,7 +229,7 @@ public class LandManager {
 	    Messaging mess = new Messaging(sender);
 	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
 	    
-	    if ( id > 0 && !iConomyLand.landMgr.getLandByID(id).location.equals(select) ) {
+	    if ( id > 0 && iConomyLand.landMgr.getLandByID(id).location.equals(select) ) {
 	        showExistingLandInfo(sender, lands.get(id));
 	    } else if ( id > 0 ) {
             mess.send("{ERR}Intersects existing land ID# "+id);

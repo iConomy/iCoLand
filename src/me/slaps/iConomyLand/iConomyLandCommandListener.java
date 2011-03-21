@@ -10,6 +10,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.Account;
+
 public class iConomyLandCommandListener implements CommandExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -97,11 +100,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
                     //icl modify <id> <perms/addons> <tags>
                     if ( args.length > 3 ) {
                         Integer id;
-                        try {
-                            id = Integer.parseInt(args[1]);
-                        } catch (NumberFormatException e) {
-                            id = -1;
-                        }
+                        try { id = Integer.parseInt(args[1]); } catch (NumberFormatException e) { id = -1; }
                         if ( id <= 0 ) {
                             mess.send("{ERR}Bad ID");
                             showHelp(sender, "modify");
@@ -212,11 +211,20 @@ public class iConomyLandCommandListener implements CommandExecutor {
             if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
                 Cuboid newCuboid = iConomyLand.tmpCuboidMap.get(playerName);
                 if ( newCuboid.isValid() ) {
-                    if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
-                        iConomyLand.cmdMap.remove(playerName);
-                        mess.send("{}Successfully bought selected land");
+                    Account acc = iConomy.getBank().getAccount(playerName);
+                    double price = iConomyLand.landMgr.getPrice(newCuboid);
+                    if ( acc.getBalance() > price ) {
+                        if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
+                            acc.subtract(price);
+                            iConomyLand.cmdMap.remove(playerName);
+                            mess.send("{}Bought selected land for {PRM}"+price);
+                            mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                        } else {
+                            mess.send("{ERR}Error buying land");
+                        } 
                     } else {
-                        mess.send("{ERR}Error buying land");
+                        mess.send("{ERR}Not enough in account. Bank: "+acc.getBalance()+
+                                  " Price: "+price); 
                     }
                 } else {
                     mess.send("{ERR}Invalid selection");

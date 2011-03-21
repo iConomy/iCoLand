@@ -256,7 +256,7 @@ public class LandManager {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " );
+            mess.send("Price: " + getPrice(select));
 	    }
 	    
 	}
@@ -275,6 +275,25 @@ public class LandManager {
             mess.send("{CMD}Created: {}"+land.dateCreated);            
             mess.send("{CMD}Taxed: {}"+land.dateTaxed);            
         }
+	}
+	
+	public double getPrice(Cuboid target) {
+	    double sum = 0;
+	    Integer sx = target.LocMax.getBlockX()-target.LocMin.getBlockX()+1;
+	    Integer sy = target.LocMax.getBlockY()-target.LocMin.getBlockY()+1;
+	    Integer sz = target.LocMax.getBlockZ()-target.LocMin.getBlockZ()+1;
+	    for(int x=0;x<sx;x++) {
+	        for(int y=0;y<sy;y++) {
+	            for(int z=0;z<sz;z++) {
+	                sum += getPriceOfBlock(new Location(target.setLoc1.getWorld(), target.LocMin.getBlockX()+x, target.LocMin.getBlockY()+y, target.LocMin.getBlockZ()+z));
+	            }
+	        }
+	    }
+	    return sum;
+	}
+	
+	public double getPriceOfBlock(Location target) {
+	    return iConomyLand.pricePerBlock;
 	}
 	
 	

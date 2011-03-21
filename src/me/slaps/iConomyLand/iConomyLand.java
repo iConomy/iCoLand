@@ -31,6 +31,7 @@ public class iConomyLand extends JavaPlugin {
 	public static String version; // = "0.0.0001";
 	
 	public static boolean debugMode = false;
+	public static double pricePerBlock = 50;
 	
 	public static Logger logger = Logger.getLogger("Minecraft");
 	public static PluginDescriptionFile desc;
@@ -104,11 +105,13 @@ public class iConomyLand extends JavaPlugin {
         Configuration config = new Configuration(configFile);
         config.load();
         iConomyLand.debugMode = config.getBoolean("debug", false);
+        iConomyLand.pricePerBlock = config.getDouble("pricePerBlock", 50.0);
 	}
 	
 	private void saveConfig(File configFile) {
         Configuration config = new Configuration(configFile);
         config.setProperty("debug", iConomyLand.debugMode);
+        config.setProperty("pricePerBlock", iConomyLand.pricePerBlock);
         config.save();
 	}
 	

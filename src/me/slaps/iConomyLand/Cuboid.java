@@ -5,8 +5,8 @@ import org.bukkit.Location;
 public class Cuboid {
 	public Location setLoc1;
 	public Location setLoc2;
-	private Location LocMin;
-	private Location LocMax;
+	public Location LocMin;
+	public Location LocMax;
 	private boolean valid = false;
 	
 	public Cuboid() {

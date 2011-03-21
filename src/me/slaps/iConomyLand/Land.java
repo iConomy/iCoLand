@@ -80,4 +80,9 @@ public class Land {
         }
         return false;
     }
+    
+    public String toShortAddons() {
+        // TODO: make shortcuts for addons
+        return addons;
+    }
 }

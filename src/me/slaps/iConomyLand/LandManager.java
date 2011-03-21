@@ -3,6 +3,7 @@ package me.slaps.iConomyLand;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -201,6 +202,21 @@ public class LandManager {
 			if ( tmp.contains(loc) ) return tmp.getID();
 		}
 		return 0;
+	}
+	
+	public Collection<Land> getAllLands() {
+	    return lands.values();
+	}
+	
+	public Collection<Land> getLandsOwnedBy(String playerName) {
+	    ArrayList<Land> ret = new ArrayList<Land>();
+	    Iterator<Land> itr = lands.values().iterator();
+	    while(itr.hasNext()) {
+	        Land tmp = itr.next();
+	        if (tmp.owner.equals(playerName)) 
+	            ret.add(tmp);
+	    }
+	    return (Collection<Land>)ret;
 	}
 	
 	public Land getLandByID(Integer id) {

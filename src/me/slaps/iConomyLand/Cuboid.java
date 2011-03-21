@@ -127,5 +127,17 @@ public class Cuboid {
 	           (1+LocMax.getBlockZ()-LocMin.getBlockZ());
 	}
 	
+	public String toCenterCoords() {
+	    Location center = getCenter();
+	    return "("+center.getBlockX()+","+center.getBlockY()+","+center.getBlockZ()+")";
+	}
 	
+	public Location getCenter() {
+	    
+	    return new Location(setLoc1.getWorld(),
+	            LocMin.getBlockX() + (LocMax.getBlockX()-LocMin.getBlockX())/2,
+                LocMin.getBlockY() + (LocMax.getBlockY()-LocMin.getBlockY())/2,
+                LocMin.getBlockZ() + (LocMax.getBlockZ()-LocMin.getBlockZ())/2 );
+	    
+	}
 }

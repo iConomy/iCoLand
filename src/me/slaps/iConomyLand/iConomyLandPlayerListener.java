@@ -1,5 +1,6 @@
 package me.slaps.iConomyLand;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -41,10 +42,21 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    Player player = event.getPlayer();
 
 	    if ( !checkNow(player) ) return;
-	    
+
         String playerName = player.getName();
-	    
-	    //if ( iConomyLand.debugMode ) iConomyLand.info("onPlayerMove: "+playerName);
+        
+        /*
+	    DecimalFormat df = new DecimalFormat("#.##");
+	    if ( iConomyLand.debugMode ) iConomyLand.info("onPlayerMove: ("+
+	            df.format(event.getFrom().getX())+","+
+	            df.format(event.getFrom().getY())+","+
+	            df.format(event.getFrom().getZ())+") to ("+
+	            df.format(event.getTo().getX())+","+
+	            df.format(event.getTo().getY())+","+
+	            df.format(event.getTo().getZ())+")"+
+	            (event.getFrom().getBlock().equals(event.getTo().getBlock())?"":"(NEW BLOCK)")
+	            );
+        */
 	    
 	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iConomyLand.landMgr.getLandID(player.getLocation()) );
 	    

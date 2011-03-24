@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Built-By: magik
+Class-Path: ./DynamicMarket/sqlitejdbc-v056.jar ./DynamicMarket/mysql-connector-java-5.1.14-bin.jar
+

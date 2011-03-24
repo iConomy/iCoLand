@@ -6,8 +6,8 @@ import org.bukkit.Location;
 
 public class Land {
     private int id;             // unique # ( sql primary key )
-    public Cuboid location;    // cuboid describing location
-    public String owner;       //
+    public Cuboid location;     // cuboid describing location
+    public String owner;        // 
     public String perms;
     public String addons;
     public Timestamp dateCreated;

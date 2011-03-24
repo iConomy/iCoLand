@@ -12,7 +12,6 @@
     <property name="source" value="1.6"/>
     <path id="iConomyLand.classpath">
         <pathelement location="bin"/>
-        <pathelement location="dist/DynamicMarket.jar"/>
         <pathelement location="dist/craftbukkit.jar"/>
         <pathelement location="dist/bukkit-0.0.1-SNAPSHOT.jar"/>    	
         <pathelement location="dist/plugins/iConomy.jar"/>
@@ -40,9 +39,8 @@
             <src path="src"/>
             <classpath refid="iConomyLand.classpath"/>
         </javac>
-		<mkdir dir="dist"/>
-		<mkdir dir="dist/plugins"/>
-		<jar jarfile="dist/plugins/iConomyLand.jar">
+    	<mkdir dir="target"/>
+		<jar jarfile="target/iConomyLand.jar">
 			<fileset dir="bin"/>
 			<fileset file="plugin.yml"/>
 			<manifest>
@@ -50,21 +48,6 @@
     	        <attribute name="Class-Path" value="./DynamicMarket.jar ./DynamicMarket/sqlitejdbc-v056.jar ./DynamicMarket/mysql-connector-java-5.1.14-bin.jar ./DynamicMarket/mysql-connector-java-bin.jar" />
 			</manifest>
 		</jar>
-    	<mkdir dir="target"/>
-	    <mkdir dir="target/iConomyLand"/>
-    	<copy todir="target">
-    		<fileset file="dist/plugins/iConomyLand.jar"/>
-    	</copy>
-    	<copy todir="target/iConomyLand">
-    		<fileset file="DynamicMarket.jar" />
-    		<fileset file="shops.yml" />
-    		<fileset file="config.yml" />
-    	</copy>
-    	<mkdir dir="target/${version}"/>
-    	<zip destfile="target/${version}/iConomyLand-${version}.zip" basedir="target" includes="iConomyLand.jar iConomyLand iConomyLand/DynamicMarket.jar iConomyLand/shops.yml"/>
-    	<copy todir="target/${version}">
-    		<fileset file="target/iConomyLand.jar" />
-    	</copy>
     		
 
 	

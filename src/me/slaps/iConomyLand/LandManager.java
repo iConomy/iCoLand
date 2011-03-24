@@ -17,132 +17,40 @@ import org.bukkit.util.config.Configuration;
 
 public class LandManager {
 	
-    iConomyLand parent;
+    public LandDB landDB;
 	
-	File landConfigFile;
-	
-	private HashMap<Integer,Land> lands;
-	private Configuration LandConfig;
-	
-	public LandManager(iConomyLand plug) {
-		parent = plug;
-		lands = new HashMap<Integer,Land>();
-
-		landConfigFile = new File(parent.getDataFolder() + File.separator + "lands.yml");
-		
-		LandConfig = new Configuration(landConfigFile);
-		
-		if ( !landConfigFile.exists() ) saveConfigFile();
-		
-		loadConfigFile();
+	public LandManager(LandDB db) {
+	    landDB = db;
 	}
-	
-
-	
-	public void loadConfigFile() {
-		LandConfig.load();
-		
-		List<String> oList = LandConfig.getStringList("lands", null);
-		
-		iConomyLand.warning("Found " + oList.size() + " lands to protect ( loaded from file )");
-		
-		Iterator<String> itr = oList.iterator();
-		while(itr.hasNext()) {
-			String o = itr.next();
-			
-			LinkedHashMap<String,String> shopkeys = new LinkedHashMap<String,String>();
-            
-            String[] split = o.replaceFirst("\\{(.*)\\}","$1").split(",");
-            for( String line : split ) {
-                String[] ls = line.trim().split("=");
-                shopkeys.put(ls[0].trim(), (ls.length>1)?ls[1].trim():"");
-            }
-
-            int id = Integer.parseInt(shopkeys.get("id"));
-            
-            Location loc1 = new Location(parent.getServer().getWorld(shopkeys.get("world")), 
-                                         Double.parseDouble(shopkeys.get("corner1x")), 
-                                         Double.parseDouble(shopkeys.get("corner1y")), 
-                                         Double.parseDouble(shopkeys.get("corner1z")) );
-            Location loc2 = new Location(parent.getServer().getWorld(shopkeys.get("world")), 
-                                         Double.parseDouble(shopkeys.get("corner2x")), 
-                                         Double.parseDouble(shopkeys.get("corner2y")), 
-                                         Double.parseDouble(shopkeys.get("corner2z")) );
-            Cuboid loc = new Cuboid(loc1, loc2);
-            String owner = shopkeys.get("owner");
-            String perms = shopkeys.get("perms");
-            String addons = shopkeys.get("addons");
-            String dateCreated = shopkeys.get("dateCreated");
-            String dateTaxed = shopkeys.get("dateTaxed");
-
-            lands.put(id, new Land(id, loc, owner, perms, addons, dateCreated, dateTaxed));
-
-		}
-		
-		saveConfigFile();
-		
-	}
-	
-	public void saveConfigFile() {		
-		LandConfig = new Configuration(landConfigFile);
-		
-		ArrayList<LinkedHashMap<String,Object>> tmpshops = new ArrayList<LinkedHashMap<String,Object>>();
-		Iterator<Land> itr = lands.values().iterator();
-		while(itr.hasNext()) {
-			Land shop = itr.next();
-			LinkedHashMap<String,Object> tmpmap = new LinkedHashMap<String,Object>();
-			
-			tmpmap.put("id", shop.getID());
-			tmpmap.put("owner", shop.owner);
-			tmpmap.put("perms", shop.perms);
-			tmpmap.put("addons", shop.addons);
-            tmpmap.put("dateCreated", shop.dateCreated.toString() );
-            tmpmap.put("dateTaxed", shop.dateTaxed.toString() );
-			tmpmap.put("world", shop.location.setLoc1.getWorld().getName());
-			tmpmap.put("corner1x",shop.location.setLoc1.getBlockX());
-			tmpmap.put("corner1y",shop.location.setLoc1.getBlockY());
-			tmpmap.put("corner1z",shop.location.setLoc1.getBlockZ());
-			tmpmap.put("corner2x",shop.location.setLoc2.getBlockX());
-			tmpmap.put("corner2y",shop.location.setLoc2.getBlockY());
-			tmpmap.put("corner2z",shop.location.setLoc2.getBlockZ());
-
-			tmpshops.add(tmpmap);			
-		}
-		LandConfig.setProperty("lands", tmpshops);
-		
-		LandConfig.save();
-	}
-	
 	
 	public boolean add(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
 		if ( intersectsExistingLand(sl) ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		Integer id = getNextID();
-		lands.put( id, new Land(id, sl, owner, perms, addons, now.toString(), now.toString()) );
-		saveConfigFile();
+		landDB.lands.put( id, new Land(id, sl, owner, perms, addons, now.toString(), now.toString()) );
+		landDB.save();
 		return true;
 	}
 	
 	public boolean removeLandByID(Integer id) {
 		int i = 0;
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.getID() == id ) {
-			    lands.remove(i);
-				saveConfigFile();
+			    landDB.lands.remove(i);
+				landDB.save();
 				return true;
 			}
 			i++;
 		}
 		return false;
-
 	}
 	
 	public String listLand() {
 		String out = "";
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			out += tmp.getID();
@@ -153,7 +61,7 @@ public class LandManager {
 	
 	// just gets corner 1 for now
 	public Location getCenterOfLand(Integer id) {
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( id.equals(tmp.getID()) ) {
@@ -168,7 +76,7 @@ public class LandManager {
 	
 	public Integer getNextID() {
 		Integer i = 0;
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.getID() > i ) i = tmp.getID();
@@ -179,7 +87,7 @@ public class LandManager {
 	public boolean hasPermission(String playerName, Location loc) {
 	    Integer id = getLandID(loc);
 	    if ( id > 0 ) {
-	        Land land = lands.get(id);
+	        Land land = landDB.lands.get(id);
 	        return land.hasPermission(playerName);
 	    } else { 
 	        return true;
@@ -187,7 +95,7 @@ public class LandManager {
 	}
 	
 	public boolean inLand(Location loc) {
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.contains(loc) ) return true;
@@ -196,7 +104,7 @@ public class LandManager {
 	}
 	
 	public Integer getLandID(Location loc) {
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.contains(loc) ) return tmp.getID();
@@ -205,12 +113,12 @@ public class LandManager {
 	}
 	
 	public Collection<Land> getAllLands() {
-	    return lands.values();
+	    return landDB.lands.values();
 	}
 	
 	public Collection<Land> getLandsOwnedBy(String playerName) {
 	    ArrayList<Land> ret = new ArrayList<Land>();
-	    Iterator<Land> itr = lands.values().iterator();
+	    Iterator<Land> itr = landDB.lands.values().iterator();
 	    while(itr.hasNext()) {
 	        Land tmp = itr.next();
 	        if (tmp.owner.equals(playerName)) 
@@ -220,11 +128,11 @@ public class LandManager {
 	}
 	
 	public Land getLandByID(Integer id) {
-	    return lands.get(id);
+	    return landDB.lands.get(id);
 	}
 	
 	public boolean intersectsExistingLand(Cuboid loc) {
-		Iterator<Land> itr = lands.values().iterator();
+		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			if ( tmp.intersects(loc) ) return true;
@@ -233,7 +141,7 @@ public class LandManager {
 	}
 	
 	public Integer intersectsExistingLandID(Cuboid loc) {
-        Iterator<Land> itr = lands.values().iterator();
+        Iterator<Land> itr = landDB.lands.values().iterator();
         while(itr.hasNext()) {
             Land tmp = itr.next();
             if ( tmp.intersects(loc) ) return tmp.getID();
@@ -246,12 +154,12 @@ public class LandManager {
 	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
 	    
 	    if ( id > 0 && iConomyLand.landMgr.getLandByID(id).location.equals(select) ) {
-	        showExistingLandInfo(sender, lands.get(id));
+	        showExistingLandInfo(sender, landDB.lands.get(id));
 	    } else if ( id > 0 ) {
             mess.send("{ERR}Intersects existing land ID# "+id);
             mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
             iConomyLand.tmpCuboidMap.put(((Player)sender).getName(), iConomyLand.landMgr.getLandByID(id).location );
-            showExistingLandInfo(sender, lands.get(id));
+            showExistingLandInfo(sender, landDB.lands.get(id));
 	    } else {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
@@ -262,7 +170,7 @@ public class LandManager {
 	}
 	
 	public void showSelectLandInfo(CommandSender sender, Integer id) {
-	    showExistingLandInfo(sender, lands.get(id));
+	    showExistingLandInfo(sender, landDB.lands.get(id));
 	}
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {

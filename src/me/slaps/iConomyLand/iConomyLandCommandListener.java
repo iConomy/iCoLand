@@ -210,7 +210,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
         } else {
             mess.send("{ERR}Bad category");
         }
-        iConomyLand.landMgr.saveConfigFile();        
+        iConomyLand.landMgr.landDB.save();        
     }
     
 

@@ -1,12 +1,16 @@
 /**
  * 
  */
+
 package me.slaps.iConomyLand;
 
 import java.io.File;
 import java.util.logging.Logger;
 import java.util.HashMap;
 
+import me.slaps.iConomyLand.iConomyLandBlockListener;
+
+import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
@@ -32,6 +36,8 @@ public class iConomyLand extends JavaPlugin {
 	
 	public static boolean debugMode = false;
 	public static double pricePerBlock = 50;
+	
+	public static Server server;
 	
 	public static Logger logger = Logger.getLogger("Minecraft");
 	public static PluginDescriptionFile desc;
@@ -69,8 +75,10 @@ public class iConomyLand extends JavaPlugin {
 		
 		getConfig();
 		
+		server = getServer();
+		
         // setup location manager
-		landMgr = new LandManager(this);
+		landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(getDataFolder() + File.separator + "lands.yml"))));
 
 		// setup command map
         cmdMap = new HashMap<String, String>();
@@ -90,7 +98,7 @@ public class iConomyLand extends JavaPlugin {
 
 		info("Version ["+version+"] ("+codename+") enabled" + (iConomyLand.debugMode?" **DEBUG MODE ENABLED**":""));
     }
-    
+	
 	private void getConfig() {
 	    File configFile = new File(getDataFolder() + File.separator + "config.yml");
 	    

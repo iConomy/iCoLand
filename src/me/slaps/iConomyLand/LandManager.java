@@ -1,6 +1,7 @@
 package me.slaps.iConomyLand;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class LandManager {
 	
 	public boolean canBuild(String playerName, Location loc) {
 	    Integer id = getLandID(loc);
-	    if ( id > 0 ) return getLandByID(id).hasPermission(playerName);
+	    if ( id > 0 ) return getLandById(id).hasPermission(playerName);
 	    else          return true;
 	}
 	
@@ -141,7 +142,7 @@ public class LandManager {
 	    return (Collection<Land>)ret;
 	}
 	
-	public Land getLandByID(Integer id) {
+	public Land getLandById(Integer id) {
 	    return landDB.lands.get(id);
 	}
 	
@@ -168,21 +169,22 @@ public class LandManager {
 	}
 	
 	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
+	    DecimalFormat df = new DecimalFormat("#.00");
 	    Messaging mess = new Messaging(sender);
 	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
 	    
-	    if ( id > 0 && iConomyLand.landMgr.getLandByID(id).location.equals(select) ) {
+	    if ( id > 0 && iConomyLand.landMgr.getLandById(id).location.equals(select) ) {
 	        showExistingLandInfo(sender, landDB.lands.get(id));
 	    } else if ( id > 0 ) {
             mess.send("{ERR}Intersects existing land ID# "+id);
             mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
-            iConomyLand.tmpCuboidMap.put(((Player)sender).getName(), iConomyLand.landMgr.getLandByID(id).location );
+            iConomyLand.tmpCuboidMap.put(((Player)sender).getName(), iConomyLand.landMgr.getLandById(id).location );
             showExistingLandInfo(sender, landDB.lands.get(id));
 	    } else {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + getPrice(select));
+            mess.send("Price: " + df.format(getPrice(select)));
 	    }
 	    
 	}
@@ -196,10 +198,11 @@ public class LandManager {
 	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{} -- Coords: {PRM}"+land.location.toCenterCoords()));
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
-            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
-            mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));            
             mess.send("{CMD}Created: {}"+land.dateCreated);
             mess.send("{CMD}Taxed: {}"+land.dateTaxed);
+            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
+            mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
+            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(land));
         }
 	}
 	
@@ -220,9 +223,13 @@ public class LandManager {
 	}
 	
 	public double getPriceOfBlock(Location target) {
-	    return iConomyLand.pricePerBlock;
+	    return iConomyLand.pricePerBlockRaw;
 	}
 	
+	public void addAddon(Player sender, String addon, Integer id) {
+	    getLandById(id).addAddon(addon);
+        save();
+	}
 	
 	
 	

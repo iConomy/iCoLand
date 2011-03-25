@@ -35,8 +35,12 @@ public class iConomyLand extends JavaPlugin {
 	public static String version; // = "0.0.0001";
 	
 	public static boolean debugMode = false;
-	public static double pricePerBlock = 50;
-	
+
+	public static double pricePerBlockRaw;
+    public static double pricePerBlockAddonAnnounce;
+    public static double pricePerBlockAddonHealing;
+    public static double pricePerBlockAddonNoEnter;
+
 	public static Server server;
 	
 	public static Logger logger = Logger.getLogger("Minecraft");
@@ -113,13 +117,19 @@ public class iConomyLand extends JavaPlugin {
         Configuration config = new Configuration(configFile);
         config.load();
         iConomyLand.debugMode = config.getBoolean("debug", false);
-        iConomyLand.pricePerBlock = config.getDouble("pricePerBlock", 50.0);
+        iConomyLand.pricePerBlockRaw = config.getDouble("PricePerBlock-Raw", 20.0);
+        iConomyLand.pricePerBlockAddonAnnounce = config.getDouble("PricePerBlock-Addon-Announce", 50.0);
+        iConomyLand.pricePerBlockAddonHealing = config.getDouble("PricePerBlock-Addon-Healing", 200.0);
+        iConomyLand.pricePerBlockAddonNoEnter = config.getDouble("PricePerBlock-Addon-NoEnter", 200.0);
 	}
 	
 	private void saveConfig(File configFile) {
         Configuration config = new Configuration(configFile);
         config.setProperty("debug", iConomyLand.debugMode);
-        config.setProperty("pricePerBlock", iConomyLand.pricePerBlock);
+        config.setProperty("PricePerBlock-Raw", iConomyLand.pricePerBlockRaw);
+        config.setProperty("PricePerBlock-Addon-Announce", iConomyLand.pricePerBlockAddonAnnounce);
+        config.setProperty("PricePerBlock-Addon-Healing", iConomyLand.pricePerBlockAddonHealing);
+        config.setProperty("PricePerBlock-Addon-NoEnter", iConomyLand.pricePerBlockAddonNoEnter);
         config.save();
 	}
 	

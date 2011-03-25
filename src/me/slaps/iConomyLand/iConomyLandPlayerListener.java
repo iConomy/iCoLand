@@ -1,6 +1,5 @@
 package me.slaps.iConomyLand;
 
-import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -67,12 +66,12 @@ public class iConomyLandPlayerListener extends PlayerListener {
 		
 		if ( locFrom != locTo ) {
 		    if ( locFrom != 0 ) {
-		        if ( iConomyLand.landMgr.getLandByID(locFrom).hasAddon("announce") ) {
+		        if ( iConomyLand.landMgr.getLandById(locFrom).hasAddon("announce") ) {
 		            player.sendMessage("Leaving ...");
 		        }
 		    }
 		    if ( locTo != 0 ) {
-                if ( iConomyLand.landMgr.getLandByID(locTo).hasAddon("announce") ) {
+                if ( iConomyLand.landMgr.getLandById(locTo).hasAddon("announce") ) {
                     player.sendMessage("Entering ...");
                 }
 		    }

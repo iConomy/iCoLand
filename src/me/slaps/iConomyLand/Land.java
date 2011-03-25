@@ -1,6 +1,7 @@
 package me.slaps.iConomyLand;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -151,10 +152,38 @@ public class Land {
             }
         }
         return ret;
-    }    
+    }
+    
+    public double getAddonPrice(String addon) {
+        if ( addon.equalsIgnoreCase("announce") )
+            return iConomyLand.pricePerBlockAddonAnnounce*location.volume();
+        else if ( addon.equalsIgnoreCase("heal") )
+            return iConomyLand.pricePerBlockAddonHealing*location.volume();
+        else if ( addon.equalsIgnoreCase("noenter") )
+            return iConomyLand.pricePerBlockAddonNoEnter*location.volume();
+        else
+            return 0;
+    }
+    
+    public static String writeAddonPrices(Land land) {
+        DecimalFormat df = new DecimalFormat("0.##");
+        String ret = "";
+        if ( !land.addons.containsKey("announce") )
+            ret += "Announce: "+df.format(land.getAddonPrice("announce"))+" ";
+        if ( !land.addons.containsKey("heal") )
+            ret += "Heal: "+df.format(land.getAddonPrice("heal"))+" ";
+        if ( !land.addons.containsKey("noenter") )
+            ret += "NoEnter: "+df.format(land.getAddonPrice("noenter"))+" ";
+        
+        return ret;
+    }
     
     public Location getCenter() {
         return location.getCenter();
+    }
+    
+    public void addAddon(String addon) {
+        addons.put(addon, new Boolean(true));
     }
     
     

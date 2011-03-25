@@ -16,7 +16,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	public iConomyLandBlockListener(iConomyLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_RIGHTCLICKED, this, Priority.Monitor, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plug);
-        plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_CANBUILD, this, Priority.High, plug);
+        plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_PLACED, this, Priority.High, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plug);
 		 	
 	}
@@ -41,6 +41,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	        if ( newCuboid.isValid() ) {
 	            mess.send("{}Land selected!");
 	            iConomyLand.landMgr.showSelectLandInfo(player, newCuboid);
+	            iConomyLand.cmdMap.remove(playerName);
 	        } else {
                 iConomyLand.tmpCuboidMap.put(playerName, newCuboid);
 	            mess.send("{}Select 2nd corner");

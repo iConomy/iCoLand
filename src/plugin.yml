@@ -1,0 +1,17 @@
+name: iConomyLand
+main: me.slaps.iConomyLand.iConomyLand
+version: v0.006
+author: magik
+description: >
+             A protection plugin based on a block purchasing for money scheme.
+commands:
+    icl:
+        description: the main iConomyLand command
+        usage: |
+               /<command>
+               /<command> help <topic>
+    iconomyland:
+        description: the main iConomyLand command
+        usage: |
+               /<command>
+               /<command> help <topic>

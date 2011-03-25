@@ -145,6 +145,10 @@ public class LandManager {
 	    return landDB.lands.get(id);
 	}
 	
+	public boolean landIdExists(Integer id) {
+	    return landDB.lands.containsKey(id);
+	}
+	
 	public boolean intersectsExistingLand(Cuboid loc) {
 		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
@@ -189,13 +193,13 @@ public class LandManager {
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {
 	    Messaging mess = new Messaging(sender);
-	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{}"));
+	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{} -- Coords: {PRM}"+land.location.toCenterCoords()));
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
-            mess.send("{CMD}Addons: {}"+land.addons);            
-            mess.send("{CMD}Created: {}"+land.dateCreated);            
-            mess.send("{CMD}Taxed: {}"+land.dateTaxed);            
+            mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));            
+            mess.send("{CMD}Created: {}"+land.dateCreated);
+            mess.send("{CMD}Taxed: {}"+land.dateTaxed);
         }
 	}
 	

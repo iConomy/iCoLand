@@ -135,9 +135,9 @@ public class Cuboid {
 	public Location getCenter() {
 	    
 	    return new Location(setLoc1.getWorld(),
-	            LocMin.getBlockX() + (LocMax.getBlockX()-LocMin.getBlockX())/2,
-                LocMin.getBlockY() + (LocMax.getBlockY()-LocMin.getBlockY())/2,
-                LocMin.getBlockZ() + (LocMax.getBlockZ()-LocMin.getBlockZ())/2 );
+	            LocMin.getBlockX() + (LocMax.getBlockX()-LocMin.getBlockX())/2.0,
+                LocMin.getBlockY() + (LocMax.getBlockY()-LocMin.getBlockY())/2.0,
+                LocMin.getBlockZ() + (LocMax.getBlockZ()-LocMin.getBlockZ())/2.0 );
 	    
 	}
 }

@@ -153,5 +153,9 @@ public class Land {
         return ret;
     }    
     
+    public Location getCenter() {
+        return location.getCenter();
+    }
+    
     
 }

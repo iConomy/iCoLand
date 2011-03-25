@@ -64,7 +64,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
                         mess.send("Console can't select");
                     } else if ( args.length == 1 ) {
                         selectArea((Player)sender);
-                    } else if ( args.length == 2 & args[0].equalsIgnoreCase("cancel") ) {
+                    } else if ( args.length == 2 & args[1].equalsIgnoreCase("cancel") ) {
                         mess.send("{}Cancelling current selection.");
                         iConomyLand.cmdMap.remove(((Player)sender).getName());
                         iConomyLand.tmpCuboidMap.remove(((Player)sender).getName());                        
@@ -73,16 +73,16 @@ public class iConomyLandCommandListener implements CommandExecutor {
                         showHelp(sender, "select");
                     }
                 } else {
-                    mess.send("{ERR}No access for that...");                    
+                    mess.send("{ERR}No access for that...");
                 }
                 return true;
                 
             // /icl info
             } else if (args[0].equalsIgnoreCase("info") ) {
                 if ( iConomyLand.hasPermission(sender, "info") ) {
-                    if ( args.length == 1 ) {
+                    if ( (args.length == 1) ) {
                         if ( sender instanceof Player )
-                            showLandInfo((Player)sender, "");
+                            showLandInfo(sender, "");
                         else
                             mess.send("{ERR}Console needs to supply arguments for this command");
                     } else {
@@ -95,7 +95,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 
             // /icl buy
             } else if (args[0].equalsIgnoreCase("buy") ) {
-                if ( iConomyLand.hasPermission(sender, "buy") ) { 
+                if ( iConomyLand.hasPermission(sender, "buy") ) {
                     buyLand(sender);
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -104,7 +104,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
 
             // /icl sell
             } else if (args[0].equalsIgnoreCase("sell") ) {
-                if ( iConomyLand.hasPermission(sender, "sell") ) { 
+                if ( iConomyLand.hasPermission(sender, "sell") ) {
                     sellLand(sender);
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -314,45 +314,50 @@ public class iConomyLandCommandListener implements CommandExecutor {
     public void showLandInfo(Player sender, String... args) {
         Messaging mess = new Messaging(sender);
         
-        if ( args[0].isEmpty() ) {
-            // use location search or selected search
-            String playerName = sender.getName();
-            if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
-                Cuboid select = iConomyLand.tmpCuboidMap.get(playerName);
-                if ( select.isValid() ) {
-                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, select);
-                } else {
-                    mess.send("{ERR}Current selection invalid! Use {CMD}/lwc select{} to cancel");
-                }
+        // use location search or selected search
+        String playerName = sender.getName();
+        if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
+            Cuboid select = iConomyLand.tmpCuboidMap.get(playerName);
+            if ( select.isValid() ) {
+                iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, select);
             } else {
-                Location loc = sender.getLocation();
-                Integer landid = iConomyLand.landMgr.getLandID(loc);
-                if ( landid > 0 ) {
-                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, landid);
-                } else {
-                    mess.send("{ERR}No current selection, not on owned land");
-                }
+                mess.send("{ERR}Current selection invalid! Use {CMD}/lwc select{} to cancel");
             }
-            
         } else {
-            
+            Location loc = sender.getLocation();
+            Integer landid = iConomyLand.landMgr.getLandID(loc);
+            if ( landid > 0 ) {
+                iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, landid);
+            } else {
+                mess.send("{ERR}No current selection, not on owned land");
+            }
         }
+            
     }
     
     public void showLandInfo(CommandSender sender, String... args) {
+        Messaging mess = new Messaging(sender);
+
         if ( args.length == 0 ) {
             showHelp(sender,"info");
         } else {
-            Integer id;            
+            Integer id;          
             try {
                 id = Integer.parseInt(args[0]);
             } catch (NumberFormatException e ) {
                 id = -1;
             }
             if ( id > 0 ) {
-                iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
+                if ( iConomyLand.landMgr.landIdExists(id)) {
+                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
+                } else {
+                    mess.send("{ERR}Land ID# "+id+" does not exist");
+                }
             } else {
-                showHelp(sender,"info");
+                if ( sender instanceof Player ) 
+                    showLandInfo((Player)sender, args);
+                else
+                    showHelp(sender,"info");
             }
         }
     }

@@ -51,7 +51,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	public void onBlockBreak( BlockBreakEvent event ) {
 	    Location loc = event.getBlock().getLocation();
 	    Player player = event.getPlayer();
-        if ( !iConomyLand.landMgr.hasPermission(player.getName(), loc) ) {
+        if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);
             mess.send("{ERR}You can't do that here.");
@@ -61,7 +61,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	public void onBlockPlace( BlockPlaceEvent event )    {
         Location loc = event.getBlock().getLocation();
         Player player = event.getPlayer();
-        if ( !iConomyLand.landMgr.hasPermission(player.getName(), loc) ) {
+        if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);
             mess.send("{ERR}You can't do that here.");
@@ -73,7 +73,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	    if ( event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) ) {
             Location loc = event.getBlock().getLocation();
             Player player = event.getPlayer();
-            if ( !iConomyLand.landMgr.hasPermission(player.getName(), loc) ) {
+            if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
                 event.setCancelled(true);
                 Messaging mess = new Messaging((CommandSender)player);
                 mess.send("{ERR}You can't do that here.");

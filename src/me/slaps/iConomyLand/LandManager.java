@@ -1,26 +1,29 @@
 package me.slaps.iConomyLand;
 
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.config.Configuration;
 
 public class LandManager {
 	
-    public LandDB landDB;
+    private LandDB landDB;
 	
 	public LandManager(LandDB db) {
 	    landDB = db;
+	}
+	
+	public void save() {
+	    landDB.save();
+	}
+	
+	public void load() {
+	    landDB.load();
 	}
 	
 	public boolean add(Cuboid sl, String owner, String perms, String addons) {
@@ -28,7 +31,8 @@ public class LandManager {
 		if ( intersectsExistingLand(sl) ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		Integer id = getNextID();
-		landDB.lands.put( id, new Land(id, sl, owner, perms, addons, now.toString(), now.toString()) );
+		landDB.lands.put( id, new Land(id, sl, owner, Land.parsePermTags(perms), Land.parseAddonTags(addons), 
+		        now.toString(), now.toString()) );
 		landDB.save();
 		return true;
 	}
@@ -84,7 +88,17 @@ public class LandManager {
 		return i+1;
 	}
 	
-	public boolean hasPermission(String playerName, Location loc) {
+	public boolean isOwner(String playerName, Integer id) {
+	    return ( playerName.equals(landDB.lands.get(id).owner) );
+	}
+	
+	public boolean canBuild(String playerName, Location loc) {
+	    Integer id = getLandID(loc);
+	    if ( id > 0 ) return getLandByID(id).hasPermission(playerName);
+	    else          return true;
+	}
+	
+	public boolean canBuildDestroy(String playerName, Location loc) {
 	    Integer id = getLandID(loc);
 	    if ( id > 0 ) {
 	        Land land = landDB.lands.get(id);
@@ -178,7 +192,7 @@ public class LandManager {
 	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{}"));
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
-            mess.send("{CMD}Perms: {}"+land.perms);            
+            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
             mess.send("{CMD}Addons: {}"+land.addons);            
             mess.send("{CMD}Created: {}"+land.dateCreated);            
             mess.send("{CMD}Taxed: {}"+land.dateTaxed);            

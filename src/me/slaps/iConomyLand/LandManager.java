@@ -26,7 +26,7 @@ public class LandManager {
 	    landDB.load();
 	}
 	
-	public boolean add(Cuboid sl, String owner, String perms, String addons) {
+	public boolean addLand(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
 		if ( intersectsExistingLand(sl) ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
@@ -207,7 +207,8 @@ public class LandManager {
 	    for(int x=0;x<sx;x++) {
 	        for(int y=0;y<sy;y++) {
 	            for(int z=0;z<sz;z++) {
-	                sum += getPriceOfBlock(new Location(target.setLoc1.getWorld(), target.LocMin.getBlockX()+x, target.LocMin.getBlockY()+y, target.LocMin.getBlockZ()+z));
+	                sum += getPriceOfBlock(new Location(target.setLoc1.getWorld(), 
+	                        target.LocMin.getBlockX()+x, target.LocMin.getBlockY()+y, target.LocMin.getBlockZ()+z));
 	            }
 	        }
 	    }

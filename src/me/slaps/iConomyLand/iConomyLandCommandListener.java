@@ -1,6 +1,5 @@
 package me.slaps.iConomyLand;
 
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,12 +59,19 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 
             // /icl select
             } else if (args[0].equalsIgnoreCase("select") ) {
-                if ( iConomyLand.hasPermission(sender, "select") ) { 
-                    if ( sender instanceof Player ) 
-                        selectArea((Player)sender);
-                    else
+                if ( iConomyLand.hasPermission(sender, "select") ) {
+                    if ( !(sender instanceof Player) ) {
                         mess.send("Console can't select");
-                
+                    } else if ( args.length == 1 ) {
+                        selectArea((Player)sender);
+                    } else if ( args.length == 2 & args[0].equalsIgnoreCase("cancel") ) {
+                        mess.send("{}Cancelling current selection.");
+                        iConomyLand.cmdMap.remove(((Player)sender).getName());
+                        iConomyLand.tmpCuboidMap.remove(((Player)sender).getName());                        
+                    } else {
+                        mess.send("{ERR}Too many arguments.");
+                        showHelp(sender, "select");
+                    }
                 } else {
                     mess.send("{ERR}No access for that...");                    
                 }
@@ -99,7 +105,6 @@ public class iConomyLandCommandListener implements CommandExecutor {
             // /icl sell
             } else if (args[0].equalsIgnoreCase("sell") ) {
                 if ( iConomyLand.hasPermission(sender, "sell") ) { 
-                    // TODO: Add sell
                     sellLand(sender);
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -109,15 +114,16 @@ public class iConomyLandCommandListener implements CommandExecutor {
             // /icl modify <id> <perms|addons> <add|del> <tags>
             } else if (args[0].equalsIgnoreCase("modify") ) {
                 if ( iConomyLand.hasPermission(sender, "modify") ) {
-                    //icl modify <id> <perms/addons> <tags>
-                    if ( args.length > 4 ) {
+                    if ( args.length < 5 ) {
+                        mess.send("{ERR}Not enough arguments");
+                        showHelp(sender, "modify");
+                    } else {
                         Integer id;
                         try { id = Integer.parseInt(args[1]); } catch (NumberFormatException e) { id = -1; }
                         if ( id <= 0 ) {
                             mess.send("{ERR}Bad ID");
                             showHelp(sender, "modify");
                         } else {
-                            
                             String tags = args[4];
                             for(int i=5;i<args.length;i++) tags += " "+args[i];
                             
@@ -144,9 +150,6 @@ public class iConomyLandCommandListener implements CommandExecutor {
                                 showHelp(sender, "modify");
                             }
                         }
-                    } else {
-                        mess.send("{ERR}Not enough arguments");
-                        showHelp(sender, "modify");
                     }
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -182,8 +185,8 @@ public class iConomyLandCommandListener implements CommandExecutor {
                       " {PRM}V:{}"+land.location.volume()+
                       "{PRM}[{}"+land.location.toDimString()+
                       "{PRM}] C{}"+land.location.toCenterCoords()+
-//                      " {PRM}Ad:{}"+land.toShortAddons()+
-                      " {PRM}P:{}"
+                      " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
+                      " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
                       );
         }
         
@@ -280,7 +283,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
                     Account acc = iConomy.getBank().getAccount(playerName);
                     double price = iConomyLand.landMgr.getPrice(newCuboid);
                     if ( acc.getBalance() > price ) {
-                        if ( iConomyLand.landMgr.add(newCuboid, playerName, "", "") ) {
+                        if ( iConomyLand.landMgr.addLand(newCuboid, playerName, "", "") ) {
                             acc.subtract(price);
                             iConomyLand.cmdMap.remove(playerName);
                             mess.send("{}Bought selected land for {PRM}"+price);

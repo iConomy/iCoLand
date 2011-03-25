@@ -7,16 +7,15 @@ import java.util.Set;
 import org.bukkit.Location;
 
 public class Land {
-    private int id;             // unique # ( sql primary key )
-    public Cuboid location;     // cuboid describing location
-    public String owner;        // 
-//    public String perms;
-//    public String addons;
-    public HashMap<String, Boolean> canBuildDestroy;
-    public HashMap<String, Boolean> addons;
-    public Timestamp dateCreated;
-    public Timestamp dateTaxed;
-    private boolean valid = false;
+    private int id;                                     // unique # ( sql primary key )
+    public Cuboid location;                             // cuboid describing location
+    public String owner;                                // owner name
+    public String locationName;                         // location name ( for announce )
+    public HashMap<String, Boolean> canBuildDestroy;    // hash map lookup for perms
+    public HashMap<String, Boolean> addons;             // hash map lookup for addons
+    public Timestamp dateCreated;                       // date created
+    public Timestamp dateTaxed;                         // date taxed
+    private boolean valid = false;                      // valid
     
     public Land(int id, Cuboid loc, String owner, HashMap<String, Boolean> perms, 
             HashMap<String, Boolean> addons, String dateCreated, String dateTaxed) {
@@ -107,7 +106,6 @@ public class Land {
         addons.remove(addon);
     }
     
-    
     public static String writeAddonTags(HashMap<String, Boolean> addonTags) {
         String ret = "";
         Set<String> tags = addonTags.keySet();
@@ -154,5 +152,6 @@ public class Land {
         }
         return ret;
     }    
+    
     
 }

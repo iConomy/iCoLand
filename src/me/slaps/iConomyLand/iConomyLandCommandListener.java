@@ -86,8 +86,11 @@ public class iConomyLandCommandListener implements CommandExecutor {
                             showLandInfo(sender, "");
                         else
                             mess.send("{ERR}Console needs to supply arguments for this command");
-                    } else {
+                    } else if ( args.length == 2 ) {
                         showLandInfo(sender, args[1]);
+                    } else {
+                        mess.send("{ERR}Bad info command");
+                        showHelp(sender, "info");
                     }
                 } else {
                     mess.send("{ERR}No access for that...");

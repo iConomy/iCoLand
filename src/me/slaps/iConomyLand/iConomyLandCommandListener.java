@@ -289,47 +289,9 @@ public class iConomyLandCommandListener implements CommandExecutor {
             land.owner = tags;
             mess.send("{}Owner changed");
         } else if ( category.equalsIgnoreCase("addons") ) {
-            
+            mess.send("need to implement...");
         }
-        /*
-        Messaging mess = new Messaging(sender);
-        if ( category.equals("owner") ) {
-            changeOwner(sender, id, tags);
-        } else if ( category.equals("perms") ) {
-            
-        } else if ( category.equalsIgnoreCase("addons") ) {
-            
-            
-            adminEditLand(sender, id, tags);
-    
-            if ( args[2].equals("perms") && iConomyLand.hasPermission(sender,"modify.perms") ) {
-                if ( args[3].equalsIgnoreCase("add") ) {
-                    addPerms(sender, id, tags);
-                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                } else if ( args[3].equalsIgnoreCase("del") ) {
-                    delPerms(sender, id, tags);
-                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                } else {
-                    mess.send("{ERR}Bad modifier - must be add or del");
-                }
-            } else if ( args[2].equals("addons") && iConomyLand.hasPermission(sender,"modify.addons") ) {
-                if ( args[3].equalsIgnoreCase("add") ) {
-                    addAddon(sender, id, tags);
-                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                } else if ( args[3].equalsIgnoreCase("del") ) {
-                    delAddon(sender, id, tags);
-                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                } else {
-                    mess.send("{ERR}Bad modifier - must be add or del");
-                }
-            } else {
-                mess.send("{ERR}Bad category");
-                showHelp(sender, "modify");
-            }
-    
 
-        }
-        */
         
     }
     

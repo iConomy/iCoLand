@@ -5,6 +5,7 @@
 package me.slaps.iConomyLand;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.logging.Logger;
 import java.util.HashMap;
 
@@ -40,6 +41,7 @@ public class iConomyLand extends JavaPlugin {
     public static double pricePerBlockAddonAnnounce;
     public static double pricePerBlockAddonHealing;
     public static double pricePerBlockAddonNoEnter;
+    public static double sellTax;
 
 	public static Server server;
 	
@@ -57,6 +59,15 @@ public class iConomyLand extends JavaPlugin {
 	public static LandManager landMgr;
     public static HashMap<String, String> cmdMap;
     public static HashMap<String, Cuboid> tmpCuboidMap;
+    
+    public static DecimalFormat df;
+    
+    public iConomyLand() {
+        // setup command map
+        cmdMap = new HashMap<String, String>();
+        tmpCuboidMap = new HashMap<String, Cuboid>();
+        df = new DecimalFormat("#.00");
+    }
     
     public static void info(String msg) {
     	logger.info("["+name+"] "+ msg);
@@ -83,10 +94,6 @@ public class iConomyLand extends JavaPlugin {
 		
         // setup location manager
 		landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(getDataFolder() + File.separator + "lands.yml"))));
-
-		// setup command map
-        cmdMap = new HashMap<String, String>();
-        tmpCuboidMap = new HashMap<String, Cuboid>();
 
         //clear command list
         cmdMap.clear();
@@ -121,6 +128,9 @@ public class iConomyLand extends JavaPlugin {
         iConomyLand.pricePerBlockAddonAnnounce = config.getDouble("PricePerBlock-Addon-Announce", 50.0);
         iConomyLand.pricePerBlockAddonHealing = config.getDouble("PricePerBlock-Addon-Healing", 200.0);
         iConomyLand.pricePerBlockAddonNoEnter = config.getDouble("PricePerBlock-Addon-NoEnter", 200.0);
+        iConomyLand.sellTax = config.getDouble("SalesTaxPercent", 80.0)/100.0;
+        if ( sellTax < 0 ) sellTax = 0;
+        if ( sellTax > 1 ) sellTax = 1;
 	}
 	
 	private void saveConfig(File configFile) {
@@ -130,6 +140,7 @@ public class iConomyLand extends JavaPlugin {
         config.setProperty("PricePerBlock-Addon-Announce", iConomyLand.pricePerBlockAddonAnnounce);
         config.setProperty("PricePerBlock-Addon-Healing", iConomyLand.pricePerBlockAddonHealing);
         config.setProperty("PricePerBlock-Addon-NoEnter", iConomyLand.pricePerBlockAddonNoEnter);
+        config.setProperty("SalesTaxPercent", iConomyLand.sellTax*100.0);
         config.save();
 	}
 	

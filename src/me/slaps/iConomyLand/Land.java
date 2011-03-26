@@ -107,6 +107,52 @@ public class Land {
         addons.remove(addon);
     }
     
+
+    
+    public Location getCenter() {
+        return location.getCenter();
+    }
+    
+    public void addAddon(String addon) {
+        addons.put(addon, new Boolean(true));
+    }
+
+    public double getAddonPrice(String addon) {
+        if ( addon.equalsIgnoreCase("announce") )
+            return iConomyLand.pricePerBlockAddonAnnounce*location.volume();
+        else if ( addon.equalsIgnoreCase("heal") )
+            return iConomyLand.pricePerBlockAddonHealing*location.volume();
+        else if ( addon.equalsIgnoreCase("noenter") )
+            return iConomyLand.pricePerBlockAddonNoEnter*location.volume();
+        else
+            return 0;
+    }
+    
+    public double getSalePrice() {
+        double price = 0;
+        Set<String> addonsBought = addons.keySet();
+        
+        // add up prices for addons
+        for( String add : addonsBought ) {
+            price += getAddonPrice(add);
+        }
+        
+        // add price of land
+        price += iConomyLand.landMgr.getPrice(location);
+        
+        // take out sales tax
+        price *= iConomyLand.sellTax;
+        
+        return price;
+    }
+    
+    
+    
+    
+    
+    
+    //  STATICS =============================================================
+    
     public static String writeAddonTags(HashMap<String, Boolean> addonTags) {
         String ret = "";
         Set<String> tags = addonTags.keySet();
@@ -154,37 +200,20 @@ public class Land {
         return ret;
     }
     
-    public double getAddonPrice(String addon) {
-        if ( addon.equalsIgnoreCase("announce") )
-            return iConomyLand.pricePerBlockAddonAnnounce*location.volume();
-        else if ( addon.equalsIgnoreCase("heal") )
-            return iConomyLand.pricePerBlockAddonHealing*location.volume();
-        else if ( addon.equalsIgnoreCase("noenter") )
-            return iConomyLand.pricePerBlockAddonNoEnter*location.volume();
-        else
-            return 0;
-    }
+
     
     public static String writeAddonPrices(Land land) {
-        DecimalFormat df = new DecimalFormat("0.##");
         String ret = "";
         if ( !land.addons.containsKey("announce") )
-            ret += "Announce: "+df.format(land.getAddonPrice("announce"))+" ";
+            ret += "Announce: "+iConomyLand.df.format(land.getAddonPrice("announce"))+" ";
         if ( !land.addons.containsKey("heal") )
-            ret += "Heal: "+df.format(land.getAddonPrice("heal"))+" ";
+            ret += "Heal: "+iConomyLand.df.format(land.getAddonPrice("heal"))+" ";
         if ( !land.addons.containsKey("noenter") )
-            ret += "NoEnter: "+df.format(land.getAddonPrice("noenter"))+" ";
+            ret += "NoEnter: "+iConomyLand.df.format(land.getAddonPrice("noenter"))+" ";
         
         return ret;
     }
     
-    public Location getCenter() {
-        return location.getCenter();
-    }
-    
-    public void addAddon(String addon) {
-        addons.put(addon, new Boolean(true));
-    }
     
     
 }

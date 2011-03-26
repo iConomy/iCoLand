@@ -135,10 +135,46 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 }
                 return true;
 
-            // /icl sell
+            // /icl sell land <ID>
+            // /icl sell addon <ADDON> <ID>
             } else if (args[0].equalsIgnoreCase("sell") ) {
-                if ( iConomyLand.hasPermission(sender, "sell") ) {
-                    sellLand(sender);
+                if ( !(sender instanceof Player) ) {
+                    mess.send("{ERR}Console can't sell land");
+                } else if ( iConomyLand.hasPermission(sender, "sell") ){
+                    if ( args.length == 3 && args[1].equalsIgnoreCase("land") ) {
+                        Integer id = 0;
+                        try {
+                            id = Integer.parseInt(args[2]);
+                        } catch (NumberFormatException ex) {
+                            mess.send("{ERR}Error parsing ID#");
+                        }
+                        
+                        if ( iConomyLand.landMgr.landIdExists(id) ) {
+                            sellLand((Player)sender, id);
+                        } else {
+                            mess.send("{ERR}Land ID# "+id+" does not exist");
+                        }
+                    } else if ( args.length == 4 && args[1].equalsIgnoreCase("addon") ) {
+                        Integer id = 0;
+                        try {
+                            id = Integer.parseInt(args[3]);
+                        } catch (NumberFormatException ex) {
+                            mess.send("{ERR}Error parsing ID#");
+                        }
+                        
+                        if ( iConomyLand.landMgr.landIdExists(id) ) {
+                            if ( Misc.isAny(args[2], "announce", "healing", "noenter" ) ) {
+                                sellAddon((Player)sender, args[2], id);
+                            } else {
+                                mess.send("{ERR}Not valid addon: {PRM}"+args[2]);
+                            }
+                        } else {
+                            mess.send("{ERR}Land ID# "+id+" does not exist");
+                        }
+                    } else {
+                        mess.send("{ERR}Bad sell command");
+                        showHelp(sender,"sell");
+                    }
                 } else {
                     mess.send("{ERR}No access for that...");
                 }
@@ -316,25 +352,23 @@ public class iConomyLandCommandListener implements CommandExecutor {
     }
 
     public void buyAddon(Player sender, String addon, Integer id) {
-        DecimalFormat df= new DecimalFormat("#.00");
         Messaging mess = new Messaging(sender);
         String playerName = sender.getName();
         Account acc = iConomy.getBank().getAccount(playerName);
-        double price = iConomyLand.landMgr.getLandById(id).getAddonPrice(addon);
+        double price = Double.valueOf(iConomyLand.df.format(iConomyLand.landMgr.getLandById(id).getAddonPrice(addon)));
         if ( acc.getBalance() > price ) {
             acc.subtract(price);
             iConomyLand.landMgr.addAddon(sender, addon, id);
             iConomyLand.landMgr.save();
-            mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+df.format(price));
-            mess.send("{}Bank Balance: {PRM}"+df.format(acc.getBalance()));
+            mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iConomyLand.df.format(price));
+            mess.send("{}Bank Balance: {PRM}"+iConomyLand.df.format(acc.getBalance()));
         } else {
-            mess.send("{ERR}Not enough in account. Bank: "+df.format(acc.getBalance())+
-                    " Price: "+df.format(price)); 
+            mess.send("{ERR}Not enough in account. Bank: "+iConomyLand.df.format(acc.getBalance())+
+                    " Price: "+iConomyLand.df.format(price)); 
         }
     }
 
     public void buyLand(CommandSender sender) {
-        DecimalFormat df = new DecimalFormat("#.00");
         Messaging mess = new Messaging(sender);
         if ( sender instanceof Player ) {
             String playerName = ((Player)sender).getName();
@@ -342,19 +376,19 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 Cuboid newCuboid = iConomyLand.tmpCuboidMap.get(playerName);
                 if ( newCuboid.isValid() ) {
                     Account acc = iConomy.getBank().getAccount(playerName);
-                    double price = iConomyLand.landMgr.getPrice(newCuboid);
+                    double price = Double.valueOf(iConomyLand.df.format(iConomyLand.landMgr.getPrice(newCuboid)));
                     if ( acc.getBalance() > price ) {
                         if ( iConomyLand.landMgr.addLand(newCuboid, playerName, "", "") ) {
                             acc.subtract(price);
                             iConomyLand.cmdMap.remove(playerName);
-                            mess.send("{}Bought selected land for {PRM}"+df.format(price));
-                            mess.send("{}Bank Balance: {PRM}"+df.format(acc.getBalance()));
+                            mess.send("{}Bought selected land for {PRM}"+iConomyLand.df.format(price));
+                            mess.send("{}Bank Balance: {PRM}"+iConomyLand.df.format(acc.getBalance()));
                         } else {
                             mess.send("{ERR}Error buying land");
                         } 
                     } else {
-                        mess.send("{ERR}Not enough in account. Bank: "+df.format(acc.getBalance())+
-                                  " Price: "+df.format(price)); 
+                        mess.send("{ERR}Not enough in account. Bank: "+iConomyLand.df.format(acc.getBalance())+
+                                  " Price: "+iConomyLand.df.format(price)); 
                     }
                 } else {
                     mess.send("{ERR}Invalid selection");
@@ -367,8 +401,43 @@ public class iConomyLandCommandListener implements CommandExecutor {
         }
     }
     
-    public void sellLand(CommandSender sender) {
+    public void sellLand(Player sender, Integer id) {
+        Messaging mess = new Messaging(sender);
+        Land land = iConomyLand.landMgr.getLandById(id);
         
+        if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
+        
+            Account acc = iConomy.getBank().getAccount(sender.getName());
+            double price = Double.valueOf(iConomyLand.df.format(land.getSalePrice()));
+            
+            acc.add(price);
+            iConomyLand.landMgr.removeLandById(id);
+            
+            mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}"+price);
+            mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+        } else {
+            mess.send("{ERR}Not owner of land ID# {PRM}"+id);
+        }
+    }
+    
+    public void sellAddon(Player sender, String addon, Integer id) {
+        Messaging mess = new Messaging(sender);
+        Land land = iConomyLand.landMgr.getLandById(id);
+        
+        if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
+        
+            Account acc = iConomy.getBank().getAccount(sender.getName());
+            double price = Double.valueOf(iConomyLand.df.format(land.getAddonPrice(addon)*iConomyLand.sellTax));
+            
+            acc.add(price);
+            land.removeAddon(addon);
+            iConomyLand.landMgr.save();
+    
+            mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
+            mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+        } else {
+            mess.send("{ERR}Not owner of land ID# {PRM}"+id);
+        }
     }
     
     

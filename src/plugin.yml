@@ -1,6 +1,6 @@
 name: iConomyLand
 main: me.slaps.iConomyLand.iConomyLand
-version: v0.007
+version: v0.009
 author: magik
 description: >
              A protection plugin based on a block purchasing for money scheme.

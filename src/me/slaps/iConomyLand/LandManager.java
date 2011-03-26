@@ -38,7 +38,7 @@ public class LandManager {
 		return true;
 	}
 	
-	public boolean removeLandByID(Integer id) {
+	public boolean removeLandById(Integer id) {
 		int i = 0;
 		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
@@ -169,7 +169,6 @@ public class LandManager {
 	}
 	
 	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
-	    DecimalFormat df = new DecimalFormat("#.00");
 	    Messaging mess = new Messaging(sender);
 	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
 	    
@@ -184,7 +183,7 @@ public class LandManager {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + df.format(getPrice(select)));
+            mess.send("Price: " + iConomyLand.df.format(getPrice(select)));
 	    }
 	    
 	}
@@ -195,7 +194,7 @@ public class LandManager {
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {
 	    Messaging mess = new Messaging(sender);
-	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{} -- Coords: {PRM}"+land.location.toCenterCoords()));
+	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{} -- Coords: {PRM}"+land.location.toCenterCoords()+"{}"));
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
             mess.send("{CMD}Created: {}"+land.dateCreated);

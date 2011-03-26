@@ -1,7 +1,6 @@
 package me.slaps.iConomyLand;
 
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.ArrayList;
@@ -32,25 +31,20 @@ public class LandManager {
 		if ( intersectsExistingLand(sl) ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		Integer id = getNextID();
-		landDB.lands.put( id, new Land(id, sl, owner, Land.parsePermTags(perms), Land.parseAddonTags(addons), 
+		landDB.lands.put( id, new Land(id, sl, owner, "", Land.parsePermTags(perms), Land.parseAddonTags(addons), 
 		        now.toString(), now.toString()) );
 		landDB.save();
 		return true;
 	}
 	
 	public boolean removeLandById(Integer id) {
-		int i = 0;
-		Iterator<Land> itr = landDB.lands.values().iterator();
-		while(itr.hasNext()) {
-		    Land tmp = itr.next();
-			if ( tmp.getID() == id ) {
-			    landDB.lands.remove(i);
-				landDB.save();
-				return true;
-			}
-			i++;
-		}
-		return false;
+	    Land land = landDB.lands.remove(id);
+	    if ( land != null ) {
+	        landDB.save();
+	        return true;
+	    } else {
+	        return false;
+	    }
 	}
 	
 	public String listLand() {
@@ -64,7 +58,6 @@ public class LandManager {
 		return out;
 	}
 	
-	// just gets corner 1 for now
 	public Location getCenterOfLand(Integer id) {
 		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
@@ -117,6 +110,7 @@ public class LandManager {
 		}
 		return false;
 	}
+	
 	
 	public Integer getLandID(Location loc) {
 		Iterator<Land> itr = landDB.lands.values().iterator();
@@ -197,6 +191,8 @@ public class LandManager {
 	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{} -- Coords: {PRM}"+land.location.toCenterCoords()+"{}"));
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
+            if ( !land.locationName.isEmpty() )
+                mess.send("{CMD}Name: {}"+land.locationName);
             mess.send("{CMD}Created: {}"+land.dateCreated);
             mess.send("{CMD}Taxed: {}"+land.dateTaxed);
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
@@ -224,12 +220,6 @@ public class LandManager {
 	public double getPriceOfBlock(Location target) {
 	    return iConomyLand.pricePerBlockRaw;
 	}
-	
-	public void addAddon(Player sender, String addon, Integer id) {
-	    getLandById(id).addAddon(addon);
-        save();
-	}
-	
 	
 	
 }

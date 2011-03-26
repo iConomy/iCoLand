@@ -18,7 +18,7 @@ public class Land {
     public Timestamp dateTaxed;                         // date taxed
     private boolean valid = false;                      // valid
     
-    public Land(int id, Cuboid loc, String owner, HashMap<String, Boolean> perms, 
+    public Land(int id, Cuboid loc, String owner, String locName, HashMap<String, Boolean> perms, 
             HashMap<String, Boolean> addons, String dateCreated, String dateTaxed) {
         
         this.id = id;
@@ -29,6 +29,8 @@ public class Land {
         
         this.dateCreated = Timestamp.valueOf(dateCreated);
         this.dateTaxed = Timestamp.valueOf(dateTaxed);
+        
+        this.locationName = locName;
         
         validate();
     }
@@ -46,7 +48,6 @@ public class Land {
         if ( id < 0 ) ret = false;
         if ( !location.isValid() ) ret = false;
         if ( owner.isEmpty() ) ret = false;
-//        if ( !validatePermString(perms) ) ret = false;
         if ( dateCreated == null ) ret = false;
         if ( dateTaxed == null ) ret = false;
         
@@ -54,9 +55,14 @@ public class Land {
         return ret;
     }
     
-//    public static boolean validatePermString(String perms) {
-//        return true;
-//    }
+    public void changeOwner(String newOwner) {
+        owner = newOwner;
+    }
+    
+
+    public void addPermCanBuild(String playerName, Boolean perm) {
+        canBuildDestroy.put(playerName, perm);
+    }
     
     public boolean contains(Location loc) {
         return location.isIn(loc);
@@ -70,13 +76,12 @@ public class Land {
         Boolean ret = false;
         if (playerName.equals(owner)) ret = true;
         else { 
-            if ( canBuildDestroy.containsKey("all") ) {
-                ret = canBuildDestroy.get("all");
-            }
             if ( canBuildDestroy.containsKey(playerName) ) {
                 ret = canBuildDestroy.get(playerName);
             }
-            
+            if ( canBuildDestroy.containsKey("default") ) {
+                ret = canBuildDestroy.get("default");
+            }
         }
         if (iConomyLand.debugMode) iConomyLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
         return ret;
@@ -100,7 +105,7 @@ public class Land {
     }
     
     public void giveAddon(String addon) {
-        addons.put(addon, new Boolean(true));
+        addons.put(addon, true);
     }
     
     public void removeAddon(String addon) {
@@ -114,7 +119,7 @@ public class Land {
     }
     
     public void addAddon(String addon) {
-        addons.put(addon, new Boolean(true));
+        addons.put(addon, true);
     }
 
     public double getAddonPrice(String addon) {
@@ -147,6 +152,26 @@ public class Land {
     }
     
     
+    public void modifyBuildDestroyWithTags(String tagString) {
+        if ( tagString.isEmpty() ) return;
+        String[] split = tagString.split(" ");
+        for(String tag : split ) {
+            String[] keys = tag.split(":");
+            if ( keys.length == 2 ) {
+                if ( keys[1].equals("-") ) {
+                    canBuildDestroy.remove(keys[0]);
+                } else if ( keys[1].startsWith("f") ) {
+                    canBuildDestroy.put(keys[0], false);
+                } else if ( keys[1].startsWith("t") ) {
+                    canBuildDestroy.put(keys[0], true);
+                } else { 
+                    iConomyLand.warning("Error parsing tag: "+tag);
+                }
+            } else {
+                iConomyLand.warning("Error parsing tag: "+tag);
+            }
+        }
+    }
     
     
     
@@ -162,13 +187,12 @@ public class Land {
         return ret;
     }
     
-    
     public static HashMap<String, Boolean> parseAddonTags(String tagString) {
         HashMap<String, Boolean> ret = new HashMap<String, Boolean>();
         if ( tagString.isEmpty() ) return ret;
         String[] split = tagString.split(" ");
         for(String tag : split) {
-            ret.put(tag, new Boolean(true));
+            ret.put(tag, true);
         }
         return ret;        
     }
@@ -182,7 +206,6 @@ public class Land {
         }
         return ret;
     }
-    
 
     public static HashMap<String, Boolean> parsePermTags(String tagString) {
         HashMap<String, Boolean> ret = new HashMap<String, Boolean>();
@@ -194,13 +217,11 @@ public class Land {
                 Boolean perm = keys[1].toLowerCase().startsWith("t");
                 ret.put(keys[0], perm);
             } else {
-                iConomyLand.warning("Error parsing tag from flat file: "+tag);
+                iConomyLand.warning("Error parsing tag: "+tag);
             }
         }
         return ret;
     }
-    
-
     
     public static String writeAddonPrices(Land land) {
         String ret = "";

@@ -1,6 +1,5 @@
 package me.slaps.iConomyLand;
 
-import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,6 +54,75 @@ public class iConomyLandCommandListener implements CommandExecutor {
                     showList(sender);
                 } else {
                     mess.send("{ERR}No access for list");
+                }
+                return true;
+                
+            // /icl edit <LANDID> <name|perms> <tags>
+            } else if (args[0].equalsIgnoreCase("edit") ) {
+                if ( !(sender instanceof Player) ) {
+                    mess.send("{ERR}Console can not edit with this command");
+                } else if ( iConomyLand.hasPermission(sender, "edit") ) {
+                    Player player = (Player)sender;
+                    if ( args.length > 3 ) {
+                        Integer id;
+                        try { 
+                            id = Integer.parseInt(args[1]); 
+                        } catch (NumberFormatException ex) { 
+                            mess.send("{ERR}Error reading <LANDID>");
+                            return true;
+                        }
+                        if ( iConomyLand.landMgr.landIdExists(id) ) {
+                            if ( iConomyLand.landMgr.isOwner(player.getName(), id) ) {                            
+                                if ( Misc.isEither(args[2], "name", "perms") ) {
+                                    String tags = "";
+                                    for(int i=3;i<args.length;i++) tags += args[i] + " ";
+                                    editLand(player, id, args[2], tags);
+                                } else {
+                                    mess.send("{ERR}Not a valid category");
+                                    showHelp(sender,"edit");
+                                }
+                            } else {
+                                mess.send("{ERR}Not owner of land ID# {PRM}"+id);
+                            }
+                        } else {
+                            mess.send("{ERR}Land ID# {PRM}"+id+" {ERR}doesn't exist");
+                        }
+                    } else {
+                        mess.send("{ERR}Too few arguments");
+                    }
+                } else {
+                    mess.send("{ERR}No access for edit");
+                }
+                return true;
+                
+            // /icl modify <id> <perms|addons> <tags>
+            } else if (args[0].equalsIgnoreCase("modify") ) {
+                if ( iConomyLand.hasPermission(sender, "modify") ) {
+                    if ( args.length < 4 ) {
+                        mess.send("{ERR}Not enough arguments");
+                        showHelp(sender, "modify");
+                    } else {
+                        Integer id;
+                        try { 
+                            id = Integer.parseInt(args[1]); 
+                        } catch (NumberFormatException e) { 
+                            mess.send("{ERR}Error parsing <LANDID>");
+                            return true;
+                        }
+                        if ( !iConomyLand.landMgr.landIdExists(id) ) {
+                            mess.send("{ERR}Land ID# {PRM}" + id + " {ERR}doesn't exist");
+                        } else {
+                            if ( Misc.isAny(args[2], "perms", "addons", "owner") ) {
+                                String tags = args[3];
+                                for(int i=4;i<args.length;i++) tags += args[i];
+                                adminEditLand(sender, id, args[2], tags);
+                            } else {
+                                mess.send("{ERR}Bad category");
+                            }
+                        }
+                    }
+                } else {
+                    mess.send("{ERR}No access for that...");
                 }
                 return true;
                 
@@ -183,62 +251,6 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 }
                 return true;
 
-            // /icl modify <id> <perms|addons> <add|del> <tags>
-            } else if (args[0].equalsIgnoreCase("modify") ) {
-                if ( iConomyLand.hasPermission(sender, "modify") ) {
-                    if ( args.length < 4 ) {
-                        mess.send("{ERR}Not enough arguments");
-                        showHelp(sender, "modify");
-                    } else {
-                        Integer id;
-                        try { id = Integer.parseInt(args[1]); } catch (NumberFormatException e) { id = -1; }
-                        if ( id <= 0 ) {
-                            mess.send("{ERR}Bad ID");
-                            showHelp(sender, "modify");
-                        } else {
-                            if ( args[2].equals("owner") && iConomyLand.hasPermission(sender,"modify.owner") ) {
-                                changeOwner(sender, id, args[3]);
-                            } else {
-                                if ( args.length < 5 ) {
-                                    mess.send("{ERR}Not enough arguments");
-                                    showHelp(sender, "modify");
-                                } else {
-                                    String tags = args[4];
-                                    for(int i=5;i<args.length;i++) tags += " "+args[i];
-                                    
-                                    if ( args[2].equals("perms") && iConomyLand.hasPermission(sender,"modify.perms") ) {
-                                        if ( args[3].equalsIgnoreCase("add") ) {
-                                            addPerms(sender, id, tags);
-                                            iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                                        } else if ( args[3].equalsIgnoreCase("del") ) {
-                                            delPerms(sender, id, tags);
-                                            iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                                        } else {
-                                            mess.send("{ERR}Bad modifier - must be add or del");
-                                        }
-                                    } else if ( args[2].equals("addons") && iConomyLand.hasPermission(sender,"modify.addons") ) {
-                                        if ( args[3].equalsIgnoreCase("add") ) {
-                                            addAddon(sender, id, tags);
-                                            iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                                        } else if ( args[3].equalsIgnoreCase("del") ) {
-                                            delAddon(sender, id, tags);
-                                            iConomyLand.landMgr.showSelectLandInfo(sender, id);
-                                        } else {
-                                            mess.send("{ERR}Bad modifier - must be add or del");
-                                        }
-                                    } else {
-                                        mess.send("{ERR}Bad category");
-                                        showHelp(sender, "modify");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    mess.send("{ERR}No access for that...");
-                }
-                return true;
-                
             // unrecognized /icl command
             } else {
                 mess.send("{}Unrecognized/invalid/malformed command!");
@@ -253,28 +265,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
 
     }
     
-    public void showList(CommandSender sender) {
-        Collection<Land> list;
-        if( sender instanceof Player )
-            list = iConomyLand.landMgr.getLandsOwnedBy(((Player)sender).getName());
-        else
-            list = iConomyLand.landMgr.getAllLands();
-                
-        Messaging mess = new Messaging(sender);
-        Iterator<Land> itr = list.iterator();
-        while(itr.hasNext()) {
-            Land land = itr.next();
-            mess.send("{PRM}ID#{}"+land.getID()+
-                      " {PRM}V:{}"+land.location.volume()+
-                      "{PRM}[{}"+land.location.toDimString()+
-                      "{PRM}] C{}"+land.location.toCenterCoords()+
-                      " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
-                      " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
-                      );
-        }
-        
-    }
-    
+    /*
     public void addPerms(CommandSender sender, Integer id, String tags) {
         Messaging mess = new Messaging(sender);
         Land land = iConomyLand.landMgr.getLandById(id);
@@ -353,21 +344,143 @@ public class iConomyLandCommandListener implements CommandExecutor {
         
         iConomyLand.landMgr.save();
     }
+*/
+    
+    public void editLand(Player player, Integer id, String category, String args) {
+        Messaging mess = new Messaging(player);
+        Land land = iConomyLand.landMgr.getLandById(id);
+        if ( category.equals("perms") ) {
+            land.modifyBuildDestroyWithTags(args);
+            mess.send("{}Permissions added");
+            iConomyLand.landMgr.save();
+        } else if ( category.equalsIgnoreCase("name") ) {
+            land.locationName = args.substring(0, (args.length()>35)?35:args.length());
+            iConomyLand.landMgr.save();
+            mess.send("{}Location name changed");
+        }
+    }
+    
+    
+    public void adminEditLand(CommandSender sender, Integer id, String category, String tags) {
+        Messaging mess = new Messaging(sender);
+        Land land = iConomyLand.landMgr.getLandById(id);
+        if ( category.equals("perms") ) {
+            editLand((Player)sender, id, category, tags);
+        } else if ( category.equalsIgnoreCase("name") ) {
+            editLand((Player)sender, id, category, tags);
+        } else if ( category.equalsIgnoreCase("owner") ) {
+            land.owner = tags;
+            mess.send("{}Owner changed");
+        } else if ( category.equalsIgnoreCase("addons") ) {
+            
+        }
+        /*
+        Messaging mess = new Messaging(sender);
+        if ( category.equals("owner") ) {
+            changeOwner(sender, id, tags);
+        } else if ( category.equals("perms") ) {
+            
+        } else if ( category.equalsIgnoreCase("addons") ) {
+            
+            
+            adminEditLand(sender, id, tags);
+    
+            if ( args[2].equals("perms") && iConomyLand.hasPermission(sender,"modify.perms") ) {
+                if ( args[3].equalsIgnoreCase("add") ) {
+                    addPerms(sender, id, tags);
+                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
+                } else if ( args[3].equalsIgnoreCase("del") ) {
+                    delPerms(sender, id, tags);
+                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
+                } else {
+                    mess.send("{ERR}Bad modifier - must be add or del");
+                }
+            } else if ( args[2].equals("addons") && iConomyLand.hasPermission(sender,"modify.addons") ) {
+                if ( args[3].equalsIgnoreCase("add") ) {
+                    addAddon(sender, id, tags);
+                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
+                } else if ( args[3].equalsIgnoreCase("del") ) {
+                    delAddon(sender, id, tags);
+                    iConomyLand.landMgr.showSelectLandInfo(sender, id);
+                } else {
+                    mess.send("{ERR}Bad modifier - must be add or del");
+                }
+            } else {
+                mess.send("{ERR}Bad category");
+                showHelp(sender, "modify");
+            }
+    
+
+        }
+        */
+        
+    }
+    
+    public void showList(CommandSender sender) {
+        Collection<Land> list;
+        if( sender instanceof Player )
+            list = iConomyLand.landMgr.getLandsOwnedBy(((Player)sender).getName());
+        else
+            list = iConomyLand.landMgr.getAllLands();
+                
+        Messaging mess = new Messaging(sender);
+        Iterator<Land> itr = list.iterator();
+        while(itr.hasNext()) {
+            Land land = itr.next();
+            mess.send("{PRM}ID#{}"+land.getID()+
+                      " {PRM}V:{}"+land.location.volume()+
+                      "{PRM}[{}"+land.location.toDimString()+
+                      "{PRM}] C{}"+land.location.toCenterCoords()+
+                      " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
+                      " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
+                      );
+        }
+        
+    }
+ 
 
     public void buyAddon(Player sender, String addon, Integer id) {
         Messaging mess = new Messaging(sender);
-        String playerName = sender.getName();
-        Account acc = iConomy.getBank().getAccount(playerName);
-        double price = Double.valueOf(iConomyLand.df.format(iConomyLand.landMgr.getLandById(id).getAddonPrice(addon)));
-        if ( acc.getBalance() > price ) {
-            acc.subtract(price);
-            iConomyLand.landMgr.addAddon(sender, addon, id);
-            iConomyLand.landMgr.save();
-            mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iConomyLand.df.format(price));
-            mess.send("{}Bank Balance: {PRM}"+iConomyLand.df.format(acc.getBalance()));
+        Land land = iConomyLand.landMgr.getLandById(id);
+
+        if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
+
+            Account acc = iConomy.getBank().getAccount(sender.getName());
+            double price = Double.valueOf(iConomyLand.df.format(iConomyLand.landMgr.getLandById(id).getAddonPrice(addon)));
+            
+            if ( acc.getBalance() > price ) {
+                acc.subtract(price);
+                land.addAddon(addon);
+                iConomyLand.landMgr.save();
+                
+                mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iConomyLand.df.format(price));
+                mess.send("{}Bank Balance: {PRM}"+iConomyLand.df.format(acc.getBalance()));
+            } else {
+                mess.send("{ERR}Not enough in account. Bank: "+iConomyLand.df.format(acc.getBalance())+
+                        " Price: "+iConomyLand.df.format(price)); 
+            }
         } else {
-            mess.send("{ERR}Not enough in account. Bank: "+iConomyLand.df.format(acc.getBalance())+
-                    " Price: "+iConomyLand.df.format(price)); 
+            mess.send("{ERR}Not owner of land ID# {PRM}"+id);
+        }
+    }
+    
+    public void sellAddon(Player sender, String addon, Integer id) {
+        Messaging mess = new Messaging(sender);
+        Land land = iConomyLand.landMgr.getLandById(id);
+        
+        if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
+        
+            Account acc = iConomy.getBank().getAccount(sender.getName());
+            double price = Double.valueOf(iConomyLand.df.format(land.getAddonPrice(addon)*iConomyLand.sellTax));
+            
+            acc.add(price);
+            land.removeAddon(addon);
+            iConomyLand.landMgr.save();
+    
+            mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
+            mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+        } else {
+            mess.send("{ERR}Not owner of land ID# {PRM}"+id);
         }
     }
 
@@ -417,26 +530,6 @@ public class iConomyLandCommandListener implements CommandExecutor {
             iConomyLand.landMgr.removeLandById(id);
             
             mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}"+price);
-            mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
-        } else {
-            mess.send("{ERR}Not owner of land ID# {PRM}"+id);
-        }
-    }
-    
-    public void sellAddon(Player sender, String addon, Integer id) {
-        Messaging mess = new Messaging(sender);
-        Land land = iConomyLand.landMgr.getLandById(id);
-        
-        if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
-        
-            Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iConomyLand.df.format(land.getAddonPrice(addon)*iConomyLand.sellTax));
-            
-            acc.add(price);
-            land.removeAddon(addon);
-            iConomyLand.landMgr.save();
-    
-            mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
             mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
         } else {
             mess.send("{ERR}Not owner of land ID# {PRM}"+id);

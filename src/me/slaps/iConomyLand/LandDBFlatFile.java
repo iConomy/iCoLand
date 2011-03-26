@@ -1,14 +1,11 @@
 package me.slaps.iConomyLand;
 
 import java.io.File;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.util.config.Configuration;
@@ -61,8 +58,9 @@ public class LandDBFlatFile extends LandDB {
             HashMap<String, Boolean> addons = Land.parseAddonTags(shopkeys.get("addons"));
             String dateCreated = shopkeys.get("dateCreated");
             String dateTaxed = shopkeys.get("dateTaxed");
+            String locationName = shopkeys.get("name");
 
-            lands.put(id, new Land(id, loc, owner, perms, addons, dateCreated, dateTaxed));
+            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, dateCreated, dateTaxed));
 
         }
         
@@ -76,22 +74,23 @@ public class LandDBFlatFile extends LandDB {
         ArrayList<LinkedHashMap<String,Object>> tmpshops = new ArrayList<LinkedHashMap<String,Object>>();
         Iterator<Land> itr = lands.values().iterator();
         while(itr.hasNext()) {
-            Land shop = itr.next();
+            Land land = itr.next();
             LinkedHashMap<String,Object> tmpmap = new LinkedHashMap<String,Object>();
             
-            tmpmap.put("id", shop.getID());
-            tmpmap.put("owner", shop.owner);
-            tmpmap.put("perms", Land.writePermTags(shop.canBuildDestroy));
-            tmpmap.put("addons", Land.writeAddonTags(shop.addons));
-            tmpmap.put("dateCreated", shop.dateCreated.toString() );
-            tmpmap.put("dateTaxed", shop.dateTaxed.toString() );
-            tmpmap.put("world", shop.location.setLoc1.getWorld().getName());
-            tmpmap.put("corner1x",shop.location.setLoc1.getBlockX());
-            tmpmap.put("corner1y",shop.location.setLoc1.getBlockY());
-            tmpmap.put("corner1z",shop.location.setLoc1.getBlockZ());
-            tmpmap.put("corner2x",shop.location.setLoc2.getBlockX());
-            tmpmap.put("corner2y",shop.location.setLoc2.getBlockY());
-            tmpmap.put("corner2z",shop.location.setLoc2.getBlockZ());
+            tmpmap.put("id", land.getID());
+            tmpmap.put("owner", land.owner);
+            tmpmap.put("perms", Land.writePermTags(land.canBuildDestroy));
+            tmpmap.put("addons", Land.writeAddonTags(land.addons));
+            tmpmap.put("dateCreated", land.dateCreated.toString() );
+            tmpmap.put("dateTaxed", land.dateTaxed.toString() );
+            tmpmap.put("name", land.locationName);
+            tmpmap.put("world", land.location.setLoc1.getWorld().getName());
+            tmpmap.put("corner1x",land.location.setLoc1.getBlockX());
+            tmpmap.put("corner1y",land.location.setLoc1.getBlockY());
+            tmpmap.put("corner1z",land.location.setLoc1.getBlockZ());
+            tmpmap.put("corner2x",land.location.setLoc2.getBlockX());
+            tmpmap.put("corner2y",land.location.setLoc2.getBlockY());
+            tmpmap.put("corner2z",land.location.setLoc2.getBlockZ());
 
             tmpshops.add(tmpmap);           
         }

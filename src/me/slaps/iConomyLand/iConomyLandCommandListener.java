@@ -1,9 +1,7 @@
 package me.slaps.iConomyLand;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -264,87 +262,6 @@ public class iConomyLandCommandListener implements CommandExecutor {
         }
 
     }
-    
-    /*
-    public void addPerms(CommandSender sender, Integer id, String tags) {
-        Messaging mess = new Messaging(sender);
-        Land land = iConomyLand.landMgr.getLandById(id);
-        String playerName = (sender instanceof Player)? ((Player)sender).getName():""; 
-
-        if ( (sender instanceof Player) && !land.owner.equals(playerName) ) {
-            mess.send("{ERR}No permission to do that");
-        } else {
-            HashMap<String, Boolean> parsedTags = Land.parsePermTags(tags);
-            Set<String> keys = parsedTags.keySet();
-            for( String key : keys ) {
-                land.addPermission(key, parsedTags.get(key) );
-            }
-        }
-        iConomyLand.landMgr.save();
-    }
-    
-    public void delPerms(CommandSender sender, Integer id, String tags) {
-        Messaging mess = new Messaging(sender);
-        Land land = iConomyLand.landMgr.getLandById(id);
-        String playerName = (sender instanceof Player)? ((Player)sender).getName():""; 
-        
-        if ( (sender instanceof Player) && !land.owner.equals(playerName) ) {
-            mess.send("{ERR}No permission to do that");
-        } else {
-            String[] split = tags.split(" ");
-            for( String key : split ) {
-                land.delPermission(key);
-            }
-        }
-        iConomyLand.landMgr.save();
-    }
-    
-    public void addAddon(CommandSender sender, Integer id, String tags) {
-        Messaging mess = new Messaging(sender);
-        Land land = iConomyLand.landMgr.getLandById(id);
-        String playerName = (sender instanceof Player)? ((Player)sender).getName():"";
-        
-        if ( (sender instanceof Player) && !land.owner.equals(playerName) ) {
-            mess.send("{ERR}No permission to do that");
-        } else {
-            String[] split = tags.split(" ");
-            for( String key : split ) {
-                land.giveAddon(key);
-            }
-        }
-        iConomyLand.landMgr.save();        
-    }
-
-    public void delAddon(CommandSender sender, Integer id, String tags) {
-        Messaging mess = new Messaging(sender);
-        Land land = iConomyLand.landMgr.getLandById(id);
-        String playerName = (sender instanceof Player)? ((Player)sender).getName():"";
-        
-        if ( (sender instanceof Player) && !land.owner.equals(playerName) ) {
-            mess.send("{ERR}No permission to do that");
-        } else {
-            String[] split = tags.split(" ");
-            for( String key : split ) {
-                land.removeAddon(key);
-            }
-        }
-        iConomyLand.landMgr.save();
-    }
-    
-    public void changeOwner(CommandSender sender, Integer id, String tags) {
-        Messaging mess = new Messaging(sender);
-        Land land = iConomyLand.landMgr.getLandById(id);
-        String playerName = (sender instanceof Player)? ((Player)sender).getName():"";
-
-        if ( (sender instanceof Player) && !land.owner.equals(playerName) ) {
-            mess.send("{ERR}No permission to do that");
-        } else {
-            land.owner = tags;
-        }
-        
-        iConomyLand.landMgr.save();
-    }
-*/
     
     public void editLand(Player player, Integer id, String category, String args) {
         Messaging mess = new Messaging(player);

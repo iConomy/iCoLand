@@ -50,8 +50,8 @@ public class iConomyLandBlockListener extends BlockListener {
 	}
 	
 	public void onBlockBreak( BlockBreakEvent event ) {
-	    Location loc = event.getBlock().getLocation();
-	    Player player = event.getPlayer();
+        Location loc = event.getBlock().getLocation();
+        Player player = event.getPlayer();
         if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);

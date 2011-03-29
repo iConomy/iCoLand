@@ -87,13 +87,13 @@ public class LandManager {
 	}
 	
 	public boolean canBuild(String playerName, Location loc) {
-	    Integer id = getLandID(loc);
+	    Integer id = getLandId(loc);
 	    if ( id > 0 ) return getLandById(id).hasPermission(playerName);
 	    else          return true;
 	}
 	
 	public boolean canBuildDestroy(String playerName, Location loc) {
-	    Integer id = getLandID(loc);
+	    Integer id = getLandId(loc);
 	    if ( id > 0 ) {
 	        Land land = landDB.lands.get(id);
 	        return land.hasPermission(playerName);
@@ -112,7 +112,7 @@ public class LandManager {
 	}
 	
 	
-	public Integer getLandID(Location loc) {
+	public Integer getLandId(Location loc) {
 		Iterator<Land> itr = landDB.lands.values().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();

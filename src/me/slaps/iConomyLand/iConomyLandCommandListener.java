@@ -144,7 +144,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
                 }
                 return true;
                 
-            // /icl info
+            // /icl info [here|LANDID]
             } else if (args[0].equalsIgnoreCase("info") ) {
                 if ( iConomyLand.hasPermission(sender, "info") ) {
                     if ( (args.length == 1) ) {
@@ -430,7 +430,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
             }
         } else {
             Location loc = sender.getLocation();
-            Integer landid = iConomyLand.landMgr.getLandID(loc);
+            Integer landid = iConomyLand.landMgr.getLandId(loc);
             if ( landid > 0 ) {
                 iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, landid);
             } else {
@@ -446,12 +446,17 @@ public class iConomyLandCommandListener implements CommandExecutor {
         if ( args.length == 0 ) {
             showHelp(sender,"info");
         } else {
-            Integer id;          
-            try {
-                id = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e ) {
-                id = -1;
+            Integer id = 0;          
+            if ( args[0].equalsIgnoreCase("here") ) {
+                id = iConomyLand.landMgr.getLandId(((Player)sender).getLocation());
+            } else {
+                try {
+                    id = Integer.parseInt(args[0]);
+                } catch (NumberFormatException e ) {
+                    id = 0;
+                }
             }
+            
             if ( id > 0 ) {
                 if ( iConomyLand.landMgr.landIdExists(id)) {
                     iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
@@ -469,7 +474,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
     
     public void showHelp(CommandSender sender, String topic) {
         Messaging mess = new Messaging(sender);
-        mess.send("{}"+Misc.headerify("{CMD} " + iConomyLand.name + " {BKT}({CMD}" + iConomyLand.codename + "{BKT}){}"));
+        mess.send("{}"+Misc.headerify("{CMD}" + iConomyLand.name + " {BKT}({CMD}" + iConomyLand.codename + "{BKT}){}"));
     	if ( topic == null || topic.isEmpty() ) {
     	    
     	    mess.send(" {CMD}/icl {}- main command");
@@ -478,36 +483,67 @@ public class iConomyLandCommandListener implements CommandExecutor {
             if ( iConomyLand.hasPermission(sender, "list") ) topics += "list";
             if ( iConomyLand.hasPermission(sender, "select") ) topics += " select";
             if ( iConomyLand.hasPermission(sender, "info") ) topics += " info";
+            if ( iConomyLand.hasPermission(sender, "edit") ) topics += " edit";
             if ( iConomyLand.hasPermission(sender, "buy") ) topics += " buy";
+            if ( iConomyLand.hasPermission(sender, "sell") ) topics += " buy";
             if ( iConomyLand.hasPermission(sender, "modify") ) topics += " modify";
     	    
     	    mess.send(" {} help topics: {CMD}" + topics);
     	    
     	} else if ( topic.equalsIgnoreCase("list") ) {
             if ( iConomyLand.hasPermission(sender, "list") ) { 
-                mess.send(" {CMD}/icl {PRM}list {}- list owned land");
+                mess.send(" {CMD}/icl {PRM}list {}- lists owned land");
             }
             
         } else if ( topic.equalsIgnoreCase("select") ) {
             if ( iConomyLand.hasPermission(sender, "select") ) { 
-                mess.send(" {CMD}/icl {PRM}select {}- select land");
+                mess.send(" {CMD}/icl {PRM}select {}- start cuboid selection process");
+                mess.send("    {}After typing this command, right click ( use something");
+                mess.send("    {}unplaceable ) on the first corner, then right click");
+                mess.send("    {}on the second corner.");
             }
         } else if ( topic.equalsIgnoreCase("info") ) {
             if ( iConomyLand.hasPermission(sender, "info") ) { 
-                mess.send(" {CMD}/icl {PRM}info {}- get land info");
+                mess.send(" {CMD}/icl {PRM}info {BKT}[{PRM}here{BKT}|{PRM}LANDID{BKT] {}- gets land info");
+                mess.send("    {}Optional arguments 'here' or <LANDID>");
+                mess.send("    {}Will give info on the selected land, or current location, or specific land ID#");
             }
             
         } else if ( topic.equalsIgnoreCase("buy") ) {
             if ( iConomyLand.hasPermission(sender, "buy") ) { 
-                mess.send(" {CMD}/icl {PRM}buy {}- purchase selected land");
+                mess.send(" {CMD}/icl {PRM}buy {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}- purchase land or addons");
+                mess.send("    {}this command can be used to purchase land: {CMD}/icl buy land");
+                mess.send("    {}it can also be used to buy addons for a specific land ID# with:");
+                mess.send("    {}{CMD}/icl buy addon <ADDON> <LANDID>");
             }
             
+        } else if ( topic.equalsIgnoreCase("sell") ) {
+            if ( iConomyLand.hasPermission(sender, "sell") ) { 
+                mess.send(" {CMD}/icl {PRM}sell {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}- purchase land or addons");
+                mess.send("    {}this command can be used to sell land: {CMD}/icl sell land");
+                mess.send("    {}it can also be used to sell addons for a specific land ID# with:");
+                mess.send("    {}{CMD}/icl sell addon <ADDON> <LANDID>");
+            }
+
+        } else if ( topic.equalsIgnoreCase("edit") ) {
+            if ( iConomyLand.hasPermission(sender, "edit") ) {
+                mess.send(" {CMD}/icl {PRM}edit {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}name{BKT}> <{PRM}tags{BKT}>");
+                mess.send("    {}modifies config for land ( permissions, names )");
+                mess.send("    {}change location name example: {CMD}/icl edit 4 name This Land");
+                mess.send("    {}Tags for perms: {BKT}<{PRM}playerName{BKT}>{PRM}:{BKT}<{PRM}t{BKT}|{PRM}f{BKT}|{PRM}-{BKT}>");
+                mess.send("    {}{BKT}<{PRM}playerName{BKT}> {}- player to be affected ( or '{PRM}default{}' )");
+                mess.send("    {}{BKT}<{PRM}t{BKT}|{PRM}f{BKT}|{PRM}-{BKT}> {}- {PRM}t{}/{PRM}f{} for true/false (build/destroy)");
+                mess.send("    {}{PRM}- {}removes perm for playerName");
+                mess.send("    {}perm example: {CMD}/icl edit 4 perms default:f kigam:t jesus:t");
+            }
+
         } else if ( topic.equalsIgnoreCase("modify") ) {
             if ( iConomyLand.hasPermission(sender, "modify") ) { 
-                mess.send(" {CMD}/icl {PRM}modify {}- modify land settings");
+                mess.send(" {CMD}/icl {PRM}modify {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}addons{BKT}> <{PRM}tags{BKT}> {}- modify land settings");
             }
             
         }
+
     }
     
     public boolean selectArea(Player player) {

@@ -57,10 +57,10 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	            );
         */
 	    
-	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iConomyLand.landMgr.getLandID(player.getLocation()) );
+	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iConomyLand.landMgr.getLandId(player.getLocation()) );
 	    
 	    int locFrom = locMap.get(playerName);
-		int locTo = iConomyLand.landMgr.getLandID(player.getLocation());
+		int locTo = iConomyLand.landMgr.getLandId(player.getLocation());
 		
 		locMap.put(playerName, locTo);
 		

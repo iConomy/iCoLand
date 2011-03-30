@@ -123,11 +123,11 @@ public class Land {
 
     public double getAddonPrice(String addon) {
         if ( addon.equalsIgnoreCase("announce") )
-            return Config.pricePerBlockAddonAnnounce*location.volume();
+            return Config.addonsPricePerBlock.get("announce")*location.volume();
         else if ( addon.equalsIgnoreCase("heal") )
-            return Config.pricePerBlockAddonHealing*location.volume();
+            return Config.addonsPricePerBlock.get("heal")*location.volume();
         else if ( addon.equalsIgnoreCase("noenter") )
-            return Config.pricePerBlockAddonNoEnter*location.volume();
+            return Config.addonsPricePerBlock.get("noenter")*location.volume();
         else
             return 0;
     }

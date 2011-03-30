@@ -13,11 +13,9 @@ public class Config {
     public static double sellTax;
 
     public static double pricePerBlockRaw;
-    public static double pricePerBlockAddonAnnounce;
-    public static double pricePerBlockAddonHealing;
-    public static double pricePerBlockAddonNoEnter;
     
-    public static HashMap<String, Boolean> enabledAddons = new HashMap<String, Boolean>();
+    public static HashMap<String, Boolean> addonsEnabled;
+    public static HashMap<String, Double> addonsPricePerBlock;
     
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
@@ -25,12 +23,17 @@ public class Config {
         // setup defaults
         debugMode = false;
         pricePerBlockRaw = 50.0;
-        pricePerBlockAddonHealing = 200.0;
-        pricePerBlockAddonNoEnter = 200.0;
         sellTax = 0.80;
-        enabledAddons.put("announce", true);
-        enabledAddons.put("noenter", true);
-        enabledAddons.put("heal", true);
+
+        addonsEnabled = new HashMap<String, Boolean>();
+        addonsEnabled.put("announce", true);
+        addonsEnabled.put("noenter", true);
+        addonsEnabled.put("heal", true);
+
+        addonsPricePerBlock = new HashMap<String, Double>();
+        addonsPricePerBlock.put("announce", 50.0);
+        addonsPricePerBlock.put("noenter", 100.0);
+        addonsPricePerBlock.put("heal", 200.0);
         
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
@@ -46,35 +49,38 @@ public class Config {
         config.load();
         debugMode = config.getBoolean("debug", false);
         pricePerBlockRaw = config.getDouble("PricePerBlock-Raw", 20.0);
-        pricePerBlockAddonAnnounce = config.getDouble("PricePerBlock-Addon-Announce", 50.0);
-        pricePerBlockAddonHealing = config.getDouble("PricePerBlock-Addon-Healing", 200.0);
-        pricePerBlockAddonNoEnter = config.getDouble("PricePerBlock-Addon-NoEnter", 200.0);
         
         sellTax = config.getDouble("SalesTaxPercent", 80.0)/100.0;
         if ( sellTax < 0 ) sellTax = 0;
         if ( sellTax > 1 ) sellTax = 1;
         
-        //List<Boolean> addons = config.getBooleanList("Addons-Enabled", null);
-        enabledAddons.clear();
+        addonsEnabled.clear();
         ConfigurationNode addons = config.getNode("Addons-Enabled");
-        enabledAddons.put("announce", addons.getBoolean("announce", false));
-        enabledAddons.put("noenter", addons.getBoolean("noenter", false));
-        enabledAddons.put("heal", addons.getBoolean("heal", false));
-        
+        addonsEnabled.put("announce", addons.getBoolean("announce", false));
+        addonsEnabled.put("noenter", addons.getBoolean("noenter", false));
+        addonsEnabled.put("heal", addons.getBoolean("heal", false));
+
+        addonsPricePerBlock.clear();
+        ConfigurationNode addonPrices = config.getNode("Addons-PricePerBlock");
+        addonsPricePerBlock.put("announce", addonPrices.getDouble("announce", 50.0));
+        addonsPricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
+        addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
     }
     
     public static void saveConfig(File configFile) {
         Configuration config = new Configuration(configFile);
         config.setProperty("debug", debugMode);
         config.setProperty("PricePerBlock-Raw", pricePerBlockRaw);
-        config.setProperty("PricePerBlock-Addon-Announce", pricePerBlockAddonAnnounce);
-        config.setProperty("PricePerBlock-Addon-Healing", pricePerBlockAddonHealing);
-        config.setProperty("PricePerBlock-Addon-NoEnter", pricePerBlockAddonNoEnter);
         config.setProperty("SalesTaxPercent", sellTax*100.0);
         
-        config.setProperty("Addons-Enabled.announce", enabledAddons.get("announce"));
-        config.setProperty("Addons-Enabled.noenter", enabledAddons.get("noenter"));
-        config.setProperty("Addons-Enabled.heal", enabledAddons.get("heal"));
+        config.setProperty("Addons-Enabled.announce", addonsEnabled.get("announce"));
+        config.setProperty("Addons-Enabled.noenter", addonsEnabled.get("noenter"));
+        config.setProperty("Addons-Enabled.heal", addonsEnabled.get("heal"));
+
+        config.setProperty("Addons-PricePerBlock.announce", addonsPricePerBlock.get("announce"));
+        config.setProperty("Addons-PricePerBlock.noenter", addonsPricePerBlock.get("noenter"));
+        config.setProperty("Addons-PricePerBlock.heal", addonsPricePerBlock.get("heal"));
+
         config.save();
     }
 }

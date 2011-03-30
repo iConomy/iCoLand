@@ -272,8 +272,8 @@ public class iConomyLandCommandListener implements CommandExecutor {
             iConomyLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("name") ) {
             land.locationName = args.substring(0, (args.length()>35)?35:args.length());
-            iConomyLand.landMgr.save();
             mess.send("{}Location name changed");
+            iConomyLand.landMgr.save();
         }
     }
     
@@ -283,13 +283,17 @@ public class iConomyLandCommandListener implements CommandExecutor {
         Land land = iConomyLand.landMgr.getLandById(id);
         if ( category.equals("perms") ) {
             editLand((Player)sender, id, category, tags);
+            iConomyLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("name") ) {
             editLand((Player)sender, id, category, tags);
+            iConomyLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("owner") ) {
             land.owner = tags;
             mess.send("{}Owner changed");
+            iConomyLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("addons") ) {
             mess.send("need to implement...");
+            iConomyLand.landMgr.save();
         }
 
         

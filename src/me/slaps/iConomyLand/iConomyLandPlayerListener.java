@@ -3,6 +3,7 @@ package me.slaps.iConomyLand;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -15,7 +16,8 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
-    private static int checkDelay = 200; // milliseconds
+    private static HashMap<String, Location> lastNonLandLoc;
+    private static int checkDelay = 500; // milliseconds
     
     
 	public iConomyLandPlayerListener(iConomyLand plug) {
@@ -25,6 +27,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    
 	    timeMap = new HashMap<String, Long>();
 	    locMap = new HashMap<String, Integer>();
+	    lastNonLandLoc = new HashMap<String, Location>();
 	}
 
     @Override
@@ -62,19 +65,29 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    int locFrom = locMap.get(playerName);
 		int locTo = iConomyLand.landMgr.getLandId(player.getLocation());
 		
-		locMap.put(playerName, locTo);
+		if ( locTo == 0 ) lastNonLandLoc.put(playerName, player.getLocation());
 		
-		if ( locFrom != locTo ) {
+		locMap.put(playerName, locTo);
+
+        Land landFrom = iConomyLand.landMgr.getLandById(locFrom);
+        Land landTo = iConomyLand.landMgr.getLandById(locTo);
+        
+		if ( Config.addonsEnabled.get("noenter") && landTo != null && locTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) ) {
+            Location loc = lastNonLandLoc.get(playerName);
+            if ( loc != null ) {
+                locMap.put(playerName, 0);
+                player.sendMessage("Can't enter this land");
+                player.teleportTo(loc);
+            }
+		} else if ( Config.addonsEnabled.get("noenter") && locFrom != locTo ) {
 		    if ( locFrom != 0 ) {
-		        Land land = iConomyLand.landMgr.getLandById(locFrom);
-		        if ( land.hasAddon("announce") ) {
-		            player.sendMessage("Leaving "+(land.locationName.isEmpty()?"unnamed land":land.locationName));
+		            if ( landFrom.hasAddon("announce") ) {
+		            player.sendMessage("Leaving "+(landFrom.locationName.isEmpty()?"unnamed land":landFrom.locationName));
 		        }
 		    }
 		    if ( locTo != 0 ) {
-                Land land = iConomyLand.landMgr.getLandById(locTo);
-                if ( land.hasAddon("announce") ) {
-                    player.sendMessage("Entering "+(land.locationName.isEmpty()?"unnamed land":land.locationName));
+                if ( landTo.hasAddon("announce") ) {
+                    player.sendMessage("Entering "+(landTo.locationName.isEmpty()?"unnamed land":landTo.locationName));
                 }
 		    }
 		}

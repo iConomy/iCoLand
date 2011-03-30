@@ -453,25 +453,29 @@ public class iConomyLandCommandListener implements CommandExecutor {
             Integer id = 0;          
             if ( args[0].equalsIgnoreCase("here") ) {
                 id = iConomyLand.landMgr.getLandId(((Player)sender).getLocation());
+                if ( id > 0 ) {
+                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
+                } else {
+                    mess.send("{ERR}No land claimed where you are standing.");
+                }
             } else {
                 try {
                     id = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e ) {
                     id = 0;
                 }
-            }
-            
-            if ( id > 0 ) {
-                if ( iConomyLand.landMgr.landIdExists(id)) {
-                    iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
+                if ( id > 0 ) {
+                    if ( iConomyLand.landMgr.landIdExists(id)) {
+                        iConomyLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
+                    } else {
+                        mess.send("{ERR}Land ID# "+id+" does not exist");
+                    }
                 } else {
-                    mess.send("{ERR}Land ID# "+id+" does not exist");
+                    if ( sender instanceof Player ) 
+                        showLandInfo((Player)sender, args);
+                    else
+                        showHelp(sender,"info");
                 }
-            } else {
-                if ( sender instanceof Player ) 
-                    showLandInfo((Player)sender, args);
-                else
-                    showHelp(sender,"info");
             }
         }
     }
@@ -553,18 +557,17 @@ public class iConomyLandCommandListener implements CommandExecutor {
     public boolean selectArea(Player player) {
         String playerName = player.getName();
         Messaging mess = new Messaging((CommandSender)player);
-        if ( iConomyLand.cmdMap.containsKey(playerName) ) {
-            String action = iConomyLand.cmdMap.get(playerName);
-            if ( action.equals("select") ) {
-                mess.send("{}Cancelling current selection.");
-                iConomyLand.cmdMap.remove(playerName);
-                iConomyLand.tmpCuboidMap.remove(playerName);
-            } else {
-                mess.send("{ERR} Canceling "+action);
-                iConomyLand.cmdMap.remove(playerName);
-            }
+        if ( iConomyLand.cmdMap.containsKey(playerName) && iConomyLand.cmdMap.get(playerName).equals("select") ) {
+            mess.send("{ERR}Cancelling selection command.");
+            iConomyLand.cmdMap.remove(playerName);
         }
-        mess.send("{}Select 1st Corner");
+        
+        if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
+            mess.send("{ERR}Unselecting current cuboid");
+            iConomyLand.tmpCuboidMap.remove(playerName);
+        }
+            
+        mess.send("{}Left Click 1st Corner");
         iConomyLand.cmdMap.put(playerName,"select");
         return true;
     }

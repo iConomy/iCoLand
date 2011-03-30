@@ -7,7 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -21,23 +22,44 @@ public class iConomyLandPlayerListener extends PlayerListener {
     
     
 	public iConomyLandPlayerListener(iConomyLand plug) {
+        plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_INTERACT, this, Priority.Monitor, plug);
 	    plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plug);
-	    if ( Config.debugMode )
-	        plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this, Priority.Highest, plug);
-	    
+
 	    timeMap = new HashMap<String, Long>();
 	    locMap = new HashMap<String, Integer>();
 	    lastNonLandLoc = new HashMap<String, Location>();
 	}
-
-    @Override
-    public void onPlayerCommandPreprocess ( PlayerChatEvent event ) {
-        if (Config.debugMode)
-            iConomyLand.info("iConomyLandPlayerListener.onPlayerCommandPreprocess(): Player: " + 
-                           event.getPlayer().getName() + " msg: " + event.getMessage() + 
-                           " Canceled? " + ( event.isCancelled()? "Yes": "No" ) );
-       
-    }	
+	
+	@Override
+	public void onPlayerInteract(PlayerInteractEvent event) {
+	    Player player = event.getPlayer();
+	    String playerName = player.getName();
+	    
+	    if ( event.getAction().equals(Action.LEFT_CLICK_BLOCK) ) {
+    	    if ( iConomyLand.cmdMap.containsKey(playerName) && iConomyLand.cmdMap.get(playerName).equals("select") ) {
+    	        Cuboid newCuboid;
+    	        Location loc = event.getClickedBlock().getLocation();
+          
+    	        if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
+    	            newCuboid = iConomyLand.tmpCuboidMap.get(playerName);
+    	            newCuboid.setLocation(loc);
+    	        } else {
+    	            newCuboid = new Cuboid(loc); 
+    	        }
+          
+    	        Messaging mess = new Messaging(player);
+          
+    	        if ( newCuboid.isValid() ) {
+    	            mess.send("{}Land selected!");
+    	            iConomyLand.landMgr.showSelectLandInfo(player, newCuboid);
+    	            iConomyLand.cmdMap.remove(playerName);
+    	        } else {
+    	            iConomyLand.tmpCuboidMap.put(playerName, newCuboid);
+    	            mess.send("{}Left click the 2nd corner");
+    	        }
+    	    }
+	    }
+	}
 	
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
@@ -46,19 +68,6 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    if ( !checkNow(player) ) return;
 
         String playerName = player.getName();
-        
-        /*
-	    DecimalFormat df = new DecimalFormat("#.##");
-	    if ( iConomyLand.debugMode ) iConomyLand.info("onPlayerMove: ("+
-	            df.format(event.getFrom().getX())+","+
-	            df.format(event.getFrom().getY())+","+
-	            df.format(event.getFrom().getZ())+") to ("+
-	            df.format(event.getTo().getX())+","+
-	            df.format(event.getTo().getY())+","+
-	            df.format(event.getTo().getZ())+")"+
-	            (event.getFrom().getBlock().equals(event.getTo().getBlock())?"":"(NEW BLOCK)")
-	            );
-        */
 	    
 	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iConomyLand.landMgr.getLandId(player.getLocation()) );
 	    
@@ -77,7 +86,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
             if ( loc != null ) {
                 locMap.put(playerName, 0);
                 player.sendMessage("Can't enter this land");
-                player.teleportTo(loc);
+                player.teleport(loc);
             }
 		} else if ( Config.addonsEnabled.get("noenter") && locFrom != locTo ) {
 		    if ( locFrom != 0 ) {

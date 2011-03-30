@@ -1,9 +1,10 @@
 package me.slaps.iConomyLand;
 
 import org.bukkit.event.Event;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.event.server.PluginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -17,11 +18,12 @@ public class iConomyLandPluginListener extends ServerListener {
     
 	public iConomyLandPluginListener(iConomyLand plug) {
 	    parent = plug;
-	    plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, this, Priority.Monitor, plug);
+        plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, this, Priority.Monitor, plug);
+        plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_DISABLE, this, Priority.Monitor, plug);
 	}
 	
 	@Override
-    public void onPluginEnabled(PluginEvent event) {
+    public void onPluginEnable(PluginEnableEvent event) {
     	if ( event.getPlugin().getDescription().getName().equals("iConomy") ) {
             Plugin pluginIC = parent.getServer().getPluginManager().getPlugin("iConomy");
 	 
@@ -34,6 +36,11 @@ public class iConomyLandPluginListener extends ServerListener {
 	        if ( pluginPerms != null )	enablePermissions((Permissions)pluginPerms);
     	}
     }
+
+	@Override
+	public void onPluginDisable(PluginDisableEvent event) {
+	    
+	}
 	
 	public void enableiConomy(iConomy plugin) {
 		iConomyLand.ic = plugin;

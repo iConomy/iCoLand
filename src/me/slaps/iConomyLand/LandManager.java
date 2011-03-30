@@ -218,7 +218,7 @@ public class LandManager {
 	}
 	
 	public double getPriceOfBlock(Location target) {
-	    return iConomyLand.pricePerBlockRaw;
+	    return Config.pricePerBlockRaw;
 	}
 	
 	

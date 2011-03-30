@@ -17,7 +17,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         Messaging mess = new Messaging(sender);
 
-        if ( iConomyLand.debugMode ) {
+        if ( Config.debugMode ) {
             String debug = "iConomyLand.onCommand(): " + ((sender instanceof Player) ? "Player " + ((Player) sender).getName() : "Console") + " Command " + cmd.getName() + " args: ";
             for (int i = 0; i < args.length; i++) 
                 debug += args[i] + " ";
@@ -30,7 +30,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
 
         // is our command?
         if ( Misc.isAny(cmd.getName(), "icl", "iConomyLand", "iConomyLand:icl", "iConomyLand:iConomyLand") ) {
-            if (iConomyLand.debugMode) iConomyLand.info("Is an /icl or /iConomyLand command");
+            if (Config.debugMode) iConomyLand.info("Is an /icl or /iConomyLand command");
 
             // /icl
             if ( args.length == 0 ) {
@@ -350,7 +350,7 @@ public class iConomyLandCommandListener implements CommandExecutor {
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
         
             Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iConomyLand.df.format(land.getAddonPrice(addon)*iConomyLand.sellTax));
+            double price = Double.valueOf(iConomyLand.df.format(land.getAddonPrice(addon)*Config.sellTax));
             
             acc.add(price);
             land.removeAddon(addon);

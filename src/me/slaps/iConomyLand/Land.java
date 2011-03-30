@@ -82,7 +82,7 @@ public class Land {
                 ret = canBuildDestroy.get("default");
             }
         }
-        if (iConomyLand.debugMode) iConomyLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
+        if (Config.debugMode) iConomyLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
         return ret;
     }
 
@@ -123,11 +123,11 @@ public class Land {
 
     public double getAddonPrice(String addon) {
         if ( addon.equalsIgnoreCase("announce") )
-            return iConomyLand.pricePerBlockAddonAnnounce*location.volume();
+            return Config.pricePerBlockAddonAnnounce*location.volume();
         else if ( addon.equalsIgnoreCase("heal") )
-            return iConomyLand.pricePerBlockAddonHealing*location.volume();
+            return Config.pricePerBlockAddonHealing*location.volume();
         else if ( addon.equalsIgnoreCase("noenter") )
-            return iConomyLand.pricePerBlockAddonNoEnter*location.volume();
+            return Config.pricePerBlockAddonNoEnter*location.volume();
         else
             return 0;
     }
@@ -145,7 +145,7 @@ public class Land {
         price += iConomyLand.landMgr.getPrice(location);
         
         // take out sales tax
-        price *= iConomyLand.sellTax;
+        price *= Config.sellTax;
         
         return price;
     }

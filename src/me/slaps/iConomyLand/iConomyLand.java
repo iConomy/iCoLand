@@ -14,7 +14,6 @@ import me.slaps.iConomyLand.iConomyLandBlockListener;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -35,14 +34,6 @@ public class iConomyLand extends JavaPlugin {
 	public static String codename = "initial";
 	public static String version; // = "0.0.0001";
 	
-	public static boolean debugMode = false;
-
-	public static double pricePerBlockRaw;
-    public static double pricePerBlockAddonAnnounce;
-    public static double pricePerBlockAddonHealing;
-    public static double pricePerBlockAddonNoEnter;
-    public static double sellTax;
-
 	public static Server server;
 	
 	public static Logger logger = Logger.getLogger("Minecraft");
@@ -88,7 +79,7 @@ public class iConomyLand extends JavaPlugin {
 
 		getDataFolder().mkdir();
 		
-		getConfig();
+		Config.getConfig(getDataFolder());
 		
 		server = getServer();
 		
@@ -107,43 +98,10 @@ public class iConomyLand extends JavaPlugin {
 	  	// try to check for if external plugins already enabled
 	  	pluginListener.tryEnablePlugins(getServer().getPluginManager());
 
-		info("Version ["+version+"] ("+codename+") enabled" + (iConomyLand.debugMode?" **DEBUG MODE ENABLED**":""));
+		info("Version ["+version+"] ("+codename+") enabled" + (Config.debugMode?" **DEBUG MODE ENABLED**":""));
     }
 	
-	private void getConfig() {
-	    File configFile = new File(getDataFolder() + File.separator + "config.yml");
-	    
-	    if ( !configFile.exists() ) {
-	        saveConfig(configFile);
-	    }
-	    
-	    loadConfig(configFile);
-	}
-	    
-	private void loadConfig(File configFile) {
-        Configuration config = new Configuration(configFile);
-        config.load();
-        iConomyLand.debugMode = config.getBoolean("debug", false);
-        iConomyLand.pricePerBlockRaw = config.getDouble("PricePerBlock-Raw", 20.0);
-        iConomyLand.pricePerBlockAddonAnnounce = config.getDouble("PricePerBlock-Addon-Announce", 50.0);
-        iConomyLand.pricePerBlockAddonHealing = config.getDouble("PricePerBlock-Addon-Healing", 200.0);
-        iConomyLand.pricePerBlockAddonNoEnter = config.getDouble("PricePerBlock-Addon-NoEnter", 200.0);
-        iConomyLand.sellTax = config.getDouble("SalesTaxPercent", 80.0)/100.0;
-        if ( sellTax < 0 ) sellTax = 0;
-        if ( sellTax > 1 ) sellTax = 1;
-	}
-	
-	private void saveConfig(File configFile) {
-        Configuration config = new Configuration(configFile);
-        config.setProperty("debug", iConomyLand.debugMode);
-        config.setProperty("PricePerBlock-Raw", iConomyLand.pricePerBlockRaw);
-        config.setProperty("PricePerBlock-Addon-Announce", iConomyLand.pricePerBlockAddonAnnounce);
-        config.setProperty("PricePerBlock-Addon-Healing", iConomyLand.pricePerBlockAddonHealing);
-        config.setProperty("PricePerBlock-Addon-NoEnter", iConomyLand.pricePerBlockAddonNoEnter);
-        config.setProperty("SalesTaxPercent", iConomyLand.sellTax*100.0);
-        config.save();
-	}
-	
+
     public static boolean hasPermission(CommandSender sender, String permString) {
         if (sender instanceof Player)
             return Permissions.Security.permission((Player) sender, name.toLowerCase() + "." + permString);

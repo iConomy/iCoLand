@@ -10,7 +10,7 @@ commands:
         usage: |
                /<command>
                /<command> help <topic>
-    iconomyland:
+    icoland:
         description: the main iConomyLand command
         usage: |
                /<command>

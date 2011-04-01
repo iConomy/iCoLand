@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 
-public class iConomyLandPlayerListener extends PlayerListener {
+public class iCoLandPlayerListener extends PlayerListener {
 	
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
@@ -21,7 +21,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
     private static int checkDelay = 500; // milliseconds
     
     
-	public iConomyLandPlayerListener(iCoLand plug) {
+	public iCoLandPlayerListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_INTERACT, this, Priority.Monitor, plug);
 	    plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plug);
 

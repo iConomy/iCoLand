@@ -10,9 +10,9 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-public class iConomyLandBlockListener extends BlockListener {
+public class iCoLandBlockListener extends BlockListener {
 	
-	public iConomyLandBlockListener(iCoLand plug) {
+	public iCoLandBlockListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_PLACE, this, Priority.High, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plug);

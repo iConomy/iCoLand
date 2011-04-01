@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.Locale;
 
-import me.slaps.iCoLand.iConomyLandBlockListener;
+import me.slaps.iCoLand.iCoLandBlockListener;
 
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -24,14 +24,14 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 
 
 /**
- * iConomyLand
+ * iCoLand
  * 
  * @author magik
  *
  */
 public class iCoLand extends JavaPlugin {
 
-	public static String name; // = "iConomyLand";
+	public static String name; // = "iCoLand";
 	public static String codename = "initial";
 	public static String version; // = "0.0.0001";
 	
@@ -43,10 +43,10 @@ public class iCoLand extends JavaPlugin {
 	public static Permissions perms;
 	public static iConomy ic;
 	
-	public static iConomyLandBlockListener blockListener;
-	public static iConomyLandPlayerListener playerListener;
-	public static iConomyLandPluginListener pluginListener;
-	public static iConomyLandCommandListener commandListener;
+	public static iCoLandBlockListener blockListener;
+	public static iCoLandPlayerListener playerListener;
+	public static iCoLandPluginListener pluginListener;
+	public static iCoLandCommandListener commandListener;
 	
 	public static LandManager landMgr;
     public static HashMap<String, String> cmdMap;
@@ -93,10 +93,10 @@ public class iCoLand extends JavaPlugin {
         cmdMap.clear();
 		
 		// setup listeners
-	  	getCommand("icl").setExecutor(new iConomyLandCommandListener());        
-		blockListener =  new iConomyLandBlockListener(this);
-		playerListener = new iConomyLandPlayerListener(this);
-	  	pluginListener = new iConomyLandPluginListener(this);
+	  	getCommand("icl").setExecutor(new iCoLandCommandListener());        
+		blockListener =  new iCoLandBlockListener(this);
+		playerListener = new iCoLandPlayerListener(this);
+	  	pluginListener = new iCoLandPluginListener(this);
 	  	
 	  	// try to check for if external plugins already enabled
 	  	pluginListener.tryEnablePlugins(getServer().getPluginManager());

@@ -12,11 +12,11 @@ import org.bukkit.plugin.PluginManager;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
-public class iConomyLandPluginListener extends ServerListener {
+public class iCoLandPluginListener extends ServerListener {
 	
     iCoLand parent;
     
-	public iConomyLandPluginListener(iCoLand plug) {
+	public iCoLandPluginListener(iCoLand plug) {
 	    parent = plug;
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, this, Priority.Monitor, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_DISABLE, this, Priority.Monitor, plug);

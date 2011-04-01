@@ -12,13 +12,13 @@ import org.bukkit.entity.Player;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.Account;
 
-public class iConomyLandCommandListener implements CommandExecutor {
+public class iCoLandCommandListener implements CommandExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         Messaging mess = new Messaging(sender);
 
         if ( Config.debugMode ) {
-            String debug = "iConomyLand.onCommand(): " + ((sender instanceof Player) ? "Player " + ((Player) sender).getName() : "Console") + " Command " + cmd.getName() + " args: ";
+            String debug = "iCoLand.onCommand(): " + ((sender instanceof Player) ? "Player " + ((Player) sender).getName() : "Console") + " Command " + cmd.getName() + " args: ";
             for (int i = 0; i < args.length; i++) 
                 debug += args[i] + " ";
             iCoLand.info(debug);
@@ -29,8 +29,8 @@ public class iConomyLandCommandListener implements CommandExecutor {
         	return false;
 
         // is our command?
-        if ( Misc.isAny(cmd.getName(), "icl", "iConomyLand", "iConomyLand:icl", "iConomyLand:iConomyLand") ) {
-            if (Config.debugMode) iCoLand.info("Is an /icl or /iConomyLand command");
+        if ( Misc.isAny(cmd.getName(), "icl", "iCoLand", "iCoLand:icl", "iCoLand:iCoLand") ) {
+            if (Config.debugMode) iCoLand.info("Is an /icl or /iCoLand command");
 
             // /icl
             if ( args.length == 0 ) {

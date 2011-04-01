@@ -121,11 +121,11 @@ public class LandManager {
 		return 0;
 	}
 	
-	public Collection<Land> getAllLands() {
-	    return landDB.lands.values();
+	public ArrayList<Land> getAllLands() {
+	    return (ArrayList<Land>) landDB.lands.values();
 	}
 	
-	public Collection<Land> getLandsOwnedBy(String playerName) {
+	public ArrayList<Land> getLandsOwnedBy(String playerName) {
 	    ArrayList<Land> ret = new ArrayList<Land>();
 	    Iterator<Land> itr = landDB.lands.values().iterator();
 	    while(itr.hasNext()) {
@@ -133,7 +133,7 @@ public class LandManager {
 	        if (tmp.owner.equals(playerName)) 
 	            ret.add(tmp);
 	    }
-	    return (Collection<Land>)ret;
+	    return ret;
 	}
 	
 	public Land getLandById(Integer id) {

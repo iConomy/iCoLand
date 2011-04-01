@@ -1,5 +1,6 @@
 package me.slaps.iCoLand;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -49,7 +50,20 @@ public class iCoLandCommandListener implements CommandExecutor {
             // /icl list
             } else if (args[0].equalsIgnoreCase("list") ) {
                 if ( iCoLand.hasPermission(sender, "list") ) { 
-                    showList(sender);
+                    if ( args.length > 1 ) {
+                        Integer page;
+                        try { 
+                            page = Integer.parseInt(args[1]);
+                            if ( page > 1 ) 
+                                showList(sender, page-1);
+                            else
+                                mess.send("{ERR}Bad page #");
+                        } catch(NumberFormatException ex) {
+                            mess.send("{ERR}Error parsing page #!");                        
+                        }
+                    } else {
+                        showList(sender, 0);
+                    }
                 } else {
                     mess.send("{ERR}No access for list");
                 }
@@ -299,24 +313,38 @@ public class iCoLandCommandListener implements CommandExecutor {
         
     }
     
-    public void showList(CommandSender sender) {
-        Collection<Land> list;
+    public void showList(CommandSender sender, Integer page) {
+        Integer pageSize = 7;
+        ArrayList<Land> list;
         if( sender instanceof Player )
             list = iCoLand.landMgr.getLandsOwnedBy(((Player)sender).getName());
         else
             list = iCoLand.landMgr.getAllLands();
                 
         Messaging mess = new Messaging(sender);
-        Iterator<Land> itr = list.iterator();
-        while(itr.hasNext()) {
-            Land land = itr.next();
-            mess.send("{PRM}ID#{}"+land.getID()+
-                      " {PRM}V:{}"+land.location.volume()+
-                      "{PRM}[{}"+land.location.toDimString()+
-                      "{PRM}] C{}"+land.location.toCenterCoords()+
-                      " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
-                      " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
-                      );
+        Integer numLands = list.size();
+        if ( numLands == 0 ) {
+            mess.send("{ERR}You do not own any land");
+        } else {
+            if ( page*10 > numLands ) {
+                mess.send("{ERR}No lands on this page");
+            } else {
+                int i;
+                for(i=page*pageSize;i<numLands && i<(page+1)*pageSize;i++) {
+                    Land land = list.get(i);
+                    mess.send("{PRM}ID#{}"+land.getID()+
+                            " {PRM}V:{}"+land.location.volume()+
+                            "{PRM}[{}"+land.location.toDimString()+
+                            "{PRM}] C{}"+land.location.toCenterCoords()+
+                            " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
+                            " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
+                            );
+                }
+                if ( i < numLands ) {
+                    mess.send("{PRM}more on next page...");
+                }
+            }
+            
         }
         
     }

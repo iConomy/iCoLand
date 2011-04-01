@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class iConomyLandPlayerListener extends PlayerListener {
     private static int checkDelay = 500; // milliseconds
     
     
-	public iConomyLandPlayerListener(iConomyLand plug) {
+	public iConomyLandPlayerListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_INTERACT, this, Priority.Monitor, plug);
 	    plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plug);
 
@@ -36,12 +36,12 @@ public class iConomyLandPlayerListener extends PlayerListener {
 	    String playerName = player.getName();
 	    
 	    if ( event.getAction().equals(Action.LEFT_CLICK_BLOCK) ) {
-    	    if ( iConomyLand.cmdMap.containsKey(playerName) && iConomyLand.cmdMap.get(playerName).equals("select") ) {
+    	    if ( iCoLand.cmdMap.containsKey(playerName) && iCoLand.cmdMap.get(playerName).equals("select") ) {
     	        Cuboid newCuboid;
     	        Location loc = event.getClickedBlock().getLocation();
           
-    	        if ( iConomyLand.tmpCuboidMap.containsKey(playerName) ) {
-    	            newCuboid = iConomyLand.tmpCuboidMap.get(playerName);
+    	        if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
+    	            newCuboid = iCoLand.tmpCuboidMap.get(playerName);
     	            newCuboid.setLocation(loc);
     	        } else {
     	            newCuboid = new Cuboid(loc); 
@@ -51,10 +51,10 @@ public class iConomyLandPlayerListener extends PlayerListener {
           
     	        if ( newCuboid.isValid() ) {
     	            mess.send("{}Land selected!");
-    	            iConomyLand.landMgr.showSelectLandInfo(player, newCuboid);
-    	            iConomyLand.cmdMap.remove(playerName);
+    	            iCoLand.landMgr.showSelectLandInfo(player, newCuboid);
+    	            iCoLand.cmdMap.remove(playerName);
     	        } else {
-    	            iConomyLand.tmpCuboidMap.put(playerName, newCuboid);
+    	            iCoLand.tmpCuboidMap.put(playerName, newCuboid);
     	            mess.send("{}Left click the 2nd corner");
     	        }
     	    }
@@ -69,17 +69,17 @@ public class iConomyLandPlayerListener extends PlayerListener {
 
         String playerName = player.getName();
 	    
-	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iConomyLand.landMgr.getLandId(player.getLocation()) );
+	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iCoLand.landMgr.getLandId(player.getLocation()) );
 	    
 	    int locFrom = locMap.get(playerName);
-		int locTo = iConomyLand.landMgr.getLandId(player.getLocation());
+		int locTo = iCoLand.landMgr.getLandId(player.getLocation());
 		
 		if ( locTo == 0 ) lastNonLandLoc.put(playerName, player.getLocation());
 		
 		locMap.put(playerName, locTo);
 
-        Land landFrom = iConomyLand.landMgr.getLandById(locFrom);
-        Land landTo = iConomyLand.landMgr.getLandById(locTo);
+        Land landFrom = iCoLand.landMgr.getLandById(locFrom);
+        Land landTo = iCoLand.landMgr.getLandById(locTo);
         
 		if ( Config.addonsEnabled.get("noenter") && landTo != null && locTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) ) {
             Location loc = lastNonLandLoc.get(playerName);

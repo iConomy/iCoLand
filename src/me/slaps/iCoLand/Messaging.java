@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;

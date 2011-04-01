@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 public class Misc {
 

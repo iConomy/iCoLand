@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import java.io.File;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class iConomyLandBlockListener extends BlockListener {
 	
-	public iConomyLandBlockListener(iConomyLand plug) {
+	public iConomyLandBlockListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_PLACE, this, Priority.High, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plug);
@@ -22,7 +22,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	public void onBlockBreak( BlockBreakEvent event ) {
         Location loc = event.getBlock().getLocation();
         Player player = event.getPlayer();
-        if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
+        if ( !iCoLand.landMgr.canBuild(player.getName(), loc) ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);
             mess.send("{ERR}You can't do that here.");
@@ -32,7 +32,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	public void onBlockPlace( BlockPlaceEvent event )    {
         Location loc = event.getBlock().getLocation();
         Player player = event.getPlayer();
-        if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
+        if ( !iCoLand.landMgr.canBuild(player.getName(), loc) ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);
             mess.send("{ERR}You can't do that here.");
@@ -44,7 +44,7 @@ public class iConomyLandBlockListener extends BlockListener {
 	    if ( event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) ) {
             Location loc = event.getBlock().getLocation();
             Player player = event.getPlayer();
-            if ( !iConomyLand.landMgr.canBuild(player.getName(), loc) ) {
+            if ( !iCoLand.landMgr.canBuild(player.getName(), loc) ) {
                 event.setCancelled(true);
                 Messaging mess = new Messaging((CommandSender)player);
                 mess.send("{ERR}You can't do that here.");

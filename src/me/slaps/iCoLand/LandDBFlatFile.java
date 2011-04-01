@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class LandDBFlatFile extends LandDB {
         
         List<String> oList = LandConfig.getStringList("lands", null);
         
-        iConomyLand.warning("Found " + oList.size() + " lands to protect ( loaded from file )");
+        iCoLand.warning("Found " + oList.size() + " lands to protect ( loaded from file )");
         
         Iterator<String> itr = oList.iterator();
         while(itr.hasNext()) {
@@ -44,11 +44,11 @@ public class LandDBFlatFile extends LandDB {
 
             int id = Integer.parseInt(shopkeys.get("id"));
             
-            Location loc1 = new Location(iConomyLand.server.getWorld(shopkeys.get("world")), 
+            Location loc1 = new Location(iCoLand.server.getWorld(shopkeys.get("world")), 
                                          Double.parseDouble(shopkeys.get("corner1x")), 
                                          Double.parseDouble(shopkeys.get("corner1y")), 
                                          Double.parseDouble(shopkeys.get("corner1z")) );
-            Location loc2 = new Location(iConomyLand.server.getWorld(shopkeys.get("world")), 
+            Location loc2 = new Location(iCoLand.server.getWorld(shopkeys.get("world")), 
                                          Double.parseDouble(shopkeys.get("corner2x")), 
                                          Double.parseDouble(shopkeys.get("corner2y")), 
                                          Double.parseDouble(shopkeys.get("corner2z")) );

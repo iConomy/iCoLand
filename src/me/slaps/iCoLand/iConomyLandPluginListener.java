@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -14,9 +14,9 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class iConomyLandPluginListener extends ServerListener {
 	
-    iConomyLand parent;
+    iCoLand parent;
     
-	public iConomyLandPluginListener(iConomyLand plug) {
+	public iConomyLandPluginListener(iCoLand plug) {
 	    parent = plug;
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, this, Priority.Monitor, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_DISABLE, this, Priority.Monitor, plug);
@@ -43,13 +43,13 @@ public class iConomyLandPluginListener extends ServerListener {
 	}
 	
 	public void enableiConomy(iConomy plugin) {
-		iConomyLand.ic = plugin;
-  		iConomyLand.info("Successfully linked with iConomy");
+		iCoLand.ic = plugin;
+  		iCoLand.info("Successfully linked with iConomy");
 	}
 	
 	public void enablePermissions(Permissions plugin) {
-		iConomyLand.perms = plugin;
-		iConomyLand.info("Successfully linked with Permissions");	  		
+		iCoLand.perms = plugin;
+		iCoLand.info("Successfully linked with Permissions");	  		
 	}
 	
 	public void tryEnablePlugins(PluginManager pm) {

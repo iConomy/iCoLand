@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -164,20 +164,20 @@ public class LandManager {
 	
 	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
 	    Messaging mess = new Messaging(sender);
-	    Integer id = iConomyLand.landMgr.intersectsExistingLandID(select);
+	    Integer id = iCoLand.landMgr.intersectsExistingLandID(select);
 	    
-	    if ( id > 0 && iConomyLand.landMgr.getLandById(id).location.equals(select) ) {
+	    if ( id > 0 && iCoLand.landMgr.getLandById(id).location.equals(select) ) {
 	        showExistingLandInfo(sender, landDB.lands.get(id));
 	    } else if ( id > 0 ) {
             mess.send("{ERR}Intersects existing land ID# "+id);
             mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
-            iConomyLand.tmpCuboidMap.put(((Player)sender).getName(), iConomyLand.landMgr.getLandById(id).location );
+            iCoLand.tmpCuboidMap.put(((Player)sender).getName(), iCoLand.landMgr.getLandById(id).location );
             showExistingLandInfo(sender, landDB.lands.get(id));
 	    } else {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + iConomyLand.df.format(getPrice(select)));
+            mess.send("Price: " + iCoLand.df.format(getPrice(select)));
 	    }
 	    
 	}

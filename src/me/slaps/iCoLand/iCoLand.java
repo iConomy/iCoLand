@@ -2,7 +2,7 @@
  * 
  */
 
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.Locale;
 
-import me.slaps.iConomyLand.iConomyLandBlockListener;
+import me.slaps.iCoLand.iConomyLandBlockListener;
 
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -29,7 +29,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  * @author magik
  *
  */
-public class iConomyLand extends JavaPlugin {
+public class iCoLand extends JavaPlugin {
 
 	public static String name; // = "iConomyLand";
 	public static String codename = "initial";
@@ -54,7 +54,7 @@ public class iConomyLand extends JavaPlugin {
     
     public static DecimalFormat df;
     
-    public iConomyLand() {
+    public iCoLand() {
         // setup command map
         cmdMap = new HashMap<String, String>();
         tmpCuboidMap = new HashMap<String, Cuboid>();

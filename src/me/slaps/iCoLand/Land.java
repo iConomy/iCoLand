@@ -1,4 +1,4 @@
-package me.slaps.iConomyLand;
+package me.slaps.iCoLand;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public class Land {
                 ret = canBuildDestroy.get("default");
             }
         }
-        if (Config.debugMode) iConomyLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
+        if (Config.debugMode) iCoLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
         return ret;
     }
 
@@ -142,7 +142,7 @@ public class Land {
         }
         
         // add price of land
-        price += iConomyLand.landMgr.getPrice(location);
+        price += iCoLand.landMgr.getPrice(location);
         
         // take out sales tax
         price *= Config.sellTax;
@@ -164,10 +164,10 @@ public class Land {
                 } else if ( keys[1].startsWith("t") ) {
                     canBuildDestroy.put(keys[0], true);
                 } else { 
-                    iConomyLand.warning("Error parsing tag: "+tag);
+                    iCoLand.warning("Error parsing tag: "+tag);
                 }
             } else {
-                iConomyLand.warning("Error parsing tag: "+tag);
+                iCoLand.warning("Error parsing tag: "+tag);
             }
         }
     }
@@ -216,7 +216,7 @@ public class Land {
                 Boolean perm = keys[1].toLowerCase().startsWith("t");
                 ret.put(keys[0], perm);
             } else {
-                iConomyLand.warning("Error parsing tag: "+tag);
+                iCoLand.warning("Error parsing tag: "+tag);
             }
         }
         return ret;
@@ -225,11 +225,11 @@ public class Land {
     public static String writeAddonPrices(Land land) {
         String ret = "";
         if ( !land.addons.containsKey("announce") )
-            ret += "Announce: "+iConomyLand.df.format(land.getAddonPrice("announce"))+" ";
+            ret += "Announce: "+iCoLand.df.format(land.getAddonPrice("announce"))+" ";
         if ( !land.addons.containsKey("heal") )
-            ret += "Heal: "+iConomyLand.df.format(land.getAddonPrice("heal"))+" ";
+            ret += "Heal: "+iCoLand.df.format(land.getAddonPrice("heal"))+" ";
         if ( !land.addons.containsKey("noenter") )
-            ret += "NoEnter: "+iConomyLand.df.format(land.getAddonPrice("noenter"))+" ";
+            ret += "NoEnter: "+iCoLand.df.format(land.getAddonPrice("noenter"))+" ";
         
         return ret;
     }

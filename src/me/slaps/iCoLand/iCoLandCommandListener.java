@@ -1,8 +1,6 @@
 package me.slaps.iCoLand;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;

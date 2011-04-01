@@ -8,6 +8,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.logging.Logger;
 import java.util.HashMap;
+import java.util.Locale;
 
 import me.slaps.iConomyLand.iConomyLandBlockListener;
 
@@ -57,6 +58,8 @@ public class iConomyLand extends JavaPlugin {
         // setup command map
         cmdMap = new HashMap<String, String>();
         tmpCuboidMap = new HashMap<String, Cuboid>();
+        
+        Locale.setDefault(Locale.US);
         df = new DecimalFormat("#.00");
     }
     

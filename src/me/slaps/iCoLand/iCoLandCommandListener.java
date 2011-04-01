@@ -309,7 +309,6 @@ public class iCoLandCommandListener implements CommandExecutor {
             mess.send("need to implement...");
             iCoLand.landMgr.save();
         }
-
         
     }
     
@@ -329,6 +328,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             if ( page*10 > numLands ) {
                 mess.send("{ERR}No lands on this page");
             } else {
+                mess.send("{}"+Misc.headerify("{CMD}Your Lands {BKT}({CMD}Page " + (page+1) + "{BKT}){}"));                
                 int i;
                 for(i=page*pageSize;i<numLands && i<(page+1)*pageSize;i++) {
                     Land land = list.get(i);
@@ -528,7 +528,7 @@ public class iCoLandCommandListener implements CommandExecutor {
     	    
     	} else if ( topic.equalsIgnoreCase("list") ) {
             if ( iCoLand.hasPermission(sender, "list") ) { 
-                mess.send(" {CMD}/icl {PRM}list {}- lists owned land");
+                mess.send(" {CMD}/icl {PRM}list {BKT}[{PRM}PAGE{BKT}] {}- lists owned land");
             }
             
         } else if ( topic.equalsIgnoreCase("select") ) {

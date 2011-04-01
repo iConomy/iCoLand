@@ -11,9 +11,13 @@ public class Config {
     public static boolean debugMode;
 
     public static double sellTax;
-
-    public static double pricePerBlockRaw;
     
+    public static Integer maxBlocksClaimable;
+    public static Integer maxLandsClaimable;
+    public static Integer minLandVolume;
+    public static Integer maxLandVolume;
+    
+    public static double pricePerBlockRaw;
     public static HashMap<String, Boolean> addonsEnabled;
     public static HashMap<String, Double> addonsPricePerBlock;
     
@@ -24,6 +28,12 @@ public class Config {
         debugMode = false;
         pricePerBlockRaw = 50.0;
         sellTax = 0.80;
+        
+        maxBlocksClaimable = 1000;
+        maxLandsClaimable = 10;
+        
+        maxLandVolume = 1000;
+        minLandVolume = 10;
 
         addonsEnabled = new HashMap<String, Boolean>();
         addonsEnabled.put("announce", true);
@@ -47,12 +57,19 @@ public class Config {
     public static void loadConfig(File configFile) {
         Configuration config = new Configuration(configFile);
         config.load();
+        
         debugMode = config.getBoolean("debug", false);
-        pricePerBlockRaw = config.getDouble("PricePerBlock-Raw", 20.0);
         
         sellTax = config.getDouble("SalesTaxPercent", 80.0)/100.0;
         if ( sellTax < 0 ) sellTax = 0;
         if ( sellTax > 1 ) sellTax = 1;
+        
+        maxBlocksClaimable = config.getInt("Max-Total-Blocks-Claimable", 1000);
+        maxLandsClaimable = config.getInt("Max-Lands-Claimable", 10);
+        maxLandVolume = config.getInt("Max-Land-Volume", 1000);
+        minLandVolume = config.getInt("Min-Land-Volume", 10);
+
+        pricePerBlockRaw = config.getDouble("PricePerBlock-Raw", 20.0);        
         
         addonsEnabled.clear();
         ConfigurationNode addons = config.getNode("Addons-Enabled");
@@ -72,6 +89,11 @@ public class Config {
         config.setProperty("debug", debugMode);
         config.setProperty("PricePerBlock-Raw", pricePerBlockRaw);
         config.setProperty("SalesTaxPercent", sellTax*100.0);
+        
+        config.setProperty("Max-Total-Blocks-Claimable", maxBlocksClaimable);
+        config.setProperty("Max-Lands-Claimable", maxLandsClaimable);
+        config.setProperty("Max-Land-Volume", maxLandVolume);
+        config.setProperty("Min-Land-Volume", minLandVolume);
         
         config.setProperty("Addons-Enabled.announce", addonsEnabled.get("announce"));
         config.setProperty("Addons-Enabled.noenter", addonsEnabled.get("noenter"));

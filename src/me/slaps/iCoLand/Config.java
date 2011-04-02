@@ -43,12 +43,16 @@ public class Config {
         addonsEnabled.put("noenter", true);
         addonsEnabled.put("heal", true);
         addonsEnabled.put("nospawn", true);
+        addonsEnabled.put("noboom", true);
+        addonsEnabled.put("nofire", true);
 
         addonsPricePerBlock = new HashMap<String, Double>();
         addonsPricePerBlock.put("announce", 50.0);
         addonsPricePerBlock.put("noenter", 100.0);
         addonsPricePerBlock.put("heal", 200.0);
         addonsPricePerBlock.put("nospawn", 50.0);
+        addonsPricePerBlock.put("noboom", 50.0);
+        addonsPricePerBlock.put("nofire", 10.0);
         
         healTime = 30;
         mobRemovalTime = 2;
@@ -85,6 +89,8 @@ public class Config {
         addonsEnabled.put("noenter", addons.getBoolean("noenter", false));
         addonsEnabled.put("heal", addons.getBoolean("heal", false));
         addonsEnabled.put("nospawn", addons.getBoolean("nospawn", false));
+        addonsEnabled.put("noboom", addons.getBoolean("noboom", false));
+        addonsEnabled.put("nofire", addons.getBoolean("nofire", false));
 
         addonsPricePerBlock.clear();
         ConfigurationNode addonPrices = config.getNode("Addons-PricePerBlock");
@@ -92,6 +98,8 @@ public class Config {
         addonsPricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
         addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
         addonsPricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
+        addonsPricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
+        addonsPricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
         
         healTime = config.getInt("Heal-Interval", 30);
         mobRemovalTime = config.getInt("Mob-Removal-Interval", 2);
@@ -112,11 +120,15 @@ public class Config {
         config.setProperty("Addons-Enabled.noenter", addonsEnabled.get("noenter"));
         config.setProperty("Addons-Enabled.heal", addonsEnabled.get("heal"));
         config.setProperty("Addons-Enabled.nospawn", addonsEnabled.get("nospawn"));
-
+        config.setProperty("Addons-Enabled.noboom", addonsEnabled.get("noboom"));
+        config.setProperty("Addons-Enabled.nofire", addonsEnabled.get("nofire"));
+        
         config.setProperty("Addons-PricePerBlock.announce", addonsPricePerBlock.get("announce"));
         config.setProperty("Addons-PricePerBlock.noenter", addonsPricePerBlock.get("noenter"));
         config.setProperty("Addons-PricePerBlock.heal", addonsPricePerBlock.get("heal"));
         config.setProperty("Addons-PricePerBlock.nospawn", addonsPricePerBlock.get("nospawn"));
+        config.setProperty("Addons-PricePerBlock.noboom", addonsPricePerBlock.get("noboom"));
+        config.setProperty("Addons-PricePerBlock.nofire", addonsPricePerBlock.get("nofire"));
         
         config.setProperty("Heal-Interval", healTime);
         config.setProperty("Mob-Removal-Interval", mobRemovalTime);

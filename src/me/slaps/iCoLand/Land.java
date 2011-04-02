@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class Land {
     private int id;                                     // unique # ( sql primary key )
@@ -235,6 +234,10 @@ public class Land {
             ret += "NoEnter: "+iCoLand.df.format(land.getAddonPrice(sender, "noenter"))+" ";
         if ( !land.addons.containsKey("nospawn") )
             ret += "NoSpawn: "+iCoLand.df.format(land.getAddonPrice(sender, "nospawn"))+" ";
+        if ( !land.addons.containsKey("noboom") )
+            ret += "NoBoom: "+iCoLand.df.format(land.getAddonPrice(sender, "noboom"))+" ";
+        if ( !land.addons.containsKey("nofire") )
+            ret += "NoFire: "+iCoLand.df.format(land.getAddonPrice(sender, "nofire"))+" ";
         
         return ret;
     }

@@ -330,12 +330,13 @@ public class iCoLandCommandListener implements CommandExecutor {
                 int i;
                 for(i=page*pageSize;i<numLands && i<(page+1)*pageSize;i++) {
                     Land land = list.get(i);
-                    mess.send("{PRM}ID#{}"+land.getID()+
-                            " {PRM}V:{}"+land.location.volume()+
+                    mess.send("{PRM}ID#{}"+land.getID()+" "+
+                            ((land.locationName.isEmpty())?"":land.locationName+" ") +
+                            "{PRM}V:{}"+land.location.volume()+" "+
                             "{PRM}[{}"+land.location.toDimString()+
-                            "{PRM}] C{}"+land.location.toCenterCoords()+
-                            " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
-                            " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
+                            "{PRM}] C{}"+land.location.toCenterCoords()//+
+//                            " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
+//                            " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
                             );
                 }
                 if ( i < numLands ) {

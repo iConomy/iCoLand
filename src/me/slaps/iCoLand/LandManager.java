@@ -187,7 +187,10 @@ public class LandManager {
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {
 	    Messaging mess = new Messaging(sender);
-	    mess.send("{}"+Misc.headerify("{}Land ID# {PRM}"+land.getID()+"{} -- Coords: {PRM}"+land.location.toCenterCoords()+"{}"));
+	    mess.send("{}"+Misc.headerify("{} Land ID# {PRM}"+land.getID()+"{} --"+
+	                                  (land.locationName.isEmpty()?"":" {PRM}"+land.locationName+" {}")
+	                                 ));
+	    mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
         mess.send("{CMD}Owner: {}"+land.owner);
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
             if ( !land.locationName.isEmpty() )

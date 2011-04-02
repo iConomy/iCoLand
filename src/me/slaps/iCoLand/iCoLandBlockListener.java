@@ -7,6 +7,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -18,8 +19,7 @@ public class iCoLandBlockListener extends BlockListener {
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_PLACE, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_BURN, this, Priority.Low, plug);
-         
-		 	
+        plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_FROMTO, this, Priority.Low, plug);
 	}
 	
 	public void onBlockBreak( BlockBreakEvent event ) {
@@ -64,6 +64,15 @@ public class iCoLandBlockListener extends BlockListener {
         Integer id = iCoLand.landMgr.getLandId(event.getBlock().getLocation());
         if ( id > 0 ) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nofire") ) {
+                event.setCancelled(true);
+            }
+        }
+    }
+    
+    public void onBlockFromTo( BlockFromToEvent event ) {
+        Integer id = iCoLand.landMgr.getLandId(event.getToBlock().getLocation());
+        if ( id > 0 ) {
+            if ( iCoLand.landMgr.getLandById(id).hasAddon("noflow") ) {
                 event.setCancelled(true);
             }
         }

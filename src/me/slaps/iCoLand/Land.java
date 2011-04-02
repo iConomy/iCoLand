@@ -238,6 +238,8 @@ public class Land {
             ret += "NoBoom: "+iCoLand.df.format(land.getAddonPrice(sender, "noboom"))+" ";
         if ( !land.addons.containsKey("nofire") )
             ret += "NoFire: "+iCoLand.df.format(land.getAddonPrice(sender, "nofire"))+" ";
+        if ( !land.addons.containsKey("noflow") )
+            ret += "NoFlow: "+iCoLand.df.format(land.getAddonPrice(sender, "noflow"))+" ";
         
         return ret;
     }

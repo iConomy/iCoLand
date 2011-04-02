@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -18,12 +19,13 @@ public class iCoLandPlayerListener extends PlayerListener {
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
     private static HashMap<String, Location> lastNonLandLoc;
-    private static int checkDelay = 500; // milliseconds
+    private static int checkDelay = 300; // milliseconds
     
     
 	public iCoLandPlayerListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_INTERACT, this, Priority.Monitor, plug);
-	    plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plug);
+        plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plug);
+        plug.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_QUIT, this, Priority.Monitor, plug);
 
 	    timeMap = new HashMap<String, Long>();
 	    locMap = new HashMap<String, Integer>();
@@ -114,6 +116,12 @@ public class iCoLandPlayerListener extends PlayerListener {
         } else {
             return false;
         }
+	}
+	
+	@Override
+	public void onPlayerQuit(PlayerEvent event) {
+	    iCoLand.cmdMap.remove(event.getPlayer().getName());
+	    iCoLand.tmpCuboidMap.remove(event.getPlayer().getName());
 	}
 
 

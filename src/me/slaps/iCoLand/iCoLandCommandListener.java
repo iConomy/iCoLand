@@ -189,7 +189,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                             buyLand(sender);
                         } else if ( args.length > 2 && args[1].equalsIgnoreCase("addon") ) {
                             if ( args.length == 4 ) {
-                                if ( Misc.isAny(args[2], "announce", "heal", "noenter") ) {
+                                if ( Config.isAddon(args[2]) ) {
                                     try { 
                                         Integer id = Integer.parseInt(args[3]);
                                             if ( iCoLand.landMgr.landIdExists(id) ) {
@@ -244,7 +244,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                         }
                         
                         if ( iCoLand.landMgr.landIdExists(id) ) {
-                            if ( Misc.isAny(args[2], "announce", "healing", "noenter" ) ) {
+                            if ( Config.isAddon(args[2]) ) {
                                 sellAddon((Player)sender, args[2], id);
                             } else {
                                 mess.send("{ERR}Not valid addon: {PRM}"+args[2]);

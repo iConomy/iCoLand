@@ -47,6 +47,7 @@ public class iCoLand extends JavaPlugin {
 	public static iCoLandPlayerListener playerListener;
 	public static iCoLandPluginListener pluginListener;
 	public static iCoLandCommandListener commandListener;
+	public static iCoLandEntityListener entityListener;
 	
 	public static LandManager landMgr;
     public static HashMap<String, String> cmdMap;
@@ -86,6 +87,8 @@ public class iCoLand extends JavaPlugin {
 		
 		server = getServer();
 		
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
+		
         // setup location manager
 		landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(getDataFolder() + File.separator + "lands.yml"))));
 
@@ -97,6 +100,7 @@ public class iCoLand extends JavaPlugin {
 		blockListener =  new iCoLandBlockListener(this);
 		playerListener = new iCoLandPlayerListener(this);
 	  	pluginListener = new iCoLandPluginListener(this);
+	  	entityListener = new iCoLandEntityListener(this);
 	  	
 	  	// try to check for if external plugins already enabled
 	  	pluginListener.tryEnablePlugins(getServer().getPluginManager());

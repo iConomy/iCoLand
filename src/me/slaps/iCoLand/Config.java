@@ -17,6 +17,8 @@ public class Config {
     public static Integer minLandVolume;
     public static Integer maxLandVolume;
     
+    public static Integer healTime;
+    
     public static double pricePerBlockRaw;
     public static HashMap<String, Boolean> addonsEnabled;
     public static HashMap<String, Double> addonsPricePerBlock;
@@ -39,11 +41,15 @@ public class Config {
         addonsEnabled.put("announce", true);
         addonsEnabled.put("noenter", true);
         addonsEnabled.put("heal", true);
+        addonsEnabled.put("nospawn", true);
 
         addonsPricePerBlock = new HashMap<String, Double>();
         addonsPricePerBlock.put("announce", 50.0);
         addonsPricePerBlock.put("noenter", 100.0);
         addonsPricePerBlock.put("heal", 200.0);
+        addonsPricePerBlock.put("nospawn", 50.0);
+        
+        healTime = 200;
         
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
@@ -76,12 +82,16 @@ public class Config {
         addonsEnabled.put("announce", addons.getBoolean("announce", false));
         addonsEnabled.put("noenter", addons.getBoolean("noenter", false));
         addonsEnabled.put("heal", addons.getBoolean("heal", false));
+        addonsEnabled.put("nospawn", addons.getBoolean("nospawn", false));
 
         addonsPricePerBlock.clear();
         ConfigurationNode addonPrices = config.getNode("Addons-PricePerBlock");
         addonsPricePerBlock.put("announce", addonPrices.getDouble("announce", 50.0));
         addonsPricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
         addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
+        addonsPricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
+        
+        healTime = config.getInt("Heal-Interval", 200);
     }
     
     public static void saveConfig(File configFile) {
@@ -98,11 +108,19 @@ public class Config {
         config.setProperty("Addons-Enabled.announce", addonsEnabled.get("announce"));
         config.setProperty("Addons-Enabled.noenter", addonsEnabled.get("noenter"));
         config.setProperty("Addons-Enabled.heal", addonsEnabled.get("heal"));
+        config.setProperty("Addons-Enabled.nospawn", addonsEnabled.get("nospawn"));
 
         config.setProperty("Addons-PricePerBlock.announce", addonsPricePerBlock.get("announce"));
         config.setProperty("Addons-PricePerBlock.noenter", addonsPricePerBlock.get("noenter"));
         config.setProperty("Addons-PricePerBlock.heal", addonsPricePerBlock.get("heal"));
+        config.setProperty("Addons-PricePerBlock.nospawn", addonsPricePerBlock.get("nospawn"));
+        
+        config.setProperty("Heal-Interval", healTime);
 
         config.save();
+    }
+    
+    public static boolean isAddon(String addon) {
+        return addonsEnabled.containsKey(addon);
     }
 }

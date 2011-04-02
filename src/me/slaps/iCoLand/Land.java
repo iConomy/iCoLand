@@ -122,14 +122,11 @@ public class Land {
     }
 
     public double getAddonPrice(String addon) {
-        if ( addon.equalsIgnoreCase("announce") )
-            return Config.addonsPricePerBlock.get("announce")*location.volume();
-        else if ( addon.equalsIgnoreCase("heal") )
-            return Config.addonsPricePerBlock.get("heal")*location.volume();
-        else if ( addon.equalsIgnoreCase("noenter") )
-            return Config.addonsPricePerBlock.get("noenter")*location.volume();
-        else
+        if ( Config.isAddon(addon) ) {
+            return Config.addonsPricePerBlock.get(addon)*location.volume();
+        } else {
             return 0;
+        }
     }
     
     public double getSalePrice() {
@@ -230,6 +227,8 @@ public class Land {
             ret += "Heal: "+iCoLand.df.format(land.getAddonPrice("heal"))+" ";
         if ( !land.addons.containsKey("noenter") )
             ret += "NoEnter: "+iCoLand.df.format(land.getAddonPrice("noenter"))+" ";
+        if ( !land.addons.containsKey("nospawn") )
+            ret += "NoSpawn: "+iCoLand.df.format(land.getAddonPrice("nospawn"))+" ";
         
         return ret;
     }

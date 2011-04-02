@@ -220,5 +220,20 @@ public class LandManager {
 	    return Config.pricePerBlockRaw;
 	}
 	
+	public boolean canClaimMoreLands(String playerName) {
+        ArrayList<Land> lands = getLandsOwnedBy(playerName);
+        Integer numClaimed = lands.size();
+        return  ( numClaimed < Config.maxLandsClaimable );
+	}
+	
+	public boolean canClaimMoreVolume(String playerName, Integer claimSize) {
+        ArrayList<Land> lands = getLandsOwnedBy(playerName);
+        Integer totalBlocks = claimSize;
+        for(Land land : lands) {
+            totalBlocks += land.location.volume();
+        }
+        return ( totalBlocks <= Config.maxBlocksClaimable );
+	}
+	
 	
 }

@@ -393,6 +393,27 @@ public class iCoLandCommandListener implements CommandExecutor {
         }
     }
 
+    public void purchaseLand(Player player, Cuboid newCuboid) {
+        Messaging mess = new Messaging(player);
+        String playerName = player.getName();
+        Account acc = iConomy.getBank().getAccount(playerName);
+        double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(newCuboid)));
+        if ( acc.getBalance() > price ) {
+            if ( iCoLand.landMgr.addLand(newCuboid, playerName, "", "") ) {
+                acc.subtract(price);
+                iCoLand.cmdMap.remove(playerName);
+                mess.send("{}Bought selected land for {PRM}"+iCoLand.df.format(price));
+                mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
+            } else {
+                mess.send("{ERR}Error buying land");
+            }
+        } else {
+            mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getBalance())+
+                      " Price: "+iCoLand.df.format(price)); 
+        }
+    }
+
+    
     public void buyLand(CommandSender sender) {
         Messaging mess = new Messaging(sender);
         if ( sender instanceof Player ) {
@@ -400,20 +421,26 @@ public class iCoLandCommandListener implements CommandExecutor {
             if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
                 Cuboid newCuboid = iCoLand.tmpCuboidMap.get(playerName);
                 if ( newCuboid.isValid() ) {
-                    Account acc = iConomy.getBank().getAccount(playerName);
-                    double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(newCuboid)));
-                    if ( acc.getBalance() > price ) {
-                        if ( iCoLand.landMgr.addLand(newCuboid, playerName, "", "") ) {
-                            acc.subtract(price);
-                            iCoLand.cmdMap.remove(playerName);
-                            mess.send("{}Bought selected land for {PRM}"+iCoLand.df.format(price));
-                            mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
-                        } else {
-                            mess.send("{ERR}Error buying land");
-                        } 
+                    if ( iCoLand.hasPermission(sender, "nolimits") ) {
+                        purchaseLand((Player)sender, newCuboid);
                     } else {
-                        mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getBalance())+
-                                  " Price: "+iCoLand.df.format(price)); 
+                        if ( newCuboid.volume() <= Config.maxLandVolume ) {
+                            if ( newCuboid.volume() >= Config.minLandVolume ) {                    
+                                if ( iCoLand.landMgr.canClaimMoreVolume(playerName, newCuboid.volume() ) ) {
+                                    if ( iCoLand.landMgr.canClaimMoreLands(playerName) ) {
+                                        purchaseLand((Player)sender, newCuboid);
+                                    } else {
+                                        mess.send("{ERR}Can not claim over "+Config.maxLandsClaimable+" lands!");
+                                    }
+                                } else {
+                                    mess.send("{ERR}Can not claim over "+Config.maxBlocksClaimable+" blocks!");
+                                }
+                            } else {
+                                mess.send("{ERR}Volume must be at least "+Config.minLandVolume+" blocks!");
+                            }
+                        } else {
+                            mess.send("{ERR}Too large, max volume is "+Config.maxBlocksClaimable+" blocks!");
+                        }
                     }
                 } else {
                     mess.send("{ERR}Invalid selection");

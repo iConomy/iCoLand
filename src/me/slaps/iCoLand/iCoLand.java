@@ -87,7 +87,8 @@ public class iCoLand extends JavaPlugin {
 		
 		server = getServer();
 		
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
 		
         // setup location manager
 		landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(getDataFolder() + File.separator + "lands.yml"))));

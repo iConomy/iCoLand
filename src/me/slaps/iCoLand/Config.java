@@ -18,6 +18,7 @@ public class Config {
     public static Integer maxLandVolume;
     
     public static Integer healTime;
+    public static Integer mobRemovalTime;
     
     public static double pricePerBlockRaw;
     public static HashMap<String, Boolean> addonsEnabled;
@@ -49,7 +50,8 @@ public class Config {
         addonsPricePerBlock.put("heal", 200.0);
         addonsPricePerBlock.put("nospawn", 50.0);
         
-        healTime = 200;
+        healTime = 30;
+        mobRemovalTime = 2;
         
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
@@ -91,7 +93,8 @@ public class Config {
         addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
         addonsPricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
         
-        healTime = config.getInt("Heal-Interval", 200);
+        healTime = config.getInt("Heal-Interval", 30);
+        mobRemovalTime = config.getInt("Mob-Removal-Interval", 2);
     }
     
     public static void saveConfig(File configFile) {
@@ -116,6 +119,7 @@ public class Config {
         config.setProperty("Addons-PricePerBlock.nospawn", addonsPricePerBlock.get("nospawn"));
         
         config.setProperty("Heal-Interval", healTime);
+        config.setProperty("Mob-Removal-Interval", mobRemovalTime);
 
         config.save();
     }

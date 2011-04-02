@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class Land {
     private int id;                                     // unique # ( sql primary key )
@@ -121,25 +123,29 @@ public class Land {
         addons.put(addon, true);
     }
 
-    public double getAddonPrice(String addon) {
-        if ( Config.isAddon(addon) ) {
-            return Config.addonsPricePerBlock.get(addon)*location.volume();
+    public double getAddonPrice(CommandSender sender, String addon) {
+        if ( !iCoLand.hasPermission(sender, "nocost") ) {
+            if ( Config.isAddon(addon) ) {
+                return Config.addonsPricePerBlock.get(addon)*location.volume();
+            } else {
+                return 0;
+            }
         } else {
             return 0;
         }
     }
     
-    public double getSalePrice() {
+    public double getSalePrice(CommandSender sender) {
         double price = 0;
         Set<String> addonsBought = addons.keySet();
         
         // add up prices for addons
         for( String add : addonsBought ) {
-            price += getAddonPrice(add);
+            price += getAddonPrice(sender, add);
         }
         
         // add price of land
-        price += iCoLand.landMgr.getPrice(location);
+        price += iCoLand.landMgr.getPrice(sender, location);
         
         // take out sales tax
         price *= Config.sellTax;
@@ -219,16 +225,16 @@ public class Land {
         return ret;
     }
     
-    public static String writeAddonPrices(Land land) {
+    public static String writeAddonPrices(CommandSender sender, Land land) {
         String ret = "";
         if ( !land.addons.containsKey("announce") )
-            ret += "Announce: "+iCoLand.df.format(land.getAddonPrice("announce"))+" ";
+            ret += "Announce: "+iCoLand.df.format(land.getAddonPrice(sender, "announce"))+" ";
         if ( !land.addons.containsKey("heal") )
-            ret += "Heal: "+iCoLand.df.format(land.getAddonPrice("heal"))+" ";
+            ret += "Heal: "+iCoLand.df.format(land.getAddonPrice(sender, "heal"))+" ";
         if ( !land.addons.containsKey("noenter") )
-            ret += "NoEnter: "+iCoLand.df.format(land.getAddonPrice("noenter"))+" ";
+            ret += "NoEnter: "+iCoLand.df.format(land.getAddonPrice(sender, "noenter"))+" ";
         if ( !land.addons.containsKey("nospawn") )
-            ret += "NoSpawn: "+iCoLand.df.format(land.getAddonPrice("nospawn"))+" ";
+            ret += "NoSpawn: "+iCoLand.df.format(land.getAddonPrice(sender, "nospawn"))+" ";
         
         return ret;
     }

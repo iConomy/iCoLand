@@ -176,7 +176,7 @@ public class LandManager {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + iCoLand.df.format(getPrice(select)));
+            mess.send("Price: " + iCoLand.df.format(getPrice(sender, select)));
 	    }
 	    
 	}
@@ -196,11 +196,11 @@ public class LandManager {
             mess.send("{CMD}Taxed: {}"+land.dateTaxed);
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
             mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
-            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(land));
+            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));
         }
 	}
 	
-	public double getPrice(Cuboid target) {
+	public double getPrice(CommandSender sender, Cuboid target) {
 	    double sum = 0;
 	    Integer sx = target.LocMax.getBlockX()-target.LocMin.getBlockX()+1;
 	    Integer sy = target.LocMax.getBlockY()-target.LocMin.getBlockY()+1;
@@ -208,7 +208,7 @@ public class LandManager {
 	    for(int x=0;x<sx;x++) {
 	        for(int y=0;y<sy;y++) {
 	            for(int z=0;z<sz;z++) {
-	                sum += getPriceOfBlock(new Location(target.setLoc1.getWorld(), 
+	                sum += getPriceOfBlock(sender, new Location(target.setLoc1.getWorld(), 
 	                        target.LocMin.getBlockX()+x, target.LocMin.getBlockY()+y, target.LocMin.getBlockZ()+z));
 	            }
 	        }
@@ -216,8 +216,12 @@ public class LandManager {
 	    return sum;
 	}
 	
-	public double getPriceOfBlock(Location target) {
-	    return Config.pricePerBlockRaw;
+	public double getPriceOfBlock(CommandSender sender, Location target) {
+	    if ( iCoLand.hasPermission(sender, "nocost") ) {
+	        return 0;
+	    } else {
+	        return Config.pricePerBlockRaw;
+	    }
 	}
 	
 	public boolean canClaimMoreLands(String playerName) {

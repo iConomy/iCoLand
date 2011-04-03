@@ -126,7 +126,7 @@ public class Config {
         config.setProperty("Addons-Enabled.nospawn", addonsEnabled.get("nospawn"));
         config.setProperty("Addons-Enabled.noboom", addonsEnabled.get("noboom"));
         config.setProperty("Addons-Enabled.nofire", addonsEnabled.get("nofire"));
-        config.setProperty("Addons-Enabled.nofire", addonsEnabled.get("noflow"));
+        config.setProperty("Addons-Enabled.noflow", addonsEnabled.get("noflow"));
         
         config.setProperty("Addons-PricePerBlock.announce", addonsPricePerBlock.get("announce"));
         config.setProperty("Addons-PricePerBlock.noenter", addonsPricePerBlock.get("noenter"));
@@ -134,7 +134,7 @@ public class Config {
         config.setProperty("Addons-PricePerBlock.nospawn", addonsPricePerBlock.get("nospawn"));
         config.setProperty("Addons-PricePerBlock.noboom", addonsPricePerBlock.get("noboom"));
         config.setProperty("Addons-PricePerBlock.nofire", addonsPricePerBlock.get("nofire"));
-        config.setProperty("Addons-PricePerBlock.nofire", addonsPricePerBlock.get("noflow"));
+        config.setProperty("Addons-PricePerBlock.noflow", addonsPricePerBlock.get("noflow"));
         
         config.setProperty("Heal-Interval", healTime);
         config.setProperty("Mob-Removal-Interval", mobRemovalTime);

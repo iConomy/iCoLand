@@ -1,6 +1,6 @@
 name: iCoLand
 main: me.slaps.iCoLand.iCoLand
-version: v1.14
+version: v1.15
 author: magik
 description: >
              A protection plugin based on a block purchasing for money scheme.

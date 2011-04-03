@@ -10,7 +10,9 @@ public class HealTask implements Runnable {
             Integer id = iCoLand.landMgr.getLandId(player.getLocation());
             if ( id > 0 ) {
                 if ( iCoLand.landMgr.getLandById(id).hasAddon("heal") ) {
-                    player.setHealth(player.getHealth() + 1);
+                    if ( player.getHealth() < 20 ) { 
+                        player.setHealth(player.getHealth() + 1);
+                    }
                 }
             }
         }

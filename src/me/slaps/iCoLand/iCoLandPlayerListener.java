@@ -83,7 +83,9 @@ public class iCoLandPlayerListener extends PlayerListener {
         Land landFrom = iCoLand.landMgr.getLandById(locFrom);
         Land landTo = iCoLand.landMgr.getLandById(locTo);
         
-		if ( Config.addonsEnabled.get("noenter") && landTo != null && locTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) ) {
+		if ( Config.addonsEnabled.get("noenter") && 
+		     landTo != null && locTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) && 
+		     !iCoLand.hasPermission(player, "bypass") ) {
             Location loc = lastNonLandLoc.get(playerName);
             if ( loc != null ) {
                 locMap.put(playerName, 0);

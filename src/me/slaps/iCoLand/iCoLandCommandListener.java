@@ -1,6 +1,9 @@
 package me.slaps.iCoLand;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -304,7 +307,13 @@ public class iCoLandCommandListener implements CommandExecutor {
             mess.send("{}Owner changed");
             iCoLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("addons") ) {
-            mess.send("need to implement...");
+            Set<String> in = Land.parseAddonTags(tags).keySet();
+            for(String addon : in ) {
+                if ( land.addons.containsKey(addon) )
+                    land.addons.remove(addon);
+                else
+                    land.addons.put(addon, true);
+            }
             iCoLand.landMgr.save();
         }
         

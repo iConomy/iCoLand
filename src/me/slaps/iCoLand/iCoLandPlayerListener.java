@@ -4,6 +4,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -60,6 +63,24 @@ public class iCoLandPlayerListener extends PlayerListener {
     	            mess.send("{}Left click the 2nd corner");
     	        }
     	    }
+	    } else if ( event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+	        Material mat = event.getMaterial();
+	        if ( mat.equals(Material.WATER_BUCKET) || mat.equals(Material.WATER) || 
+	             mat.equals(Material.LAVA_BUCKET) || mat.equals(Material.LAVA) ) {
+	            Location loc = event.getClickedBlock().getLocation();
+                BlockFace mod = event.getBlockFace();
+                loc.setX(loc.getX()+mod.getModX());
+                loc.setY(loc.getY()+mod.getModY());
+                loc.setZ(loc.getZ()+mod.getModZ());
+	            Integer id = iCoLand.landMgr.getLandId(loc);
+	            if ( id > 0 ) {
+	                if ( !iCoLand.landMgr.canBuild(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
+	                    event.setCancelled(true);
+	                    Messaging mess = new Messaging((CommandSender)player);
+	                    mess.send("{ERR}You can't do that here.");
+	                }
+	            }
+	        }
 	    }
 	}
 	

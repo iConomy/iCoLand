@@ -24,6 +24,8 @@ public class Config {
     public static HashMap<String, Boolean> addonsEnabled;
     public static HashMap<String, Double> addonsPricePerBlock;
     
+    public static boolean preventGlobalBuildWithoutPerm;
+    
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
         
@@ -59,13 +61,15 @@ public class Config {
         healTime = 30;
         mobRemovalTime = 2;
         
+        preventGlobalBuildWithoutPerm = false;
+        
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
             saveConfig(configFile);
+        } else {
+            loadConfig(configFile);
+            saveConfig(configFile);
         }
-        
-        loadConfig(configFile);
-        saveConfig(configFile);
     }
         
     public static void loadConfig(File configFile) {
@@ -87,26 +91,49 @@ public class Config {
         
         addonsEnabled.clear();
         ConfigurationNode addons = config.getNode("Addons-Enabled");
-        addonsEnabled.put("announce", addons.getBoolean("announce", false));
-        addonsEnabled.put("noenter", addons.getBoolean("noenter", false));
-        addonsEnabled.put("heal", addons.getBoolean("heal", false));
-        addonsEnabled.put("nospawn", addons.getBoolean("nospawn", false));
-        addonsEnabled.put("noboom", addons.getBoolean("noboom", false));
-        addonsEnabled.put("nofire", addons.getBoolean("nofire", false));
-        addonsEnabled.put("noflow", addons.getBoolean("noflow", false));
+        if ( addons != null ) {
+            addonsEnabled.put("announce", addons.getBoolean("announce", false));
+            addonsEnabled.put("noenter", addons.getBoolean("noenter", false));
+            addonsEnabled.put("heal", addons.getBoolean("heal", false));
+            addonsEnabled.put("nospawn", addons.getBoolean("nospawn", false));
+            addonsEnabled.put("noboom", addons.getBoolean("noboom", false));
+            addonsEnabled.put("nofire", addons.getBoolean("nofire", false));
+            addonsEnabled.put("noflow", addons.getBoolean("noflow", false));
+        } else {
+            addonsEnabled.put("announce", false);
+            addonsEnabled.put("noenter", false);
+            addonsEnabled.put("heal", false);
+            addonsEnabled.put("nospawn", false);
+            addonsEnabled.put("noboom", false);
+            addonsEnabled.put("nofire", false);
+            addonsEnabled.put("noflow", false);
+            
+        }
 
         addonsPricePerBlock.clear();
         ConfigurationNode addonPrices = config.getNode("Addons-PricePerBlock");
-        addonsPricePerBlock.put("announce", addonPrices.getDouble("announce", 50.0));
-        addonsPricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
-        addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
-        addonsPricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
-        addonsPricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
-        addonsPricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
-        addonsPricePerBlock.put("noflow", addonPrices.getDouble("noflow", 50.0));
+        if ( addonPrices != null ) {
+            addonsPricePerBlock.put("announce", addonPrices.getDouble("announce", 50.0));
+            addonsPricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
+            addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
+            addonsPricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
+            addonsPricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
+            addonsPricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
+            addonsPricePerBlock.put("noflow", addonPrices.getDouble("noflow", 50.0));
+        } else {
+            addonsPricePerBlock.put("announce", 50.0);
+            addonsPricePerBlock.put("noenter", 100.0);
+            addonsPricePerBlock.put("heal", 200.0);
+            addonsPricePerBlock.put("nospawn", 50.0);
+            addonsPricePerBlock.put("noboom", 50.0);
+            addonsPricePerBlock.put("nofire", 10.0);
+            addonsPricePerBlock.put("noflow", 50.0);
+        }
         
         healTime = config.getInt("Heal-Interval", 30);
         mobRemovalTime = config.getInt("Mob-Removal-Interval", 2);
+        
+        preventGlobalBuildWithoutPerm = config.getBoolean("Prevent-Build-Without-Perm", false);
     }
     
     public static void saveConfig(File configFile) {
@@ -138,6 +165,8 @@ public class Config {
         
         config.setProperty("Heal-Interval", healTime);
         config.setProperty("Mob-Removal-Interval", mobRemovalTime);
+        
+        config.setProperty("Prevent-Build-Without-Perm", preventGlobalBuildWithoutPerm);
 
         config.save();
     }

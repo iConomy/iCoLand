@@ -85,10 +85,18 @@ public class LandManager {
 	    return ( playerName.equals(landDB.lands.get(id).owner) );
 	}
 	
-	public boolean canBuild(String playerName, Location loc) {
+	public boolean canBuild(Player player, Location loc) {
+	    String playerName = player.getName();
 	    Integer id = getLandId(loc);
-	    if ( id > 0 ) return getLandById(id).hasPermission(playerName);
-	    else          return true;
+	    if ( id > 0 ) {
+	        return getLandById(id).hasPermission(playerName);
+	    } else {
+	        if ( Config.preventGlobalBuildWithoutPerm && iCoLand.hasPermission(player, "canbuild") ) {
+	            return true;
+	        } else {
+	            return false;
+	        }
+	    }
 	}
 	
 	public boolean canBuildDestroy(String playerName, Location loc) {

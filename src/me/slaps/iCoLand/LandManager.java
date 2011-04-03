@@ -192,7 +192,7 @@ public class LandManager {
 	                                 ));
 	    mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
         mess.send("{CMD}Owner: {}"+land.owner);
-        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) ) {
+        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"bypass") ) {
             if ( !land.locationName.isEmpty() )
                 mess.send("{CMD}Name: {}"+land.locationName);
             mess.send("{CMD}Created: {}"+land.dateCreated);

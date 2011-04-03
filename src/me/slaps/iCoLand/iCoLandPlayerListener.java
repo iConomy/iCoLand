@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 
 public class iCoLandPlayerListener extends PlayerListener {
@@ -121,7 +122,7 @@ public class iCoLandPlayerListener extends PlayerListener {
 	}
 	
 	@Override
-	public void onPlayerQuit(PlayerEvent event) {
+	public void onPlayerQuit(PlayerQuitEvent event) {
 	    iCoLand.cmdMap.remove(event.getPlayer().getName());
 	    iCoLand.tmpCuboidMap.remove(event.getPlayer().getName());
 	}

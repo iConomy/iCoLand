@@ -220,11 +220,11 @@ public class LandManager {
 	}
 	
 	public double getPriceOfBlock(CommandSender sender, Location target) {
-	    if ( iCoLand.hasPermission(sender, "nocost") ) {
-	        return 0;
-	    } else {
+//	    if ( iCoLand.hasPermission(sender, "nocost") ) {
+//	        return 0;
+//	    } else {
 	        return Config.pricePerBlockRaw;
-	    }
+//	    }
 	}
 	
 	public boolean canClaimMoreLands(String playerName) {

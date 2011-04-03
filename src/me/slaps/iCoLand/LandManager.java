@@ -91,10 +91,10 @@ public class LandManager {
 	    if ( id > 0 ) {
 	        return getLandById(id).hasPermission(playerName);
 	    } else {
-	        if ( Config.preventGlobalBuildWithoutPerm && iCoLand.hasPermission(player, "canbuild") ) {
-	            return true;
+	        if ( Config.preventGlobalBuildWithoutPerm ) {
+	            return iCoLand.hasPermission(player, "canbuild");
 	        } else {
-	            return false;
+	            return true;
 	        }
 	    }
 	}

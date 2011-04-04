@@ -1,5 +1,6 @@
 package me.slaps.iCoLand;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -181,6 +182,10 @@ public class LandManager {
             totalBlocks += land.location.volume();
         }
         return ( totalBlocks <= Config.maxBlocksClaimable );
+	}
+	
+	public void importDB(File importFile) {
+	    landDB.importDB(importFile);
 	}
 	
 	

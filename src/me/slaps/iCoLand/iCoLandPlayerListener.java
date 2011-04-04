@@ -22,7 +22,7 @@ public class iCoLandPlayerListener extends PlayerListener {
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
     private static HashMap<String, Location> lastNonLandLoc;
-    private static int checkDelay = 300; // milliseconds
+    private static int checkDelay = 500; // milliseconds
     
     
 	public iCoLandPlayerListener(iCoLand plug) {

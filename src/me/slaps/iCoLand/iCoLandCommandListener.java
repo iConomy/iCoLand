@@ -1,6 +1,8 @@
 package me.slaps.iCoLand;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -13,6 +15,8 @@ import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.Account;
 
 public class iCoLandCommandListener implements CommandExecutor {
+    
+    Random rn = new Random();
     
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         Messaging mess = new Messaging(sender);
@@ -261,7 +265,39 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{ERR}No access for that...");
                 }
                 return true;
+                
+            } else if ( args[0].equalsIgnoreCase("importdb") ) {
+                if ( iCoLand.hasPermission(sender, "importdb") ) {
+                    iCoLand.landMgr.importDB(new File(iCoLand.pluginDirectory + File.separator + "lands.yml"));
+                } else {
+                    mess.send("{ERR}No access for that...");
+                }
+                return true;
 
+            } else if ( args[0].equalsIgnoreCase("fakedata") ) {
+                if ( iCoLand.hasPermission(sender, "fakedata") ) {
+                    if ( args.length > 1 ) {
+                        Integer numLands = 0;
+                        try { 
+                            numLands = Integer.parseInt(args[1]);
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                        }
+                        long start = System.currentTimeMillis();
+                        for(int i=0;i<numLands;i++) {
+                            Location loc1 = new Location(iCoLand.server.getWorlds().get(0), rand(-4096,4096), rand(5,100), rand(-4096,4096));
+                            Location loc2 = new Location(iCoLand.server.getWorlds().get(0), loc1.getBlockX()+rand(0,100), loc1.getBlockY()+rand(0,28), loc1.getBlockZ()+rand(0,100));
+                            iCoLand.landMgr.addLand(new Cuboid(loc1,loc2), "kigam", "", "");
+                        }
+                        if ( Config.debugMode ) iCoLand.info("Inserting "+numLands+" random lands took: "+(System.currentTimeMillis()-start)+" ms");
+                        
+                    } else {
+                        mess.send("{ERR}Not enough arguments");
+                    }
+                } else {
+                    mess.send("{ERR}No access for that...");
+                }
+                return true;
             // unrecognized /icl command
             } else {
                 mess.send("{}Unrecognized/invalid/malformed command!");
@@ -274,6 +310,14 @@ public class iCoLandCommandListener implements CommandExecutor {
             return false;
         }
 
+    }
+    
+    public int rand(int lo, int hi) {
+        int n = hi - lo + 1;
+        int i = rn.nextInt() % n;
+        if ( i < 0 ) 
+            i = -i;
+        return lo+i;
     }
     
     public void editLand(Player player, Integer id, String category, String args) {

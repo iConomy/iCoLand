@@ -1,5 +1,6 @@
 package me.slaps.iCoLand;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,5 +31,8 @@ public interface LandDB {
     abstract public boolean updateLandAddons(int id, HashMap<String,Boolean> newAddons);
     
     abstract public boolean hasPermission(int id, String playerName);
+    
+    abstract public void importDB(File landYMLFile);
+    abstract public void exportDB(File landYMLFile);
     
 }

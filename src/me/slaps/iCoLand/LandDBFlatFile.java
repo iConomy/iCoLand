@@ -21,7 +21,6 @@ public class LandDBFlatFile implements LandDB {
     public LandDBFlatFile() {
         lands = new HashMap<Integer,Land>();
     }
-
     
     public LandDBFlatFile(File configFile) {
         super();
@@ -199,6 +198,18 @@ public class LandDBFlatFile implements LandDB {
     public int intersectsExistingLand(Cuboid loc) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+
+
+    public void importDB(File landYMLFile) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void exportDB(File landYMLFile) {
+        // TODO Auto-generated method stub
+        
     }
     
 

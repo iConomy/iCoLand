@@ -364,34 +364,33 @@ public class iCoLandCommandListener implements CommandExecutor {
     public void showList(CommandSender sender, Integer page) {
         Integer pageSize = 7;
         ArrayList<Land> list;
+
+        int numLands = 0;
         if( sender instanceof Player )
-            list = iCoLand.landMgr.getLandsOwnedBy(((Player)sender).getName());
+            numLands = iCoLand.landMgr.countLandsOwnedBy(((Player)sender).getName());
         else
-            list = iCoLand.landMgr.getAllLands();
+            numLands = iCoLand.landMgr.countLandsOwnedBy(null);
                 
         Messaging mess = new Messaging(sender);
-        Integer numLands = list.size();
         if ( numLands == 0 ) {
             mess.send("{ERR}You do not own any land");
         } else {
-            if ( page*10 > numLands ) {
+            if ( page*pageSize > numLands ) {
                 mess.send("{ERR}No lands on this page");
             } else {
-                mess.send("{}"+Misc.headerify("{CMD}Your Lands {BKT}({CMD}Page " + (page+1) + "{BKT}){}"));                
+                String playerName = (sender instanceof Player)?((Player)sender).getName():null;
+                list = iCoLand.landMgr.getLandsOwnedBy(playerName, pageSize, page*pageSize);
+                int pages = numLands / pageSize + (( numLands % pageSize > 0)?1:0);
+                mess.send("{}"+Misc.headerify("{CMD}Your Lands {BKT}({CMD}Page " + (page+1) + "{BKT}/{CMD}"+pages+"{BKT}){}"));                
                 int i;
-                for(i=page*pageSize;i<numLands && i<(page+1)*pageSize;i++) {
+                for(i=0;i<pageSize && i<list.size();i++) {
                     Land land = list.get(i);
                     mess.send("{PRM}ID#{}"+land.getID()+" "+
                             ((land.locationName.isEmpty())?"":land.locationName+" ") +
                             "{PRM}V:{}"+land.location.volume()+" "+
                             "{PRM}[{}"+land.location.toDimString()+
-                            "{PRM}] C{}"+land.location.toCenterCoords()//+
-//                            " {PRM}Ad:{}"+Land.writeAddonTags(land.addons)+
-//                            " {PRM}P:{}"+Land.writePermTags(land.canBuildDestroy)
+                            "{PRM}] C{}"+land.location.toCenterCoords()
                             );
-                }
-                if ( i < numLands ) {
-                    mess.send("{PRM}more on next page...");
                 }
             }
             

@@ -211,6 +211,17 @@ public class LandDBFlatFile implements LandDB {
         // TODO Auto-generated method stub
         
     }
+
+    public ArrayList<Land> listLandOwnedBy(String playerName, int limit,
+            int offset) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public int countLandOwnedBy(String playerName) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
     
 
     

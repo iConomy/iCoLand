@@ -185,6 +185,12 @@ public class LandDBH2 implements LandDB {
             st.executeUpdate(sql);
             st.close();
             
+            sql = "CREATE INDEX MinMaxMinMaxMinMax ON " + Config.sqlTableName + " (minX, maxX, minY, maxY, minZ, maxZ);";
+            st = conn.createStatement();
+            if ( Config.debugMode ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
             conn.close();
         } catch(SQLException ex) { 
             ex.printStackTrace();
@@ -249,12 +255,35 @@ public class LandDBH2 implements LandDB {
         }
         return (ret>0)?true:false;
     }
-
-    public ArrayList<Land> listAllLand() {
-        return listLandOwnedBy(null);
+    
+    public int countLandOwnedBy(String playerName) {
+        int count = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("SELECT COUNT(id) FROM "+Config.sqlTableName+
+                    ((playerName != null)?" WHERE owner = ?":""));
+            if ( playerName != null ) ps.setString(1, playerName);
+            
+            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            rs = ps.executeQuery();
+            while ( rs.next() ) {
+                count = rs.getInt(1);
+            }
+            
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        return count;
     }
 
-    public ArrayList<Land> listLandOwnedBy(String playerName) {
+    public ArrayList<Land> listAllLand() {
+        return listLandOwnedBy(null,0,0);
+    }
+
+    public ArrayList<Land> listLandOwnedBy(String playerName, int limit, int offset) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -263,8 +292,16 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
                     "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
                     ((playerName != null)?" WHERE owner = ?":"")+
-                    " ORDER BY id ASC;");
-            if ( playerName != null ) ps.setString(1, playerName);
+                    " ORDER BY id ASC"+
+                    ((limit > 0)?" LIMIT ? OFFSET ?;":";")
+                    );
+            int i = 1;
+            if ( playerName != null ) ps.setString(i++, playerName);
+            if ( limit > 0 ) {
+                ps.setInt(i++, limit);
+                ps.setInt(i++, offset);
+            }
+            
             if ( Config.debugMode ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             

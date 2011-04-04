@@ -87,8 +87,12 @@ public class LandManager {
 	    return landDB.listAllLand();
 	}
 	
-	public ArrayList<Land> getLandsOwnedBy(String playerName) {
-	    return landDB.listLandOwnedBy(playerName);
+	public int countLandsOwnedBy(String playerName) {
+	    return landDB.countLandOwnedBy(playerName);
+	}
+	
+	public ArrayList<Land> getLandsOwnedBy(String playerName, int limit, int offset) {
+	    return landDB.listLandOwnedBy(playerName, limit, offset);
 	}
 	
 	public Land getLandById(Integer id) {
@@ -170,13 +174,11 @@ public class LandManager {
 	}
 	
 	public boolean canClaimMoreLands(String playerName) {
-        ArrayList<Land> lands = getLandsOwnedBy(playerName);
-        Integer numClaimed = lands.size();
-        return  ( numClaimed < Config.maxLandsClaimable );
+        return  ( landDB.countLandOwnedBy(playerName) < Config.maxLandsClaimable );
 	}
 	
 	public boolean canClaimMoreVolume(String playerName, Integer claimSize) {
-        ArrayList<Land> lands = getLandsOwnedBy(playerName);
+        ArrayList<Land> lands = getLandsOwnedBy(playerName, 0, 0);
         Integer totalBlocks = claimSize;
         for(Land land : lands) {
             totalBlocks += land.location.volume();

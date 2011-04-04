@@ -94,18 +94,18 @@ public class iCoLandPlayerListener extends PlayerListener {
 	    
 	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iCoLand.landMgr.getLandId(player.getLocation()) );
 	    
-	    int locFrom = locMap.get(playerName);
-		int locTo = iCoLand.landMgr.getLandId(player.getLocation());
+	    int idFrom = locMap.get(playerName);
+		int idTo = iCoLand.landMgr.getLandId(player.getLocation());
 		
-		if ( locTo == 0 ) lastNonLandLoc.put(playerName, player.getLocation());
+		if ( idTo == 0 ) lastNonLandLoc.put(playerName, player.getLocation());
 		
-		locMap.put(playerName, locTo);
+		locMap.put(playerName, idTo);
 
-        Land landFrom = iCoLand.landMgr.getLandById(locFrom);
-        Land landTo = iCoLand.landMgr.getLandById(locTo);
+        Land landFrom = iCoLand.landMgr.getLandById(idFrom);
+        Land landTo = iCoLand.landMgr.getLandById(idTo);
         
 		if ( Config.addonsEnabled.get("noenter") && 
-		     landTo != null && locTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) && 
+		     landTo != null && idTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) && 
 		     !iCoLand.hasPermission(player, "bypass") ) {
             Location loc = lastNonLandLoc.get(playerName);
             if ( loc != null ) {
@@ -113,13 +113,13 @@ public class iCoLandPlayerListener extends PlayerListener {
                 player.sendMessage("Can't enter this land");
                 player.teleport(loc);
             }
-		} else if ( Config.addonsEnabled.get("noenter") && locFrom != locTo ) {
-		    if ( locFrom != 0 ) {
+		} else if ( Config.addonsEnabled.get("noenter") && idFrom != idTo ) {
+		    if ( idFrom != 0 ) {
 		            if ( landFrom.hasAddon("announce") ) {
 		            player.sendMessage("Leaving "+(landFrom.locationName.isEmpty()?"unnamed land":landFrom.locationName));
 		        }
 		    }
-		    if ( locTo != 0 ) {
+		    if ( idTo != 0 ) {
                 if ( landTo.hasAddon("announce") ) {
                     player.sendMessage("Entering "+(landTo.locationName.isEmpty()?"unnamed land":landTo.locationName));
                 }

@@ -12,7 +12,9 @@ public interface LandDB {
     abstract public boolean removeLandById(int id);
     
     abstract public ArrayList<Land> listAllLand();
-    abstract public ArrayList<Land> listLandOwnedBy(String playerName);
+    abstract public ArrayList<Land> listLandOwnedBy(String playerName, int limit, int offset);
+    
+    abstract public int countLandOwnedBy(String playerName);
     
     abstract public int getLandId(Location loc);
     

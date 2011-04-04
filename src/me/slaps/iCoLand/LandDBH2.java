@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -80,42 +81,77 @@ public class LandDBH2 implements LandDB {
         
     public void createTable() {
         Connection conn = getConnection();
-        PreparedStatement ps = null;
+        Statement st = null;
         try {
-            iCoLand.info("CREATE TABLE IF NOT EXISTS " + Config.sqlTableName + "("+
-                    "id INT auto_increment PRIMARY KEY,"+
-                    "owner VARCHAR(32),"+
-                    "world VARCHAR(32),"+
-                    "minX INT,"+
-                    "minY INT,"+
-                    "minZ INT,"+
-                    "maxX INT,"+
-                    "maxY INT,"+
-                    "maxZ INT,"+
-                    "dateCreated TIMESTAMP,"+
-                    "dateTaxed TIMESTAMP,"+
-                    "name VARCHAR(32),"+
-                    "perms VARCHAR(256),"+
-                    "addons VARCHAR(256)"+
-                    ");");
-            ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS " + Config.sqlTableName + "("+
-                    "id INT auto_increment PRIMARY KEY,"+
-                    "owner VARCHAR(32),"+
-                    "world VARCHAR(32),"+
-                    "minX INT,"+
-                    "minY INT,"+
-                    "minZ INT,"+
-                    "maxX INT,"+
-                    "maxY INT,"+
-                    "maxZ INT,"+
-                    "dateCreated TIMESTAMP,"+
-                    "dateTaxed TIMESTAMP,"+
-                    "name VARCHAR(32),"+
-                    "perms VARCHAR(256),"+
-                    "addons VARCHAR(256)"+
-                    ");");
-            ps.executeUpdate();
-            ps.close();
+            String sql = "CREATE TABLE IF NOT EXISTS " + Config.sqlTableName + "("+
+                "id INT auto_increment PRIMARY KEY,"+
+                "owner VARCHAR(32),"+
+                "world VARCHAR(32),"+
+                "minX INT,"+
+                "minY INT,"+
+                "minZ INT,"+
+                "maxX INT,"+
+                "maxY INT,"+
+                "maxZ INT,"+
+                "dateCreated TIMESTAMP,"+
+                "dateTaxed TIMESTAMP,"+
+                "name VARCHAR(32),"+
+                "perms VARCHAR(256),"+
+                "addons VARCHAR(256)"+
+                ");";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMinMin ON " + Config.sqlTableName + " (minX, minY, minZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMinMax ON " + Config.sqlTableName + " (minX, minY, maxZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMaxMin ON " + Config.sqlTableName + " (minX, maxY, minZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMaxMax ON " + Config.sqlTableName + " (minX, maxY, maxZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMinMin ON " + Config.sqlTableName + " (maxX, minY, minZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMinMax ON " + Config.sqlTableName + " (maxX, minY, maxZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMaxMin ON " + Config.sqlTableName + " (maxX, maxY, minZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMaxMax ON " + Config.sqlTableName + " (maxX, maxY, maxZ);";
+            st = conn.createStatement();
+            iCoLand.info(sql);
+            st.executeUpdate(sql);
+            st.close();
+            
             conn.close();
         } catch(SQLException ex) { 
             ex.printStackTrace();
@@ -403,13 +439,61 @@ public class LandDBH2 implements LandDB {
     }
     
     public String getLandPerms(int id) {
-        // TODO Auto-generated method stub
-        return null;
+        String ret = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("SELECT perms FROM "+Config.sqlTableName+
+                    " WHERE id = ?");
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        try {
+            while( rs.next() ) {
+                ret = rs.getString(1);
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return ret;
     }
 
     public String getLandAddons(int id) {
-        // TODO Auto-generated method stub
-        return null;
+        String ret = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("SELECT addons FROM "+Config.sqlTableName+
+                    " WHERE id = ?");
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        try {
+            while( rs.next() ) {
+                ret = rs.getString(1);
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return ret;
     }
 
     public String getLandOwner(int id) {

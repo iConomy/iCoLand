@@ -31,7 +31,7 @@ public class LandManager {
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
-		        Land.parseAddonTags(addons), now.toString(), now.toString()));
+		        Land.parseAddonTags(addons), now, now));
 	}
 	
 	public boolean removeLandById(Integer id) {

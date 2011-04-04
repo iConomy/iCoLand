@@ -19,7 +19,7 @@ public class Land {
     private boolean valid = false;                      // valid
     
     public Land(int id, Cuboid loc, String owner, String locName, HashMap<String, Boolean> perms, 
-            HashMap<String, Boolean> addons, String dateCreated, String dateTaxed) {
+            HashMap<String, Boolean> addons, Timestamp dateCreated, Timestamp dateTaxed) {
         
         this.id = id;
         this.location = loc;
@@ -27,8 +27,8 @@ public class Land {
         this.canBuildDestroy = perms;
         this.addons = addons;
         
-        this.dateCreated = Timestamp.valueOf(dateCreated);
-        this.dateTaxed = Timestamp.valueOf(dateTaxed);
+        this.dateCreated = dateCreated;
+        this.dateTaxed = dateTaxed;
         
         this.locationName = locName;
         

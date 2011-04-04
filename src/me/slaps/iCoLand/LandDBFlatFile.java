@@ -1,6 +1,7 @@
 package me.slaps.iCoLand;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,7 +67,7 @@ public class LandDBFlatFile implements LandDB {
             String dateTaxed = shopkeys.get("dateTaxed");
             String locationName = shopkeys.get("name");
 
-            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, dateCreated, dateTaxed));
+            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(dateTaxed)));
 
         }
         

@@ -5,17 +5,17 @@
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="iConomyLand">
-	<property name="version" value="1.18"/>
+	<property name="version" value="2.00"/>
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
     <path id="iConomyLand.classpath">
         <pathelement location="bin"/>
-        <pathelement location="../craftbukkit.jar"/>
-        <pathelement location="../bukkit.jar"/>    	
-        <pathelement location="dist/plugins/iConomy.jar"/>
-        <pathelement location="dist/plugins/Permissions.jar"/>
+        <pathelement location="C:\Users\MHaase.ALTASOL\.m2\repository\org\bukkit\craftbukkit\0.0.1-SNAPSHOT\craftbukkit-0.0.1-SNAPSHOT.jar"/>
+        <pathelement location="C:\Users\MHaase.ALTASOL\.m2\repository\org\bukkit\bukkit\0.0.1-SNAPSHOT\bukkit-0.0.1-SNAPSHOT.jar"/>    	
+        <pathelement location="./dist/plugins/iConomy.jar"/>
+        <pathelement location="./dist/plugins/Permissions.jar"/>
         <pathelement location="../h2.jar"/>
     </path>
     <target name="init">

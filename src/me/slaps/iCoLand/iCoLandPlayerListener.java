@@ -74,7 +74,7 @@ public class iCoLandPlayerListener extends PlayerListener {
                 loc.setZ(loc.getZ()+mod.getModZ());
 	            Integer id = iCoLand.landMgr.getLandId(loc);
 	            if ( id > 0 ) {
-	                if ( !iCoLand.landMgr.canBuild(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
+	                if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
 	                    event.setCancelled(true);
 	                    Messaging mess = new Messaging((CommandSender)player);
 	                    mess.send("{ERR}You can't do that here.");

@@ -12,11 +12,11 @@
     <property name="source" value="1.6"/>
     <path id="iConomyLand.classpath">
         <pathelement location="bin"/>
-        <pathelement location="dist/craftbukkit.jar"/>
-        <pathelement location="dist/bukkit-0.0.1-SNAPSHOT.jar"/>    	
+        <pathelement location="../craftbukkit.jar"/>
+        <pathelement location="../bukkit.jar"/>    	
         <pathelement location="dist/plugins/iConomy.jar"/>
-        <pathelement location="dist/minecraft_server.jar"/>
         <pathelement location="dist/plugins/Permissions.jar"/>
+        <pathelement location="../h2.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

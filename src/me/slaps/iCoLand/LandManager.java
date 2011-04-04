@@ -18,37 +18,29 @@ public class LandManager {
 	}
 	
 	public void save() {
-	    landDB.save();
+	    //landDB.save();
 	}
 	
 	public void load() {
-	    landDB.load();
+	    //landDB.load();
 	}
 	
 	public boolean addLand(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
-		if ( intersectsExistingLand(sl) ) return false;
+		if ( intersectsExistingLand(sl) > 0 ) return false;
 		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
-		Integer id = getNextID();
-		landDB.lands.put( id, new Land(id, sl, owner, "", Land.parsePermTags(perms), Land.parseAddonTags(addons), 
-		        now.toString(), now.toString()) );
-		landDB.save();
-		return true;
+		
+		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
+		        Land.parseAddonTags(addons), now.toString(), now.toString()));
 	}
 	
 	public boolean removeLandById(Integer id) {
-	    Land land = landDB.lands.remove(id);
-	    if ( land != null ) {
-	        landDB.save();
-	        return true;
-	    } else {
-	        return false;
-	    }
+	    return landDB.removeLandById(id);
 	}
 	
 	public String listLand() {
 		String out = "";
-		Iterator<Land> itr = landDB.lands.values().iterator();
+		Iterator<Land> itr = landDB.listAllLand().iterator();
 		while(itr.hasNext()) {
 		    Land tmp = itr.next();
 			out += tmp.getID();
@@ -58,38 +50,20 @@ public class LandManager {
 	}
 	
 	public Location getCenterOfLand(Integer id) {
-		Iterator<Land> itr = landDB.lands.values().iterator();
-		while(itr.hasNext()) {
-		    Land tmp = itr.next();
-			if ( id.equals(tmp.getID()) ) {
-				Location dest = new Location(tmp.location.setLoc1.getWorld(), tmp.location.setLoc1.getBlockX(), 
-				                             tmp.location.setLoc1.getBlockY(), tmp.location.setLoc1.getBlockZ() );
-				dest.setY(dest.getY()+1);
-				return dest;
-			}
-		}
-		return null;
+	    Land land = landDB.getLandById(id);
+	    return land.getCenter();
 	}
-	
-	public Integer getNextID() {
-		Integer i = 0;
-		Iterator<Land> itr = landDB.lands.values().iterator();
-		while(itr.hasNext()) {
-		    Land tmp = itr.next();
-			if ( tmp.getID() > i ) i = tmp.getID();
-		}
-		return i+1;
-	}
-	
+		
 	public boolean isOwner(String playerName, Integer id) {
-	    return ( playerName.equals(landDB.lands.get(id).owner) );
+	    return landDB.getLandOwner(id).equals(playerName);
 	}
 	
-	public boolean canBuild(Player player, Location loc) {
+	public boolean canBuildDestroy(Player player, Location loc) {
+
 	    String playerName = player.getName();
-	    Integer id = getLandId(loc);
+	    Integer id = landDB.getLandId(loc);
 	    if ( id > 0 ) {
-	        return getLandById(id).hasPermission(playerName);
+	        return landDB.hasPermission(id, playerName);
 	    } else {
 	        if ( Config.preventGlobalBuildWithoutPerm ) {
 	            return iCoLand.hasPermission(player, "canbuild");
@@ -99,87 +73,46 @@ public class LandManager {
 	    }
 	}
 	
-	public boolean canBuildDestroy(String playerName, Location loc) {
-	    Integer id = getLandId(loc);
-	    if ( id > 0 ) {
-	        Land land = landDB.lands.get(id);
-	        return land.hasPermission(playerName);
-	    } else { 
-	        return true;
-	    }
-	}
-	
 	public boolean inLand(Location loc) {
-		Iterator<Land> itr = landDB.lands.values().iterator();
-		while(itr.hasNext()) {
-		    Land tmp = itr.next();
-			if ( tmp.contains(loc) ) return true;
-		}
-		return false;
+	    int id = landDB.getLandId(loc);
+	    return (id>0)?true:false;
 	}
-	
 	
 	public Integer getLandId(Location loc) {
-		Iterator<Land> itr = landDB.lands.values().iterator();
-		while(itr.hasNext()) {
-		    Land tmp = itr.next();
-			if ( tmp.contains(loc) ) return tmp.getID();
-		}
-		return 0;
+	    return landDB.getLandId(loc);
 	}
 	
 	public ArrayList<Land> getAllLands() {
-	    return (ArrayList<Land>) landDB.lands.values();
+	    return landDB.listAllLand();
 	}
 	
 	public ArrayList<Land> getLandsOwnedBy(String playerName) {
-	    ArrayList<Land> ret = new ArrayList<Land>();
-	    Iterator<Land> itr = landDB.lands.values().iterator();
-	    while(itr.hasNext()) {
-	        Land tmp = itr.next();
-	        if (tmp.owner.equals(playerName)) 
-	            ret.add(tmp);
-	    }
-	    return ret;
+	    return landDB.listLandOwnedBy(playerName);
 	}
 	
 	public Land getLandById(Integer id) {
-	    return landDB.lands.get(id);
+	    return landDB.getLandById(id);
 	}
 	
 	public boolean landIdExists(Integer id) {
-	    return landDB.lands.containsKey(id);
+	    return landDB.landIdExists(id);
 	}
 	
-	public boolean intersectsExistingLand(Cuboid loc) {
-		Iterator<Land> itr = landDB.lands.values().iterator();
-		while(itr.hasNext()) {
-		    Land tmp = itr.next();
-			if ( tmp.intersects(loc) ) return true;
-		}
-		return false;
-	}
-	
-	public Integer intersectsExistingLandID(Cuboid loc) {
-        Iterator<Land> itr = landDB.lands.values().iterator();
-        while(itr.hasNext()) {
-            Land tmp = itr.next();
-            if ( tmp.intersects(loc) ) return tmp.getID();
-        }
-        return 0;
+	public int intersectsExistingLand(Cuboid loc) {
+	    return landDB.intersectsExistingLand(loc);
 	}
 	
 	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
 	    Messaging mess = new Messaging(sender);
-	    Integer id = iCoLand.landMgr.intersectsExistingLandID(select);
+	    Integer id = intersectsExistingLand(select);
 	    
 	    if ( id > 0 && iCoLand.landMgr.getLandById(id).location.equals(select) ) {
-	        showExistingLandInfo(sender, landDB.lands.get(id));
+	        showExistingLandInfo(sender, landDB.getLandById(id));
 	    } else if ( id > 0 ) {
             mess.send("{ERR}Intersects existing land ID# "+id);
             mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
             iCoLand.tmpCuboidMap.put(((Player)sender).getName(), iCoLand.landMgr.getLandById(id).location );
-            showExistingLandInfo(sender, landDB.lands.get(id));
+            showExistingLandInfo(sender, landDB.getLandById(id));
 	    } else {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
@@ -190,7 +123,7 @@ public class LandManager {
 	}
 	
 	public void showSelectLandInfo(CommandSender sender, Integer id) {
-	    showExistingLandInfo(sender, landDB.lands.get(id));
+	    showExistingLandInfo(sender, landDB.getLandById(id));
 	}
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {

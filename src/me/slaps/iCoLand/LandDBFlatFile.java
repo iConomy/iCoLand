@@ -10,10 +10,16 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.util.config.Configuration;
 
-public class LandDBFlatFile extends LandDB {
+public class LandDBFlatFile implements LandDB {
     
     private File landConfigFile;
     private Configuration LandConfig;
+
+    public HashMap<Integer,Land> lands;
+    
+    public LandDBFlatFile() {
+        lands = new HashMap<Integer,Land>();
+    }
 
     
     public LandDBFlatFile(File configFile) {
@@ -97,6 +103,101 @@ public class LandDBFlatFile extends LandDB {
         LandConfig.setProperty("lands", tmpshops);
         
         LandConfig.save();
+    }
+
+
+    public boolean createNewLand(Land newLand) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public boolean removeLandById(int id) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public ArrayList<Land> listAllLand() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public ArrayList<Land> listLandOwnedBy(String playerName) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public int getLandId(Location loc) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+    public Land getLandById(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public String getLandPerms(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public String getLandAddons(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public String getLandOwner(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public boolean updateLandOwner(int id, String newOwner) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public boolean updateLandName(int id, String newName) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public boolean updateLandPerms(int id, HashMap<String, Boolean> newPerms) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public boolean updateLandAddons(int id, HashMap<String, Boolean> newAddons) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public boolean hasPermission(int id, String playerName) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public boolean landIdExists(int id) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public int intersectsExistingLand(Cuboid loc) {
+        // TODO Auto-generated method stub
+        return 0;
     }
     
 

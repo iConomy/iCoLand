@@ -146,9 +146,6 @@ public class iCoLandPlayerListener extends PlayerListener {
 	    iCoLand.cmdMap.remove(event.getPlayer().getName());
 	    iCoLand.tmpCuboidMap.remove(event.getPlayer().getName());
 	}
-
-
-    
     
 
 }

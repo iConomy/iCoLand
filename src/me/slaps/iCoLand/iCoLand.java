@@ -35,6 +35,8 @@ public class iCoLand extends JavaPlugin {
 	public static String codename = "initial";
 	public static String version; // = "0.0.0001";
 	
+	public static File pluginDirectory;
+	
 	public static Server server;
 	
 	public static Logger logger = Logger.getLogger("Minecraft");
@@ -64,6 +66,10 @@ public class iCoLand extends JavaPlugin {
         df = new DecimalFormat("#.00");
     }
     
+    public static void severe(String msg) {
+        logger.severe("["+name+"] "+ msg);
+    }
+    
     public static void info(String msg) {
     	logger.info("["+name+"] "+ msg);
     }
@@ -80,10 +86,12 @@ public class iCoLand extends JavaPlugin {
 		desc = getDescription();
 		name = desc.getName();
 		version = desc.getVersion();
-
-		getDataFolder().mkdir();
 		
-		Config.getConfig(getDataFolder());
+		pluginDirectory = getDataFolder();
+
+		pluginDirectory.mkdir();
+		
+		Config.getConfig(pluginDirectory);
 		
 		server = getServer();
 		
@@ -91,8 +99,9 @@ public class iCoLand extends JavaPlugin {
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
 		
         // setup location manager
-		landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(getDataFolder() + File.separator + "lands.yml"))));
-
+        //landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(pluginDirectory + File.separator + "lands.yml"))));
+        landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
+		
         //clear command list
         cmdMap.clear();
 		

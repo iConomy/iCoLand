@@ -9,6 +9,9 @@ import org.bukkit.util.config.ConfigurationNode;
 public class Config {
     
     public static boolean debugMode;
+    
+    public static String h2DBFile = "lands.db";
+    public static String sqlTableName = "lands";
 
     public static double sellTax;
     

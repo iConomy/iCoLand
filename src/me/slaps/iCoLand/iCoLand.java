@@ -95,15 +95,6 @@ public class iCoLand extends JavaPlugin {
 		
 		server = getServer();
 		
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
-		
-        // setup location manager
-        //landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(pluginDirectory + File.separator + "lands.yml"))));
-        landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
-		
-        //clear command list
-        cmdMap.clear();
 		
 		// setup listeners
 	  	getCommand("icl").setExecutor(new iCoLandCommandListener());        
@@ -123,6 +114,18 @@ public class iCoLand extends JavaPlugin {
         if (sender instanceof Player)
             return Permissions.Security.permission((Player) sender, name.toLowerCase() + "." + permString);
         return true;
+    }
+    
+    public void setup() {
+        server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
+        server.getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
+        
+        // setup location manager
+        //landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(pluginDirectory + File.separator + "lands.yml"))));
+        iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
+        
+        //clear command list
+        iCoLand.cmdMap.clear();
     }
 	
 	

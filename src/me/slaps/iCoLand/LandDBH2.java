@@ -39,7 +39,7 @@ public class LandDBH2 implements LandDB {
             ex.printStackTrace();
         }
         
-        cp = JdbcConnectionPool.create("jdbc:h2:"+dbPath+";AUTO_RECONNECT=TRUE", "sa", "sa");
+        cp = JdbcConnectionPool.create("jdbc:h2:"+dbPath+";AUTO_RECONNECT=TRUE;CACHE_SIZE=32768", "sa", "sa");
         
         if ( !tableExists(Config.sqlTableName) ) {
             createTable();

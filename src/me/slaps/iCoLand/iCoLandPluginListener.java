@@ -61,5 +61,10 @@ public class iCoLandPluginListener extends ServerListener {
 	  		Plugin plugin = pm.getPlugin("Permissions");
 	  		enablePermissions((Permissions)plugin);
 	  	}
+	  	
+	  	if ( iCoLand.ic == null && iCoLand.perms == null ) {
+	  	    parent.setup();
+	  	}
+	  	
 	}	
 }

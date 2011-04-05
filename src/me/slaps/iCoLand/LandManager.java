@@ -186,9 +186,13 @@ public class LandManager {
         return ( totalBlocks <= Config.maxBlocksClaimable );
 	}
 	
-	public void importDB(File importFile) {
-	    landDB.importDB(importFile);
-	}
-	
+    public void importDB(File importFile) {
+        landDB.importDB(importFile);
+    }
+
+    public void exportDB(File exportFile) {
+        landDB.exportDB(exportFile);
+    }
+
 	
 }

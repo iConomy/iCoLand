@@ -754,8 +754,34 @@ public class LandDBH2 implements LandDB {
 
 
     public void exportDB(File landYMLFile) {
-        // TODO Auto-generated method stub
+        Configuration LandConfig = new Configuration(landYMLFile);
         
+        
+        ArrayList<LinkedHashMap<String,Object>> tmpshops = new ArrayList<LinkedHashMap<String,Object>>();
+        Iterator<Land> itr = listAllLand().iterator();
+        while(itr.hasNext()) {
+            Land land = itr.next();
+            LinkedHashMap<String,Object> tmpmap = new LinkedHashMap<String,Object>();
+            
+            tmpmap.put("id", land.getID());
+            tmpmap.put("owner", land.owner);
+            tmpmap.put("perms", Land.writePermTags(land.canBuildDestroy));
+            tmpmap.put("addons", Land.writeAddonTags(land.addons));
+            tmpmap.put("dateCreated", land.dateCreated.toString() );
+            tmpmap.put("dateTaxed", land.dateTaxed.toString() );
+            tmpmap.put("name", land.locationName);
+            tmpmap.put("world", land.location.setLoc1.getWorld().getName());
+            tmpmap.put("corner1x",land.location.setLoc1.getBlockX());
+            tmpmap.put("corner1y",land.location.setLoc1.getBlockY());
+            tmpmap.put("corner1z",land.location.setLoc1.getBlockZ());
+            tmpmap.put("corner2x",land.location.setLoc2.getBlockX());
+            tmpmap.put("corner2y",land.location.setLoc2.getBlockY());
+            tmpmap.put("corner2z",land.location.setLoc2.getBlockZ());
+
+            tmpshops.add(tmpmap);           
+        }
+        LandConfig.setProperty("lands", tmpshops);
+        LandConfig.save();
     }
 
 

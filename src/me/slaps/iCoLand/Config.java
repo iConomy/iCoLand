@@ -12,6 +12,9 @@ public class Config {
     
     public static String h2DBFile = "lands.db";
     public static String sqlTableName = "lands";
+    
+    public static String exportFile = "export.yml";
+    public static String importFile = "lands.yml";
 
     public static double sellTax;
     

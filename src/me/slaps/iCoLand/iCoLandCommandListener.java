@@ -268,7 +268,15 @@ public class iCoLandCommandListener implements CommandExecutor {
                 
             } else if ( args[0].equalsIgnoreCase("importdb") ) {
                 if ( iCoLand.hasPermission(sender, "importdb") ) {
-                    iCoLand.landMgr.importDB(new File(iCoLand.pluginDirectory + File.separator + "lands.yml"));
+                    iCoLand.landMgr.importDB(new File(iCoLand.pluginDirectory + File.separator + Config.importFile));
+                } else {
+                    mess.send("{ERR}No access for that...");
+                }
+                return true;
+                
+            } else if ( args[0].equalsIgnoreCase("exportdb") ) {
+                if ( iCoLand.hasPermission(sender, "exportdb") ) {
+                    iCoLand.landMgr.exportDB(new File(iCoLand.pluginDirectory + File.separator + Config.exportFile));
                 } else {
                     mess.send("{ERR}No access for that...");
                 }

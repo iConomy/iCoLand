@@ -127,7 +127,7 @@ public class iCoLand extends JavaPlugin {
         //clear command list
         iCoLand.cmdMap.clear();
         
-        iCoLand.landMgr.test();
+        //iCoLand.landMgr.test();
     }
 	
 	

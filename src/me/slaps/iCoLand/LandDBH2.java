@@ -651,8 +651,7 @@ public class LandDBH2 implements LandDB {
         return (ret>0);
     }
 
-    public boolean updateLandPerms(int id, HashMap<String, Boolean> newPerms) {
-        String perms = Land.writePermTags(newPerms);
+    public boolean updateLandPerms(int id, String perms) {
         int ret = 0;
         Connection conn = null;
         PreparedStatement ps = null;
@@ -672,8 +671,7 @@ public class LandDBH2 implements LandDB {
         return (ret>0);
     }
 
-    public boolean updateLandAddons(int id, HashMap<String, Boolean> newAddons) {
-        String addons = Land.writeAddonTags(newAddons);
+    public boolean updateLandAddons(int id, String addons) {
         int ret = 0;
         Connection conn = null;
         PreparedStatement ps = null;

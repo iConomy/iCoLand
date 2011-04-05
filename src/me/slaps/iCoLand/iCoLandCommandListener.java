@@ -3,7 +3,6 @@ package me.slaps.iCoLand;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -330,41 +329,35 @@ public class iCoLandCommandListener implements CommandExecutor {
     
     public void editLand(Player player, Integer id, String category, String args) {
         Messaging mess = new Messaging(player);
-        Land land = iCoLand.landMgr.getLandById(id);
         if ( category.equals("perms") ) {
-            land.modifyBuildDestroyWithTags(args);
-            mess.send("{}Permissions added");
-            iCoLand.landMgr.save();
+            if (iCoLand.landMgr.modifyPermTags(id, args)) 
+                mess.send("{}Permissions modified");
+            else
+                mess.send("{ERR}Problem modify permissions");
         } else if ( category.equalsIgnoreCase("name") ) {
-            land.locationName = args.substring(0, (args.length()>35)?35:args.length());
-            mess.send("{}Location name changed");
-            iCoLand.landMgr.save();
+            if ( iCoLand.landMgr.updateName(id, args.substring(0, (args.length()>35)?35:args.length())) )
+                mess.send("{}Location name changed");
+            else
+                mess.send("{ERR}Error changing location name");
         }
     }
     
-    
     public void adminEditLand(CommandSender sender, Integer id, String category, String tags) {
         Messaging mess = new Messaging(sender);
-        Land land = iCoLand.landMgr.getLandById(id);
         if ( category.equals("perms") ) {
             editLand((Player)sender, id, category, tags);
-            iCoLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("name") ) {
             editLand((Player)sender, id, category, tags);
-            iCoLand.landMgr.save();
         } else if ( category.equalsIgnoreCase("owner") ) {
-            land.owner = tags;
-            mess.send("{}Owner changed");
-            iCoLand.landMgr.save();
+            if ( iCoLand.landMgr.updateOwner(id, tags) )
+                mess.send("{}Owner changed");
+            else
+                mess.send("{ERR}Problem modifying owner");
         } else if ( category.equalsIgnoreCase("addons") ) {
-            Set<String> in = Land.parseAddonTags(tags).keySet();
-            for(String addon : in ) {
-                if ( land.addons.containsKey(addon) )
-                    land.addons.remove(addon);
-                else
-                    land.addons.put(addon, true);
-            }
-            iCoLand.landMgr.save();
+            if ( iCoLand.landMgr.toggleAddons(id, tags) )
+                mess.send("{}Addons modified");
+            else
+                mess.send("{ERR}Error modifying addons");
         }
         
     }
@@ -416,17 +409,19 @@ public class iCoLandCommandListener implements CommandExecutor {
             double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(sender, addon)));
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
-                land.addAddon(addon);
-                iCoLand.landMgr.save();
-                
-                mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
+                if ( iCoLand.landMgr.addAddon(id, addon) )
+                    mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
+                else
+                    mess.send("{ERR}Error buying addon");
             } else if ( acc.getBalance() > price ) {
-                acc.subtract(price);
-                land.addAddon(addon);
-                iCoLand.landMgr.save();
-                
-                mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iCoLand.df.format(price));
-                mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
+                if ( iCoLand.landMgr.addAddon(id, addon) ) {
+                    acc.subtract(price);
+                    
+                    mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iCoLand.df.format(price));
+                    mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
+                } else {
+                    mess.send("{ERR}Error buying addon");
+                }
             } else {
                 mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getBalance())+
                         " Price: "+iCoLand.df.format(price)); 
@@ -445,15 +440,20 @@ public class iCoLandCommandListener implements CommandExecutor {
             double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(sender,addon)*Config.sellTax));
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
-                land.removeAddon(addon);
-                mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+price+"{BKT})");
+                if ( iCoLand.landMgr.removeAddon(id, addon) )
+                    mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+price+"{BKT})");
+                else
+                    mess.send("{ERR}Error selling addon");
             } else {
-                acc.add(price);
-                land.removeAddon(addon);
-                mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
-                mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                if ( iCoLand.landMgr.removeAddon(id, addon) ) {
+                    acc.add(price);
+                    mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
+                    mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                } else {
+                    mess.send("{ERR}Error selling addon");
+                }
+
             }
-            iCoLand.landMgr.save();
         
         } else {
             mess.send("{ERR}Not owner of land ID# {PRM}"+id);

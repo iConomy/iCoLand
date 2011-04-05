@@ -4,7 +4,9 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -18,13 +20,13 @@ public class LandManager {
 	    landDB = db;
 	}
 	
-	public void save() {
-	    //landDB.save();
-	}
-	
-	public void load() {
-	    //landDB.load();
-	}
+//	public void save() {
+//	    //landDB.save();
+//	}
+//	
+//	public void load() {
+//	    //landDB.load();
+//	}
 	
 	public boolean addLand(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
@@ -56,7 +58,7 @@ public class LandManager {
 	}
 		
 	public boolean isOwner(String playerName, Integer id) {
-	    return landDB.getLandOwner(id).equals(playerName);
+	    return getOwner(id).equals(playerName);
 	}
 	
 	public boolean canBuildDestroy(Player player, Location loc) {
@@ -193,6 +195,101 @@ public class LandManager {
     public void exportDB(File exportFile) {
         landDB.exportDB(exportFile);
     }
+    
+    public boolean updateName(int id, String name) {
+        return landDB.updateLandName(id, name);
+    }
+    
+    public boolean updateOwner(int id, String playerName) {
+        return landDB.updateLandOwner(id, playerName);
+    }
+    
+    public boolean updateAddons(int id, String addonString) {
+        return landDB.updateLandAddons(id, addonString);
+    }
+    
+    public boolean toggleAddons(int id, String tags) {
+        Set<String> in = Land.parseAddonTags(tags).keySet();
+        HashMap<String, Boolean> addons = Land.parseAddonTags(iCoLand.landMgr.getAddons(id));
+        for(String addon : in ) {
+            if ( addons.containsKey(addon) )
+                addons.remove(addon);
+            else
+                addons.put(addon, true);
+        }
+        return updateAddons(id, Land.writeAddonTags(addons));
+    }
+    
+    public boolean removeAddon(int id, String addon) {
+        Boolean ret = false;
+        HashMap<String, Boolean> addons = Land.parseAddonTags(iCoLand.landMgr.getAddons(id));
+        if ( addons.containsKey(addon) ) {
+            addons.remove(addon);
+            ret = true;
+        } else {
+            ret = false;
+        }
+        updateAddons(id, Land.writeAddonTags(addons));
+        return ret;
+    }
+    
+    public boolean addAddon(int id, String addon) {
+        Boolean ret = false;
+        HashMap<String, Boolean> addons = Land.parseAddonTags(iCoLand.landMgr.getAddons(id));
+        if ( addons.containsKey(addon) ) {
+            ret = false;
+        } else {
+            addons.put(addon, true);
+            ret = true;
+        }
+        updateAddons(id, Land.writeAddonTags(addons));
+        return ret;
+    }
+
+    public boolean updatePerms(int id, String permString) {
+        return landDB.updateLandPerms(id, permString);        
+    }
+    
+    public boolean modifyPermTags(int id, String args) {
+        HashMap<String, Boolean> perms = Land.parseAddonTags(iCoLand.landMgr.getPerms(id));
+        
+        if ( args.isEmpty() ) return false;
+        String[] split = args.split(" ");
+        for(String tag : split ) {
+            String[] keys = tag.split(":");
+            if ( keys.length == 2 ) {
+                if ( keys[1].equals("-") ) {
+                    perms.remove(keys[0]);
+                } else if ( keys[1].startsWith("f") ) {
+                    perms.put(keys[0], false);
+                } else if ( keys[1].startsWith("t") ) {
+                    perms.put(keys[0], true);
+                } else { 
+                    iCoLand.warning("Error parsing tag: "+tag);
+                }
+            } else {
+                iCoLand.warning("Error parsing tag: "+tag);
+            }
+        }
+        return updatePerms(id, Land.writePermTags(perms));
+    }
+    
+    public void modifyBuildDestroyWithTags(String tagString) {
+
+    }
+    
+    public String getAddons(int id) {
+        return landDB.getLandAddons(id);
+    }
+    
+    public String getPerms(int id) {
+        return landDB.getLandPerms(id);
+    }
+    
+    public String getOwner(int id) {
+        return landDB.getLandOwner(id);
+    }
+    
 
 	
 }

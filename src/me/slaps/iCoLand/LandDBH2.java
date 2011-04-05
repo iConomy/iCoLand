@@ -50,7 +50,6 @@ public class LandDBH2 implements LandDB {
         cp.dispose();
     }
     
-    
     public Connection getConnection() {
         Connection conn = null;
         try {
@@ -70,7 +69,7 @@ public class LandDBH2 implements LandDB {
         try {
             String sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"+table.toUpperCase()+"';";
             ps = conn.prepareStatement(sql);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             while (rs.next()) {
                 if (rs.getString(1).equals(table.toUpperCase())) {
@@ -94,7 +93,7 @@ public class LandDBH2 implements LandDB {
             conn = getConnection();
             String sql = "DROP TABLE "+Config.sqlTableName+";";
             ps = conn.prepareStatement(sql);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ret = ps.executeUpdate();
             ps.close();
             conn.close();
@@ -127,67 +126,67 @@ public class LandDBH2 implements LandDB {
                 "addons VARCHAR(1024)"+
                 ");";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX iOwner ON " + Config.sqlTableName + " (owner);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MinMinMin ON " + Config.sqlTableName + " (minX, minY, minZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MinMinMax ON " + Config.sqlTableName + " (minX, minY, maxZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MinMaxMin ON " + Config.sqlTableName + " (minX, maxY, minZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MinMaxMax ON " + Config.sqlTableName + " (minX, maxY, maxZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MaxMinMin ON " + Config.sqlTableName + " (maxX, minY, minZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MaxMinMax ON " + Config.sqlTableName + " (maxX, minY, maxZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MaxMaxMin ON " + Config.sqlTableName + " (maxX, maxY, minZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MaxMaxMax ON " + Config.sqlTableName + " (maxX, maxY, maxZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
             sql = "CREATE INDEX MinMaxMinMaxMinMax ON " + Config.sqlTableName + " (minX, maxX, minY, maxY, minZ, maxZ);";
             st = conn.createStatement();
-            if ( Config.debugMode ) iCoLand.info(st.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
             st.executeUpdate(sql);
             st.close();
             
@@ -223,7 +222,7 @@ public class LandDBH2 implements LandDB {
     		ps.setInt(11, newLand.location.LocMax.getBlockY());
     		ps.setInt(12, newLand.location.LocMax.getBlockZ());
     		ps.setString(13, newLand.location.LocMax.getWorld().getName());
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
     		ret = ps.executeUpdate();
     		
     		ps.close();
@@ -244,7 +243,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("DELETE FROM "+Config.sqlTableName+
                     " WHERE id = ?;");
             ps.setInt(1, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ret = ps.executeUpdate();
             
             ps.close();
@@ -267,7 +266,7 @@ public class LandDBH2 implements LandDB {
                     ((playerName != null)?" WHERE owner = ?":""));
             if ( playerName != null ) ps.setString(1, playerName);
             
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             while ( rs.next() ) {
                 count = rs.getInt(1);
@@ -302,7 +301,7 @@ public class LandDBH2 implements LandDB {
                 ps.setInt(i++, offset);
             }
             
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             
         } catch ( SQLException ex ) {
@@ -346,7 +345,7 @@ public class LandDBH2 implements LandDB {
             ps.setInt(1, loc.getBlockX());
             ps.setInt(2, loc.getBlockY());
             ps.setInt(3, loc.getBlockZ());
-//            if ( Config.debugMode ) iCoLand.info(ps.toString());
+//            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
         } catch ( SQLException ex ) {
             ex.printStackTrace();
@@ -411,7 +410,7 @@ public class LandDBH2 implements LandDB {
                 ps.setInt(4,cub.LocMax.getBlockY());
                 ps.setInt(5,cub.LocMin.getBlockZ());
                 ps.setInt(6,cub.LocMax.getBlockZ());
-//                if ( Config.debugMode ) iCoLand.info(ps.toString());
+//                if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
                 rs = ps.executeQuery();
                 
                 while ( rs.next() ) {
@@ -482,7 +481,7 @@ public class LandDBH2 implements LandDB {
                     "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
         } catch ( SQLException ex ) {
             ex.printStackTrace();
@@ -531,7 +530,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("SELECT perms FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             
         } catch ( SQLException ex ) {
@@ -561,7 +560,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("SELECT addons FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             
         } catch ( SQLException ex ) {
@@ -591,7 +590,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("SELECT owner FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             
         } catch ( SQLException ex ) {
@@ -620,7 +619,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET owner = ? WHERE id = ?");
             ps.setString(1, newOwner);
             ps.setInt(2, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ret = ps.executeUpdate();
             ps.close();
             conn.close();
@@ -640,7 +639,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET name = ? WHERE id = ?");
             ps.setString(1, newName);
             ps.setInt(2, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ret = ps.executeUpdate();
             ps.close();
             conn.close();
@@ -661,7 +660,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET perms = ? WHERE id = ?");
             ps.setString(1, perms);
             ps.setInt(2, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ret = ps.executeUpdate();
             ps.close();
             conn.close();
@@ -682,7 +681,7 @@ public class LandDBH2 implements LandDB {
             ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET addons = ? WHERE id = ?");
             ps.setString(1, addons);
             ps.setInt(2, id);
-            if ( Config.debugMode ) iCoLand.info(ps.toString());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ret = ps.executeUpdate();
             ps.close();
             conn.close();

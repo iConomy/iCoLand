@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 
 public class LandManager {
 	
+    Random rn = new Random();
+
     private LandDB landDB;
 	
 	public LandManager(LandDB db) {
@@ -190,5 +193,27 @@ public class LandManager {
 	    landDB.importDB(importFile);
 	}
 	
+	public void test() {
+        long start = System.currentTimeMillis();
+        int numLands = 10000;
+        for(int i=0;i<numLands;i++) {
+            Location loc1 = new Location(iCoLand.server.getWorlds().get(0), rand(-10000,10000), 8, rand(-10000,10000));
+            Location loc2 = new Location(iCoLand.server.getWorlds().get(0), loc1.getBlockX()+rand(0,100), loc1.getBlockY()+rand(0,120), loc1.getBlockZ()+rand(0,100));
+            iCoLand.landMgr.addLand(new Cuboid(loc1,loc2), "kigam", "", "");
+            if ( i % 100 == 0 ) {
+                if ( Config.debugMode ) iCoLand.info(landDB.countLandOwnedBy(null)+" lands in the database");
+            }
+        }
+        if ( Config.debugMode ) iCoLand.info("Inserting "+numLands+" random lands took: "+(System.currentTimeMillis()-start)+" ms");
+        if ( Config.debugMode ) iCoLand.info(landDB.countLandOwnedBy(null)+" lands in the database");
+	}
+	
+    public int rand(int lo, int hi) {
+        int n = hi - lo + 1;
+        int i = rn.nextInt() % n;
+        if ( i < 0 ) 
+            i = -i;
+        return lo+i;
+    }
 	
 }

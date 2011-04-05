@@ -12,6 +12,8 @@ public class Config {
     
     public static String h2DBFile = "lands.db";
     public static String sqlTableName = "lands";
+    
+    public static boolean debugModeSQL = false;
 
     public static double sellTax;
     

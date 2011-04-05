@@ -510,7 +510,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                                 mess.send("{ERR}Volume must be at least "+Config.minLandVolume+" blocks!");
                             }
                         } else {
-                            mess.send("{ERR}Too large, max volume is "+Config.maxBlocksClaimable+" blocks!");
+                            mess.send("{ERR}Too large, max volume is "+Config.maxLandVolume+" blocks!");
                         }
                     }
                 } else {

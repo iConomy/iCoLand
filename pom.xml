@@ -6,6 +6,12 @@
   <name>iCoLand</name>
   <url></url>
   <build>
+  	<directory>target</directory>
+    <outputDirectory>bin</outputDirectory>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <sourceDirectory>src</sourceDirectory>
+    <scriptSourceDirectory>src</scriptSourceDirectory>
       <plugins>
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -40,6 +46,18 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.3.153</version>
+    </dependency>
+    <dependency>
+      <groupId>com.nijiko.coelho</groupId>
+      <artifactId>iConomy</artifactId>
+      <version>0.0.1</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>com.nijikokun.bukkit</groupId>
+      <artifactId>Permissions</artifactId>
+      <version>0.0.1</version>
+      <type>jar</type>
     </dependency>
   </dependencies>
 </project>

@@ -35,6 +35,7 @@ public class iCoLandPluginListener extends ServerListener {
         	
 	        if ( pluginPerms != null )	enablePermissions((Permissions)pluginPerms);
     	}
+    	tryEnablePlugins();
     }
 
 	@Override
@@ -52,7 +53,8 @@ public class iCoLandPluginListener extends ServerListener {
 		iCoLand.info("Successfully linked with Permissions");	  		
 	}
 	
-	public void tryEnablePlugins(PluginManager pm) {
+	public void tryEnablePlugins() {
+	    PluginManager pm = iCoLand.server.getPluginManager();
 	  	if( pm.getPlugin("iConomy").isEnabled() ) {
 	  		Plugin plugin = pm.getPlugin("iConomy");
 	  		enableiConomy((iConomy)plugin);

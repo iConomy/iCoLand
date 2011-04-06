@@ -143,6 +143,8 @@ public class Config {
         mobRemovalTime = config.getInt("Mob-Removal-Interval", 2);
         
         preventGlobalBuildWithoutPerm = config.getBoolean("Prevent-Build-Without-Perm", false);
+        
+        loaded = true;
     }
     
     public static void saveConfig(File configFile) {

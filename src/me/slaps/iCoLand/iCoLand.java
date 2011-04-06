@@ -105,7 +105,7 @@ public class iCoLand extends JavaPlugin {
 	  	entityListener = new iCoLandEntityListener(this);
 	  	
 	  	// try to check for if external plugins already enabled
-	  	pluginListener.tryEnablePlugins(getServer().getPluginManager());
+	  	pluginListener.tryEnablePlugins();
 
 		info("Version ["+version+"] ("+codename+") enabled" + (Config.debugMode?" **DEBUG MODE ENABLED**":""));
     }

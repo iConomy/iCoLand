@@ -23,6 +23,10 @@ public class LandManager {
 	    landDB = db;
 	}
 	
+	public void close() {
+	    landDB.close();
+	}
+	
 //	public void save() {
 //	    //landDB.save();
 //	}

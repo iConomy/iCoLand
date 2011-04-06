@@ -13,7 +13,9 @@ import java.util.Locale;
 import me.slaps.iCoLand.iCoLandBlockListener;
 
 import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -34,7 +36,7 @@ public class iCoLand extends JavaPlugin {
     public static boolean enabled = false;
 
 	public static String name; // = "iCoLand";
-	public static String codename = "initial";
+	public static String codename = "fattire";
 	public static String version; // = "0.0.0001";
 	
 	public static File pluginDirectory;
@@ -81,61 +83,97 @@ public class iCoLand extends JavaPlugin {
     }
 
 	public void onDisable() {
+        iCoLand.ic = null;
+        iCoLand.perms = null;
+        
+        iCoLand.landMgr.close();
+        iCoLand.landMgr = null;
+        iCoLand.cmdMap.clear();
+        iCoLand.tmpCuboidMap.clear();
+        
+        iCoLand.enabled = false;
+        Config.loaded = false;
+        
+        // TODO - need to kill scheduled tasks here
+        
 		info("Version ["+version+"] ("+codename+") disabled");
 	}
 
 	public void onEnable() {
-
-		desc = getDescription();
-		name = desc.getName();
-		version = desc.getVersion();
-		
-		pluginDirectory = getDataFolder();
-
-		pluginDirectory.mkdir();
+	    initPluginInfo();
 		
 		Config.getConfig(pluginDirectory);
-		
-		server = getServer();
-		
-		
-		// setup listeners
-	  	getCommand("icl").setExecutor(new iCoLandCommandListener());        
-		blockListener =  new iCoLandBlockListener(this);
-		playerListener = new iCoLandPlayerListener(this);
-	  	pluginListener = new iCoLandPluginListener(this);
-	  	entityListener = new iCoLandEntityListener(this);
 	  	
-	  	// try to check for if external plugins already enabled
-	  	pluginListener.tryEnablePlugins();
+        pluginListener = new iCoLandPluginListener(this);
 
-		info("Version ["+version+"] ("+codename+") enabled" + (Config.debugMode?" **DEBUG MODE ENABLED**":""));
+        // try to check for if external plugins already enabled
+	  	tryEnablePlugins();
     }
 	
+    public void initPluginInfo() {
+        desc = getDescription();
+        name = desc.getName();
+        version = desc.getVersion();
+        
+        pluginDirectory = getDataFolder();
 
+        pluginDirectory.mkdir();
+        
+        server = getServer();
+    }
+
+    public void tryEnablePlugins() {
+        PluginManager pm = server.getPluginManager();
+        Plugin plugin;
+        
+        plugin = pm.getPlugin("iConomy");
+        if( ( plugin != null ) && plugin.isEnabled() ) {
+            ic = ((iConomy)plugin);
+            info("Successfully linked with iConomy");
+        }
+        
+        plugin = pm.getPlugin("Permissions");
+        if( ( plugin != null ) && plugin.isEnabled() ) {
+            perms = ((Permissions)plugin);
+            info("Successfully linked with Permissions");           
+        }
+        
+         if ( Config.loaded && ( iCoLand.ic != null && iCoLand.perms != null ) ) {
+             setup();
+             iCoLand.info("Version ["+iCoLand.version+"] ("+iCoLand.codename+") enabled" + (Config.debugMode?" **DEBUG MODE ENABLED**":""));
+         }
+    }	
+	
+
+    
+    public void setup() {
+        if ( !enabled ) {
+            enabled = true;
+
+            // setup listeners
+            getCommand("icl").setExecutor(new iCoLandCommandListener());        
+            blockListener =  new iCoLandBlockListener(this);
+            playerListener = new iCoLandPlayerListener(this);
+            entityListener = new iCoLandEntityListener(this);
+            
+            // setup events
+            server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
+            server.getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
+            
+            // setup location manager
+            iCoLand.info("Initializing land manager...");
+            iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
+            
+            //iCoLand.landMgr.test();
+        }
+    }
+    
     public static boolean hasPermission(CommandSender sender, String permString) {
         if (sender instanceof Player)
             return Permissions.Security.permission((Player) sender, name.toLowerCase() + "." + permString);
         return true;
     }
-    
-    public void setup() {
-        if ( !enabled ) {
-            enabled = true;
-            
-            server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
-            server.getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
-            
-            // setup location manager
-            //landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(pluginDirectory + File.separator + "lands.yml"))));
-            iCoLand.info("Permissions and iConomy found, initializing land manager");
-            iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
-            //clear command list
-            iCoLand.cmdMap.clear();
-            
-            //iCoLand.landMgr.test();
-        }
-    }
+
 	
 	
 }

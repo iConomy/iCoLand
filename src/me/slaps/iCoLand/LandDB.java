@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.bukkit.Location;
 
 public interface LandDB {
+
+    abstract public void close();
     
     abstract public boolean createNewLand(Land newLand);
     abstract public boolean removeLandById(int id);

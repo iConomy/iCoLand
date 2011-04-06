@@ -83,6 +83,7 @@ public class iCoLand extends JavaPlugin {
 	}
 
 	public void onEnable() {
+
 		desc = getDescription();
 		name = desc.getName();
 		version = desc.getVersion();
@@ -122,8 +123,8 @@ public class iCoLand extends JavaPlugin {
         
         // setup location manager
         //landMgr = new LandManager((LandDB)(new LandDBFlatFile(new File(pluginDirectory + File.separator + "lands.yml"))));
+        iCoLand.info("Permissions and iConomy found, initializing land manager");
         iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
-        
         //clear command list
         iCoLand.cmdMap.clear();
         

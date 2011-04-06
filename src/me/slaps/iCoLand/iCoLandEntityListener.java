@@ -12,8 +12,7 @@ public class iCoLandEntityListener extends EntityListener {
     public iCoLandEntityListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.CREATURE_SPAWN, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.ENTITY_EXPLODE, this, Priority.Low, plug);
-        plug.getServer().getPluginManager().registerEvent(Event.Type.EXPLOSION_PRIME, this, Priority.Low, plug);
-        
+//        plug.getServer().getPluginManager().registerEvent(Event.Type.EXPLOSION_PRIME, this, Priority.Low, plug);
     }
     
     public void onCreatureSpawn (CreatureSpawnEvent event) {
@@ -31,6 +30,8 @@ public class iCoLandEntityListener extends EntityListener {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
                 event.setCancelled(true);
             }
+        } else if ( !Config.unclaimedLandCanBoom ) {
+            event.setCancelled(true);
         }
     }
     
@@ -40,6 +41,8 @@ public class iCoLandEntityListener extends EntityListener {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
                 event.setCancelled(true);
             }
+        } else if ( !Config.unclaimedLandCanBoom ) {
+            event.setCancelled(true);
         }
     }
     

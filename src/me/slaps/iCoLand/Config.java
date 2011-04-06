@@ -36,6 +36,7 @@ public class Config {
     
     public static boolean unclaimedLandCanBuild;
     public static boolean unclaimedLandCanBoom;
+    public static boolean unclaimedLandCanBurn;
     
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
@@ -76,6 +77,8 @@ public class Config {
         
         unclaimedLandCanBuild = true;
         unclaimedLandCanBoom = true;
+        unclaimedLandCanBurn = true;
+
         
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
@@ -111,6 +114,8 @@ public class Config {
         if ( unclaimed != null ) {
             unclaimedLandCanBuild = unclaimed.getBoolean("Can-Build", true);
             unclaimedLandCanBoom = unclaimed.getBoolean("Can-Boom", true);
+            unclaimedLandCanBurn = unclaimed.getBoolean("Can-Burn", true);
+
         }
 
         ConfigurationNode landLimits = config.getNode("Land-Limits");
@@ -172,6 +177,7 @@ public class Config {
         
         config.setProperty("Unclaimed-Land.Can-Build", unclaimedLandCanBuild);
         config.setProperty("Unclaimed-Land.Can-Boom", unclaimedLandCanBoom);
+        config.setProperty("Unclaimed-Land.Can-Burn", unclaimedLandCanBurn);
         
         config.setProperty("Land-Limits.Max-Total-Blocks-Claimable", maxBlocksClaimable);
         config.setProperty("Land-Limits.Max-Lands-Claimable", maxLandsClaimable);

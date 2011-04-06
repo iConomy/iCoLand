@@ -52,11 +52,14 @@ public class iCoLandBlockListener extends BlockListener {
                 mess.send("{ERR}You can't do that here.");
             }
 	    }
+	    
         Integer id = iCoLand.landMgr.getLandId(event.getBlock().getLocation());
         if ( id > 0 ) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nofire") ) {
                 event.setCancelled(true);
             }
+        } else if ( !Config.unclaimedLandCanBurn ) {
+            event.setCancelled(true);
         }
 	}
 	
@@ -66,6 +69,8 @@ public class iCoLandBlockListener extends BlockListener {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nofire") ) {
                 event.setCancelled(true);
             }
+        } else if ( !Config.unclaimedLandCanBurn ) {
+            event.setCancelled(true);
         }
     }
     

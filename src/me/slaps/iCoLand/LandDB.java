@@ -1,6 +1,7 @@
 package me.slaps.iCoLand;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
@@ -14,6 +15,7 @@ public interface LandDB {
     
     abstract public ArrayList<Land> listAllLand();
     abstract public ArrayList<Land> listLandOwnedBy(String playerName, int limit, int offset);
+    abstract public ArrayList<Land> listLandPastTaxTime(Timestamp time);
     
     abstract public int countLandOwnedBy(String playerName);
     
@@ -32,6 +34,7 @@ public interface LandDB {
     abstract public boolean updateLandName(int id, String newName);
     abstract public boolean updateLandPerms(int id, String perms);
     abstract public boolean updateLandAddons(int id, String addons);
+    abstract public boolean updateTaxTime(int id, Timestamp time);
     
     abstract public boolean hasPermission(int id, String playerName);
     

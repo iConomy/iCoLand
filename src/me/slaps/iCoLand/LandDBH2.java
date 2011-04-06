@@ -331,6 +331,50 @@ public class LandDBH2 implements LandDB {
         
         return ret;
     }
+    
+    public ArrayList<Land> listLandPastTaxTime(Timestamp time) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
+                    " WHERE dateTaxed < ?"+
+                    " ORDER BY id ASC"
+                    );
+            ps.setTimestamp(1,time);
+            
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            rs = ps.executeQuery();
+            
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        ArrayList<Land> ret = new ArrayList<Land>();
+        
+        try {
+            rs.beforeFirst();
+            while( rs.next() ) {
+                Location locMin = new Location(iCoLand.server.getWorld(rs.getString(14)), rs.getInt(8), rs.getInt(9), rs.getInt(10));
+                Location locMax = new Location(iCoLand.server.getWorld(rs.getString(14)), rs.getInt(11), rs.getInt(12), rs.getInt(13));
+                Cuboid newCub = new Cuboid(locMin, locMax);
+                
+                ret.add(new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
+                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4)
+                                ));
+            }
+            
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return ret;
+    }
 
     public int getLandId(Location loc) {
         int ret = 0;
@@ -689,6 +733,28 @@ public class LandDBH2 implements LandDB {
         
         return (ret>0);
     }
+    
+
+    public boolean updateTaxTime(int id, Timestamp time) {
+        int ret = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET dateTaxed = ? WHERE id = ?");
+            ps.setTimestamp(1, time);
+            ps.setInt(2, id);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ret = ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return (ret>0);
+    }
+
 
     public boolean hasPermission(int id, String playerName) {
         HashMap<String, Boolean> perms = Land.parsePermTags(getLandPerms(id));
@@ -780,6 +846,8 @@ public class LandDBH2 implements LandDB {
         LandConfig.setProperty("lands", tmpshops);
         LandConfig.save();
     }
+
+
 
 
 

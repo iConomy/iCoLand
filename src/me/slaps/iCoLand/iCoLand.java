@@ -159,6 +159,8 @@ public class iCoLand extends JavaPlugin {
             // setup events
             server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
             server.getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
+            if ( Config.taxTimeMinutes > 0 ) 
+                server.getScheduler().scheduleSyncRepeatingTask(this, new TaxTask(), 100, 20*20);
             
             // setup location manager
             iCoLand.info("Initializing land manager...");

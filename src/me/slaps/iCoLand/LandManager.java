@@ -2,7 +2,6 @@ package me.slaps.iCoLand;
 
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +37,7 @@ public class LandManager {
 	public boolean addLand(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
 		if ( intersectsExistingLand(sl) > 0 ) return false;
-		Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
+		Timestamp now = new Timestamp(System.currentTimeMillis());
 		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
 		        Land.parseAddonTags(addons), now, now));
@@ -59,6 +58,10 @@ public class LandManager {
 		return out;
 	}
 	
+	public ArrayList<Land> listLandPastTaxTime(Timestamp time) {
+	    return landDB.listLandPastTaxTime(time);
+	}
+	
 	public Location getCenterOfLand(Integer id) {
 	    Land land = landDB.getLandById(id);
 	    return land.getCenter();
@@ -75,7 +78,7 @@ public class LandManager {
 	    if ( id > 0 ) {
 	        return landDB.hasPermission(id, playerName);
 	    } else {
-	        if ( Config.preventGlobalBuildWithoutPerm ) {
+	        if ( !Config.unclaimedLandCanBuild ) {
 	            return iCoLand.hasPermission(player, "canbuild");
 	        } else {
 	            return true;
@@ -178,7 +181,7 @@ public class LandManager {
 //	    if ( iCoLand.hasPermission(sender, "nocost") ) {
 //	        return 0;
 //	    } else {
-	        return Config.pricePerBlockRaw;
+	        return Config.pricePerBlock.get("raw");
 //	    }
 	}
 	
@@ -213,6 +216,10 @@ public class LandManager {
     
     public boolean updateAddons(int id, String addonString) {
         return landDB.updateLandAddons(id, addonString);
+    }
+    
+    public boolean updateTaxTime(int id, Timestamp time) {
+        return landDB.updateTaxTime(id, time);
     }
     
     public boolean toggleAddons(int id, String tags) {

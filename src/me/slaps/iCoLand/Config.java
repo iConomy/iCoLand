@@ -20,6 +20,7 @@ public class Config {
     public static String importFile = "lands.yml";
 
     public static double sellTax;
+    public static double taxRate;
     
     public static Integer maxBlocksClaimable;
     public static Integer maxLandsClaimable;
@@ -28,20 +29,21 @@ public class Config {
     
     public static Integer healTime;
     public static Integer mobRemovalTime;
+    public static Integer taxTimeMinutes;
     
-    public static double pricePerBlockRaw;
     public static HashMap<String, Boolean> addonsEnabled;
-    public static HashMap<String, Double> addonsPricePerBlock;
+    public static HashMap<String, Double> pricePerBlock;
     
-    public static boolean preventGlobalBuildWithoutPerm;
+    public static boolean unclaimedLandCanBuild;
+    public static boolean unclaimedLandCanBoom;
     
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
         
         // setup defaults
         debugMode = false;
-        pricePerBlockRaw = 50.0;
         sellTax = 0.80;
+        taxRate = 0.05;
         
         maxBlocksClaimable = 1000;
         maxLandsClaimable = 10;
@@ -58,19 +60,22 @@ public class Config {
         addonsEnabled.put("nofire", true);
         addonsEnabled.put("noflow", true);
 
-        addonsPricePerBlock = new HashMap<String, Double>();
-        addonsPricePerBlock.put("announce", 50.0);
-        addonsPricePerBlock.put("noenter", 100.0);
-        addonsPricePerBlock.put("heal", 200.0);
-        addonsPricePerBlock.put("nospawn", 50.0);
-        addonsPricePerBlock.put("noboom", 50.0);
-        addonsPricePerBlock.put("nofire", 10.0);
-        addonsPricePerBlock.put("noflow", 10.0);
+        pricePerBlock = new HashMap<String, Double>();
+        pricePerBlock.put("raw", 20.0);
+        pricePerBlock.put("announce", 50.0);
+        pricePerBlock.put("noenter", 100.0);
+        pricePerBlock.put("heal", 200.0);
+        pricePerBlock.put("nospawn", 50.0);
+        pricePerBlock.put("noboom", 50.0);
+        pricePerBlock.put("nofire", 10.0);
+        pricePerBlock.put("noflow", 10.0);
         
         healTime = 30;
         mobRemovalTime = 2;
+        taxTimeMinutes = 0;
         
-        preventGlobalBuildWithoutPerm = false;
+        unclaimedLandCanBuild = true;
+        unclaimedLandCanBoom = true;
         
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
@@ -91,12 +96,30 @@ public class Config {
         if ( sellTax < 0 ) sellTax = 0;
         if ( sellTax > 1 ) sellTax = 1;
         
-        maxBlocksClaimable = config.getInt("Max-Total-Blocks-Claimable", 1000);
-        maxLandsClaimable = config.getInt("Max-Lands-Claimable", 10);
-        maxLandVolume = config.getInt("Max-Land-Volume", 1000);
-        minLandVolume = config.getInt("Min-Land-Volume", 10);
+        taxRate = config.getDouble("TaxRate", 5.0)/100.0;
+        if ( taxRate < 0 ) taxRate = 0;
+        if ( taxRate > 1 ) taxRate = 1;
 
-        pricePerBlockRaw = config.getDouble("PricePerBlock-Raw", 20.0);        
+        ConfigurationNode timers = config.getNode("Timer-Settings");
+        if ( timers != null ) {
+            healTime = timers.getInt("Heal-Interval", 30);
+            mobRemovalTime = timers.getInt("Mob-Removal-Interval", 2);
+            taxTimeMinutes = timers.getInt("Tax-Interval-Minutes", 0);
+        }
+        
+        ConfigurationNode unclaimed = config.getNode("Unclaimed-Land");
+        if ( unclaimed != null ) {
+            unclaimedLandCanBuild = unclaimed.getBoolean("Can-Build", true);
+            unclaimedLandCanBoom = unclaimed.getBoolean("Can-Boom", true);
+        }
+
+        ConfigurationNode landLimits = config.getNode("Land-Limits");
+        if ( landLimits != null ) {
+            maxBlocksClaimable = landLimits.getInt("Max-Total-Blocks-Claimable", 1000);
+            maxLandsClaimable = landLimits.getInt("Max-Lands-Claimable", 10);
+            maxLandVolume = landLimits.getInt("Max-Land-Volume", 1000);
+            minLandVolume = landLimits.getInt("Min-Land-Volume", 10);
+        }
         
         addonsEnabled.clear();
         ConfigurationNode addons = config.getNode("Addons-Enabled");
@@ -108,55 +131,52 @@ public class Config {
             addonsEnabled.put("noboom", addons.getBoolean("noboom", false));
             addonsEnabled.put("nofire", addons.getBoolean("nofire", false));
             addonsEnabled.put("noflow", addons.getBoolean("noflow", false));
-        } else {
-            addonsEnabled.put("announce", false);
-            addonsEnabled.put("noenter", false);
-            addonsEnabled.put("heal", false);
-            addonsEnabled.put("nospawn", false);
-            addonsEnabled.put("noboom", false);
-            addonsEnabled.put("nofire", false);
-            addonsEnabled.put("noflow", false);
-            
         }
 
-        addonsPricePerBlock.clear();
-        ConfigurationNode addonPrices = config.getNode("Addons-PricePerBlock");
+        pricePerBlock.clear();
+        ConfigurationNode addonPrices = config.getNode("Price-Per-Block");
         if ( addonPrices != null ) {
-            addonsPricePerBlock.put("announce", addonPrices.getDouble("announce", 50.0));
-            addonsPricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
-            addonsPricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
-            addonsPricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
-            addonsPricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
-            addonsPricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
-            addonsPricePerBlock.put("noflow", addonPrices.getDouble("noflow", 50.0));
+            pricePerBlock.put("raw", addonPrices.getDouble("raw", 20.0));
+            pricePerBlock.put("announce", addonPrices.getDouble("announce", 50.0));
+            pricePerBlock.put("noenter", addonPrices.getDouble("noenter", 100.0));
+            pricePerBlock.put("heal", addonPrices.getDouble("heal", 200.0));
+            pricePerBlock.put("nospawn", addonPrices.getDouble("nospawn", 50.0));
+            pricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
+            pricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
+            pricePerBlock.put("noflow", addonPrices.getDouble("noflow", 50.0));
         } else {
-            addonsPricePerBlock.put("announce", 50.0);
-            addonsPricePerBlock.put("noenter", 100.0);
-            addonsPricePerBlock.put("heal", 200.0);
-            addonsPricePerBlock.put("nospawn", 50.0);
-            addonsPricePerBlock.put("noboom", 50.0);
-            addonsPricePerBlock.put("nofire", 10.0);
-            addonsPricePerBlock.put("noflow", 50.0);
+            pricePerBlock.put("raw", 20.0);
+            pricePerBlock.put("announce", 50.0);
+            pricePerBlock.put("noenter", 100.0);
+            pricePerBlock.put("heal", 200.0);
+            pricePerBlock.put("nospawn", 50.0);
+            pricePerBlock.put("noboom", 50.0);
+            pricePerBlock.put("nofire", 10.0);
+            pricePerBlock.put("noflow", 50.0);
         }
-        
-        healTime = config.getInt("Heal-Interval", 30);
-        mobRemovalTime = config.getInt("Mob-Removal-Interval", 2);
-        
-        preventGlobalBuildWithoutPerm = config.getBoolean("Prevent-Build-Without-Perm", false);
         
         loaded = true;
     }
     
     public static void saveConfig(File configFile) {
         Configuration config = new Configuration(configFile);
-        config.setProperty("debug", debugMode);
-        config.setProperty("PricePerBlock-Raw", pricePerBlockRaw);
-        config.setProperty("SalesTaxPercent", sellTax*100.0);
         
-        config.setProperty("Max-Total-Blocks-Claimable", maxBlocksClaimable);
-        config.setProperty("Max-Lands-Claimable", maxLandsClaimable);
-        config.setProperty("Max-Land-Volume", maxLandVolume);
-        config.setProperty("Min-Land-Volume", minLandVolume);
+        config.setProperty("debug", debugMode);
+        
+        config.setProperty("SalesTaxPercent", sellTax*100.0);
+        config.setProperty("TaxRate", taxRate*100.0);
+        
+        config.setProperty("Timer-Settings.Heal-Interval", healTime);
+        config.setProperty("Timer-Settings.Mob-Removal-Interval", mobRemovalTime);
+        config.setProperty("Timer-Settings.Tax-Interval-Minutes", taxTimeMinutes);
+        
+        config.setProperty("Unclaimed-Land.Can-Build", unclaimedLandCanBuild);
+        config.setProperty("Unclaimed-Land.Can-Boom", unclaimedLandCanBoom);
+        
+        config.setProperty("Land-Limits.Max-Total-Blocks-Claimable", maxBlocksClaimable);
+        config.setProperty("Land-Limits.Max-Lands-Claimable", maxLandsClaimable);
+        config.setProperty("Land-Limits.Max-Land-Volume", maxLandVolume);
+        config.setProperty("Land-Limits.Min-Land-Volume", minLandVolume);
         
         config.setProperty("Addons-Enabled.announce", addonsEnabled.get("announce"));
         config.setProperty("Addons-Enabled.noenter", addonsEnabled.get("noenter"));
@@ -166,18 +186,15 @@ public class Config {
         config.setProperty("Addons-Enabled.nofire", addonsEnabled.get("nofire"));
         config.setProperty("Addons-Enabled.noflow", addonsEnabled.get("noflow"));
         
-        config.setProperty("Addons-PricePerBlock.announce", addonsPricePerBlock.get("announce"));
-        config.setProperty("Addons-PricePerBlock.noenter", addonsPricePerBlock.get("noenter"));
-        config.setProperty("Addons-PricePerBlock.heal", addonsPricePerBlock.get("heal"));
-        config.setProperty("Addons-PricePerBlock.nospawn", addonsPricePerBlock.get("nospawn"));
-        config.setProperty("Addons-PricePerBlock.noboom", addonsPricePerBlock.get("noboom"));
-        config.setProperty("Addons-PricePerBlock.nofire", addonsPricePerBlock.get("nofire"));
-        config.setProperty("Addons-PricePerBlock.noflow", addonsPricePerBlock.get("noflow"));
+        config.setProperty("Price-Per-Block.raw", pricePerBlock.get("raw"));
+        config.setProperty("Price-Per-Block.announce", pricePerBlock.get("announce"));
+        config.setProperty("Price-Per-Block.noenter", pricePerBlock.get("noenter"));
+        config.setProperty("Price-Per-Block.heal", pricePerBlock.get("heal"));
+        config.setProperty("Price-Per-Block.nospawn", pricePerBlock.get("nospawn"));
+        config.setProperty("Price-Per-Block.noboom", pricePerBlock.get("noboom"));
+        config.setProperty("Price-Per-Block.nofire", pricePerBlock.get("nofire"));
+        config.setProperty("Price-Per-Block.noflow", pricePerBlock.get("noflow"));
         
-        config.setProperty("Heal-Interval", healTime);
-        config.setProperty("Mob-Removal-Interval", mobRemovalTime);
-        
-        config.setProperty("Prevent-Build-Without-Perm", preventGlobalBuildWithoutPerm);
 
         config.save();
     }

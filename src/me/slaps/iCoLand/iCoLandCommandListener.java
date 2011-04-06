@@ -294,7 +294,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                         for(int i=0;i<numLands;i++) {
                             Location loc1 = new Location(iCoLand.server.getWorlds().get(0), rand(-4096,4096), rand(5,100), rand(-4096,4096));
                             Location loc2 = new Location(iCoLand.server.getWorlds().get(0), loc1.getBlockX()+rand(0,100), loc1.getBlockY()+rand(0,28), loc1.getBlockZ()+rand(0,100));
-                            iCoLand.landMgr.addLand(new Cuboid(loc1,loc2), "kigam", "", "");
+                            iCoLand.landMgr.addLand(new Cuboid(loc1,loc2), ((Player)sender).getName(), "", "");
                         }
                         if ( Config.debugMode ) iCoLand.info("Inserting "+numLands+" random lands took: "+(System.currentTimeMillis()-start)+" ms");
                         
@@ -466,7 +466,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         Account acc = iConomy.getBank().getAccount(playerName);        
         double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(player, newCuboid)));
         if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "nocost") ) {
-            if ( iCoLand.landMgr.addLand(newCuboid, playerName, "", "") ) {
+            if ( iCoLand.landMgr.addLand(newCuboid, playerName, playerName+":t", "") ) {
                 if ( iCoLand.hasPermission(player, "nocost") ) {
                     mess.send("{}Bought selected land for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
                 } else {

@@ -125,7 +125,7 @@ public class Land {
     public double getAddonPrice(CommandSender sender, String addon) {
 //        if ( !iCoLand.hasPermission(sender, "nocost") ) {
             if ( Config.isAddon(addon) ) {
-                return Config.addonsPricePerBlock.get(addon)*location.volume();
+                return Config.pricePerBlock.get(addon)*location.volume();
             } else {
                 return 0;
             }

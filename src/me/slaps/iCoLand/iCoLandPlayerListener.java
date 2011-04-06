@@ -1,6 +1,5 @@
 package me.slaps.iCoLand;
 
-import java.util.Calendar;
 import java.util.HashMap;
 
 import org.bukkit.Location;
@@ -103,6 +102,10 @@ public class iCoLandPlayerListener extends PlayerListener {
 
         Land landFrom = iCoLand.landMgr.getLandById(idFrom);
         Land landTo = iCoLand.landMgr.getLandById(idTo);
+        if ( idFrom != 0 && landFrom == null ) {
+            locMap.put(playerName, 0);
+            idFrom = 0;
+        }
         
 		if ( Config.addonsEnabled.get("noenter") && 
 		     landTo != null && idTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) && 
@@ -130,11 +133,11 @@ public class iCoLandPlayerListener extends PlayerListener {
 	
 	public boolean checkNow(Player player) {
 	    String playerName = player.getName();
-	    Long now = Calendar.getInstance().getTimeInMillis();  
+	    Long now = System.currentTimeMillis();
 	    
         if ( (!timeMap.containsKey(playerName)) 
                 || (now > timeMap.get(playerName)) ) {
-            timeMap.put(playerName, Calendar.getInstance().getTimeInMillis() + checkDelay);
+            timeMap.put(playerName, System.currentTimeMillis() + checkDelay);
             return true;
         } else {
             return false;

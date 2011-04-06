@@ -28,14 +28,15 @@ public class iCoLandPluginListener extends ServerListener {
             Plugin pluginIC = parent.getServer().getPluginManager().getPlugin("iConomy");
 	 
             if ( pluginIC != null )	enableiConomy((iConomy)pluginIC);
+            tryEnablePlugins();
     	}
 
     	if ( event.getPlugin().getDescription().getName().equals("Permissions") ) {
         	Plugin pluginPerms = parent.getServer().getPluginManager().getPlugin("Permissions");
         	
 	        if ( pluginPerms != null )	enablePermissions((Permissions)pluginPerms);
+	        tryEnablePlugins();
     	}
-    	tryEnablePlugins();
     }
 
 	@Override
@@ -55,11 +56,11 @@ public class iCoLandPluginListener extends ServerListener {
 	
 	public void tryEnablePlugins() {
 	    PluginManager pm = iCoLand.server.getPluginManager();
-	  	if( pm.getPlugin("iConomy").isEnabled() ) {
+	  	if( pm.getPlugin("iConomy").isEnabled() && iCoLand.ic == null) {
 	  		Plugin plugin = pm.getPlugin("iConomy");
 	  		enableiConomy((iConomy)plugin);
 	  	}
-	  	if( pm.getPlugin("Permissions").isEnabled() ) {
+	  	if( pm.getPlugin("Permissions").isEnabled() && iCoLand.ic == null ) {
 	  		Plugin plugin = pm.getPlugin("Permissions");
 	  		enablePermissions((Permissions)plugin);
 	  	}

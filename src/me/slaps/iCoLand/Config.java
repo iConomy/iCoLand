@@ -8,6 +8,8 @@ import org.bukkit.util.config.ConfigurationNode;
 
 public class Config {
     
+    public static boolean loaded = false;
+    
     public static boolean debugMode;
     public static boolean debugModeSQL = false;
     

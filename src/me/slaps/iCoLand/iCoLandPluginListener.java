@@ -62,7 +62,7 @@ public class iCoLandPluginListener extends ServerListener {
 	  		enablePermissions((Permissions)plugin);
 	  	}
 	  	
-	  	if ( iCoLand.ic == null && iCoLand.perms == null ) {
+	  	if ( Config.loaded && iCoLand.ic != null && iCoLand.perms != null ) {
 	  	    parent.setup();
 	  	}
 	  	

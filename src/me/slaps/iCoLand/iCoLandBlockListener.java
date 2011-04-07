@@ -43,16 +43,6 @@ public class iCoLandBlockListener extends BlockListener {
 	}
 	
 	public void onBlockIgnite( BlockIgniteEvent event )  {
-	    if ( event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) ) {
-            Location loc = event.getBlock().getLocation();
-            Player player = event.getPlayer();
-            if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
-                event.setCancelled(true);
-                Messaging mess = new Messaging((CommandSender)player);
-                mess.send("{ERR}You can't do that here.");
-            }
-	    }
-	    
         Integer id = iCoLand.landMgr.getLandId(event.getBlock().getLocation());
         if ( id > 0 ) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nofire") ) {
@@ -60,6 +50,10 @@ public class iCoLandBlockListener extends BlockListener {
             }
         } else if ( !Config.unclaimedLandCanBurn ) {
             event.setCancelled(true);
+            if ( event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) ) {
+                Messaging mess = (new Messaging(event.getPlayer()));
+                mess.send("{ERR}You can't do that here.");
+            }
         }
 	}
 	

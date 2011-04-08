@@ -21,7 +21,6 @@ public class iCoLandPlayerListener extends PlayerListener {
     private static HashMap<String, Long> timeMap;
     private static HashMap<String, Integer> locMap;
     private static HashMap<String, Location> lastNonLandLoc;
-    private static int checkDelay = 500; // milliseconds
     
     
 	public iCoLandPlayerListener(iCoLand plug) {
@@ -137,7 +136,7 @@ public class iCoLandPlayerListener extends PlayerListener {
 	    
         if ( (!timeMap.containsKey(playerName)) 
                 || (now > timeMap.get(playerName)) ) {
-            timeMap.put(playerName, System.currentTimeMillis() + checkDelay);
+            timeMap.put(playerName, System.currentTimeMillis() + Config.announceCheckInterval);
             return true;
         } else {
             return false;

@@ -11,7 +11,7 @@ public class Config {
     public static boolean loaded = false;
     
     public static boolean debugMode;
-    public static boolean debugModeSQL = false;
+    public static boolean debugModeSQL;
     
     public static String h2DBFile = "lands.db";
     public static String sqlTableName = "lands";
@@ -30,6 +30,7 @@ public class Config {
     public static Integer healTime;
     public static Integer mobRemovalTime;
     public static Integer taxTimeMinutes;
+    public static Integer announceCheckInterval;
     
     public static HashMap<String, Boolean> addonsEnabled;
     public static HashMap<String, Double> pricePerBlock;
@@ -43,6 +44,8 @@ public class Config {
         
         // setup defaults
         debugMode = false;
+        debugModeSQL = false;
+        
         sellTax = 0.80;
         taxRate = 0.05;
         
@@ -74,6 +77,7 @@ public class Config {
         healTime = 30;
         mobRemovalTime = 2;
         taxTimeMinutes = 0;
+        announceCheckInterval = 1000;
         
         unclaimedLandCanBuild = true;
         unclaimedLandCanBoom = true;
@@ -96,6 +100,7 @@ public class Config {
         config.load();
         
         debugMode = config.getBoolean("debug", false);
+        debugModeSQL = config.getBoolean("debugSQL", false);
         
         sellTax = config.getDouble("SalesTaxPercent", 80.0)/100.0;
         if ( sellTax < 0 ) sellTax = 0;
@@ -110,6 +115,7 @@ public class Config {
             healTime = timers.getInt("Heal-Interval", 30);
             mobRemovalTime = timers.getInt("Mob-Removal-Interval", 2);
             taxTimeMinutes = timers.getInt("Tax-Interval-Minutes", 0);
+            announceCheckInterval = timers.getInt("Announce-Check-Interval-ms", 0);
         }
         
         ConfigurationNode unclaimed = config.getNode("Unclaimed-Land");
@@ -168,6 +174,7 @@ public class Config {
         Configuration config = new Configuration(configFile);
         
         config.setProperty("debug", debugMode);
+        config.setProperty("debugSQL", debugModeSQL);
         
         config.setProperty("SalesTaxPercent", sellTax*100.0);
         config.setProperty("TaxRate", taxRate*100.0);
@@ -175,6 +182,7 @@ public class Config {
         config.setProperty("Timer-Settings.Heal-Interval", healTime);
         config.setProperty("Timer-Settings.Mob-Removal-Interval", mobRemovalTime);
         config.setProperty("Timer-Settings.Tax-Interval-Minutes", taxTimeMinutes);
+        config.setProperty("Timer-Settings.Announce-Check-Interval-ms", announceCheckInterval);
         
         config.setProperty("Unclaimed-Land.Can-Build", unclaimedLandCanBuild);
         config.setProperty("Unclaimed-Land.Can-Boom", unclaimedLandCanBoom);

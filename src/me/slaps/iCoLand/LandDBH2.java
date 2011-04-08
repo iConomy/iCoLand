@@ -263,7 +263,8 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT COUNT(id) FROM "+Config.sqlTableName+
-                    ((playerName != null)?" WHERE owner = ?":""));
+                    ((playerName != null)?" WHERE owner = ?":"")+
+                    ";");
             if ( playerName != null ) ps.setString(1, playerName);
             
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());

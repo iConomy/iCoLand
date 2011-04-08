@@ -141,7 +141,9 @@ public class iCoLand extends JavaPlugin {
         
          if ( Config.loaded && ( iCoLand.ic != null && iCoLand.perms != null ) ) {
              setup();
-             iCoLand.info("Version ["+iCoLand.version+"] ("+iCoLand.codename+") enabled" + (Config.debugMode?" **DEBUG MODE ENABLED**":""));
+             iCoLand.info("Version ["+iCoLand.version+"] ("+iCoLand.codename+") enabled. "+
+                     iCoLand.landMgr.countLandsOwnedBy(null)+" lands found."+
+                     (Config.debugMode?" **DEBUG MODE ENABLED**":""));
          }
     }	
 	

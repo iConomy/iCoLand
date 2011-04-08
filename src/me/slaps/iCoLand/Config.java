@@ -87,6 +87,8 @@ public class Config {
             loadConfig(configFile);
             saveConfig(configFile);
         }
+        
+        loaded = true;
     }
         
     public static void loadConfig(File configFile) {
@@ -160,7 +162,6 @@ public class Config {
             pricePerBlock.put("noflow", 50.0);
         }
         
-        loaded = true;
     }
     
     public static void saveConfig(File configFile) {

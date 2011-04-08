@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.slaps</groupId>
   <artifactId>iCoLand</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>2.14</version>
   <name>iCoLand</name>
   <url></url>
   <build>
@@ -32,6 +32,24 @@
                   </archive>              
               </configuration>    
           </plugin>
+		  <plugin>
+	    	<artifactId>maven-antrun-plugin</artifactId>
+		    <executions>
+		      <execution>
+		        <phase>install</phase>
+		        <configuration>
+		          <tasks>
+		            <property name="maven.artifactId" value="${project.artifactId}"/>
+  		            <property name="maven.version" value="${project.version}"/>
+		          	<copy file="target/${maven.artifactId}-${maven.version}.jar" tofile="target/${maven.artifactId}.jar" />
+		          </tasks>
+		        </configuration>
+		        <goals>
+		          <goal>run</goal>
+		        </goals>
+		      </execution>
+		    </executions>
+		  </plugin>
       </plugins>
   </build>
   <dependencies>

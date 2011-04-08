@@ -116,6 +116,7 @@ public class iCoLand extends JavaPlugin {
         version = desc.getVersion();
         
         pluginDirectory = getDataFolder();
+        //pluginDirectory = new File("./plugins/iCoLand/");
 
         pluginDirectory.mkdir();
         

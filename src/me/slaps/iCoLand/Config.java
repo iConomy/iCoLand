@@ -10,34 +10,47 @@ public class Config {
     
     public static boolean loaded = false;
     
+    // debug settings
     public static boolean debugMode;
     public static boolean debugModeSQL;
     
+    // database settings
     public static String h2DBFile = "lands.db";
     public static String sqlTableName = "lands";
     
+    // import/export files
     public static String exportFile = "export.yml";
     public static String importFile = "lands.yml";
 
+    // sales tax and periodic tax rate settings
     public static double sellTax;
     public static double taxRate;
     
+    // land limit settings
     public static Integer maxBlocksClaimable;
     public static Integer maxLandsClaimable;
     public static Integer minLandVolume;
     public static Integer maxLandVolume;
     
+    // interval/timer settings
     public static Integer healTime;
     public static Integer mobRemovalTime;
     public static Integer taxTimeMinutes;
     public static Integer announceCheckInterval;
     
+    // addons enabled
     public static HashMap<String, Boolean> addonsEnabled;
+    
+    // prices per block
     public static HashMap<String, Double> pricePerBlock;
     
+    // unclaimed land options
     public static boolean unclaimedLandCanBuild;
     public static boolean unclaimedLandCanBoom;
     public static boolean unclaimedLandCanBurn;
+    
+    // selection options
+    public static boolean allLandFullHeight;
     
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
@@ -82,6 +95,8 @@ public class Config {
         unclaimedLandCanBuild = true;
         unclaimedLandCanBoom = true;
         unclaimedLandCanBurn = true;
+        
+        allLandFullHeight = false;
 
         
         // write default config file if it doesn't exist
@@ -99,23 +114,30 @@ public class Config {
         Configuration config = new Configuration(configFile);
         config.load();
         
-        debugMode = config.getBoolean("debug", false);
-        debugModeSQL = config.getBoolean("debugSQL", false);
         
-        sellTax = config.getDouble("SalesTaxPercent", 80.0)/100.0;
-        if ( sellTax < 0 ) sellTax = 0;
-        if ( sellTax > 1 ) sellTax = 1;
+        ConfigurationNode debug = config.getNode("Debug");
+        if ( debug != null ) {
+            debugMode = debug.getBoolean("debug", false);
+            debugModeSQL = debug.getBoolean("debugSQL", false);
+        }
         
-        taxRate = config.getDouble("TaxRate", 5.0)/100.0;
-        if ( taxRate < 0 ) taxRate = 0;
-        if ( taxRate > 1 ) taxRate = 1;
+        ConfigurationNode taxes = config.getNode("Tax-Settings");
+        if ( taxes != null ) {
+            sellTax = taxes.getDouble("SalesTaxPercent", 80.0)/100.0;
+            if ( sellTax < 0 ) sellTax = 0;
+            if ( sellTax > 1 ) sellTax = 1;
+            
+            taxRate = taxes.getDouble("TaxRate", 5.0)/100.0;
+            if ( taxRate < 0 ) taxRate = 0;
+            if ( taxRate > 1 ) taxRate = 1;
+        }
 
         ConfigurationNode timers = config.getNode("Timer-Settings");
         if ( timers != null ) {
             healTime = timers.getInt("Heal-Interval", 30);
             mobRemovalTime = timers.getInt("Mob-Removal-Interval", 2);
             taxTimeMinutes = timers.getInt("Tax-Interval-Minutes", 0);
-            announceCheckInterval = timers.getInt("Announce-Check-Interval-ms", 0);
+            announceCheckInterval = timers.getInt("Announce-Check-Interval-ms", 1000);
         }
         
         ConfigurationNode unclaimed = config.getNode("Unclaimed-Land");
@@ -157,27 +179,25 @@ public class Config {
             pricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
             pricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
             pricePerBlock.put("noflow", addonPrices.getDouble("noflow", 50.0));
-        } else {
-            pricePerBlock.put("raw", 20.0);
-            pricePerBlock.put("announce", 50.0);
-            pricePerBlock.put("noenter", 100.0);
-            pricePerBlock.put("heal", 200.0);
-            pricePerBlock.put("nospawn", 50.0);
-            pricePerBlock.put("noboom", 50.0);
-            pricePerBlock.put("nofire", 10.0);
-            pricePerBlock.put("noflow", 50.0);
         }
+        
+        ConfigurationNode selectionOptions = config.getNode("Selection-Options");
+        if ( selectionOptions != null ) {
+            allLandFullHeight = selectionOptions.getBoolean("All-Land-Full-Height", false);
+        }
+        
+
         
     }
     
     public static void saveConfig(File configFile) {
         Configuration config = new Configuration(configFile);
         
-        config.setProperty("debug", debugMode);
-        config.setProperty("debugSQL", debugModeSQL);
+        config.setProperty("Debug.debug", debugMode);
+        config.setProperty("Debug.debugSQL", debugModeSQL);
         
-        config.setProperty("SalesTaxPercent", sellTax*100.0);
-        config.setProperty("TaxRate", taxRate*100.0);
+        config.setProperty("Tax-Settings.SalesTaxPercent", sellTax*100.0);
+        config.setProperty("Tax-Settings.TaxRate", taxRate*100.0);
         
         config.setProperty("Timer-Settings.Heal-Interval", healTime);
         config.setProperty("Timer-Settings.Mob-Removal-Interval", mobRemovalTime);
@@ -210,6 +230,7 @@ public class Config {
         config.setProperty("Price-Per-Block.nofire", pricePerBlock.get("nofire"));
         config.setProperty("Price-Per-Block.noflow", pricePerBlock.get("noflow"));
         
+        config.setProperty("Selection-Options.All-Land-Full-Height", allLandFullHeight);
 
         config.save();
     }

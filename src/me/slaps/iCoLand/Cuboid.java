@@ -29,6 +29,16 @@ public class Cuboid {
 		computeNewBlock();
 	}
 	
+	public boolean setFullHeight() {
+	    if ( valid ) {
+	        setLoc1.setY(0);
+	        setLoc2.setY(127);
+	        computeNewBlock();
+	        return true;
+	    } else
+	        return false;
+	}
+	
 	public boolean setLocation(Location loc) {
 		if ( setLoc1 == null ) {
 		    setLoc1 = loc;

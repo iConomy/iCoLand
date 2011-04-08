@@ -147,10 +147,20 @@ public class iCoLandCommandListener implements CommandExecutor {
                         mess.send("Console can't select");
                     } else if ( args.length == 1 ) {
                         selectArea((Player)sender);
-                    } else if ( args.length == 2 & args[1].equalsIgnoreCase("cancel") ) {
-                        mess.send("{}Cancelling current selection.");
-                        iCoLand.cmdMap.remove(((Player)sender).getName());
-                        iCoLand.tmpCuboidMap.remove(((Player)sender).getName());                        
+                    } else if ( args.length == 2 ) {
+                        Player player = (Player)sender;
+                        if ( args[1].equalsIgnoreCase("cancel") ) {
+                            mess.send("{}Cancelling current selection.");
+                            iCoLand.cmdMap.remove(player.getName());
+                            iCoLand.tmpCuboidMap.remove(((Player)sender).getName());
+                        } else if ( args[1].equalsIgnoreCase("fullheight") ) {
+                            if ( iCoLand.tmpCuboidMap.containsKey(player.getName()) ) {
+                                mess.send("{}Changing selection height to full height.");
+                                iCoLand.tmpCuboidMap.get(player.getName()).setFullHeight();
+                            } else {
+                                mess.send("{ERR}No currently selected land.");
+                            }
+                        }
                     } else {
                         mess.send("{ERR}Too many arguments.");
                         showHelp(sender, "select");
@@ -634,9 +644,12 @@ public class iCoLandCommandListener implements CommandExecutor {
         } else if ( topic.equalsIgnoreCase("select") ) {
             if ( iCoLand.hasPermission(sender, "select") ) { 
                 mess.send(" {CMD}/icl {PRM}select {}- start cuboid selection process");
-                mess.send("    {}After typing this command, right click ( use something");
-                mess.send("    {}unplaceable ) on the first corner, then right click");
-                mess.send("    {}on the second corner.");
+                mess.send("    {}After typing this command, left click a block to set the first corner,");
+                mess.send("    {}then left click a 2nd block to set the second corner.  This selects");
+                mess.send("    {}the {PRM}CUBE {} set by the 2 corner blocks.");
+                mess.send(" {CMD}/icl {PRM}select {BKT}[{PRM}cancel{BKT}|{PRM}fullheight{BKT}] {}");
+                mess.send("    {}pass an optional argument cancel to cancel the current selection");
+                mess.send("    {}or pass fullheight to modify your selection to be the full height.");
             }
         } else if ( topic.equalsIgnoreCase("info") ) {
             if ( iCoLand.hasPermission(sender, "info") ) { 

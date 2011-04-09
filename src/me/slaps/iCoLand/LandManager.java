@@ -265,7 +265,7 @@ public class LandManager {
     }
     
     public boolean modifyPermTags(int id, String args) {
-        HashMap<String, Boolean> perms = Land.parseAddonTags(iCoLand.landMgr.getPerms(id));
+        HashMap<String, Boolean> perms = Land.parsePermTags(iCoLand.landMgr.getPerms(id));
         
         if ( args.isEmpty() ) return false;
         String[] split = args.split(" ");

@@ -22,6 +22,7 @@ public class TaxTask implements Runnable {
             iCoLand.info("Starting tax task...  "+now);
         
         for(Land land : lands) {
+            
                 double tax = land.location.volume()*Config.taxRate;
                 
                 Account acc = iConomy.getBank().getAccount(land.owner);
@@ -43,7 +44,7 @@ public class TaxTask implements Runnable {
                     } 
                     
                     if ( Config.debugMode ) 
-                        iCoLand.info("Land ID# "+land.getID()+" taxed for "+iCoLand.df.format(tax));
+                        iCoLand.info(land.owner+ " - Land ID# "+land.getID()+" taxed for "+iCoLand.df.format(tax));
                 } else {
                     // not enough for taxes, delete zone!
                     if (!iCoLand.landMgr.removeLandById(land.getID())) {
@@ -56,7 +57,7 @@ public class TaxTask implements Runnable {
                         mess.send("{ERR}Not enough money to pay tax of {PRM}"+tax+" on land ID# {PRM}"+land.getID());
                     } 
                     if ( Config.debugMode ) 
-                        iCoLand.info("Not enough money to pay tax of "+tax+" on land ID# "+land.getID());
+                        iCoLand.info(land.owner+" didn't have enough money to pay tax of "+tax+" on land ID# "+land.getID());
                 }
                 
         }

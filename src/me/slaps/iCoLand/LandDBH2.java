@@ -44,6 +44,14 @@ public class LandDBH2 implements LandDB {
         if ( !tableExists(Config.sqlTableName) ) {
             createTable();
         }
+        
+        if ( !columnExists(Config.sqlTableName, "active") ) {
+            if ( addColumnActive() ) {
+                iCoLand.info("Active column definition added to table.");
+            } else {
+                iCoLand.warning("Unable to add active column to table definition!");
+            }
+        }
     }
     
     public void close() {
@@ -60,6 +68,48 @@ public class LandDBH2 implements LandDB {
         }
         return conn;
     }
+    
+    public boolean addColumnActive() {
+        Connection conn = getConnection();
+        PreparedStatement ps = null;
+        try {
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD IF NOT EXISTS active BOOLEAN DEFAULT TRUE NOT NULL;";
+            ps = conn.prepareStatement(sql);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return columnExists(Config.sqlTableName, "active");
+    }
+    
+    public boolean columnExists(String table, String column) {
+        boolean ret = false;
+        Connection conn = getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?;";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, table.toUpperCase());
+            ps.setString(2, column.toUpperCase());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                if (rs.getString(1).equals(column.toUpperCase())) {
+                    ret = true;
+                }
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return ret;
+    }
 
     public boolean tableExists(String table) {
         boolean ret = false;
@@ -67,8 +117,9 @@ public class LandDBH2 implements LandDB {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"+table.toUpperCase()+"';";
+            String sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?;";
             ps = conn.prepareStatement(sql);
+            ps.setString(1,table.toUpperCase());
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -341,7 +392,7 @@ public class LandDBH2 implements LandDB {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
                     "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
-                    " WHERE dateTaxed < ?"+
+                    " WHERE dateTaxed < ? AND active = TRUE "+
                     " ORDER BY id ASC"
                     );
             ps.setTimestamp(1,time);

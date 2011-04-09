@@ -55,7 +55,7 @@ public class iCoLandPlayerListener extends PlayerListener {
     	        if ( newCuboid.isValid() ) {
                     if ( Config.allLandFullHeight ) newCuboid.setFullHeight();
     	            mess.send("{}Land selected!");
-    	            iCoLand.landMgr.showSelectLandInfo(player, newCuboid);
+    	            iCoLand.commandListener.showSelectLandInfo(player, newCuboid);
     	            iCoLand.cmdMap.remove(playerName);
     	        } else {
     	            iCoLand.tmpCuboidMap.put(playerName, newCuboid);

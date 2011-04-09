@@ -154,10 +154,11 @@ public class iCoLand extends JavaPlugin {
             enabled = true;
 
             // setup listeners
-            getCommand("icl").setExecutor(new iCoLandCommandListener());        
             blockListener =  new iCoLandBlockListener(this);
             playerListener = new iCoLandPlayerListener(this);
             entityListener = new iCoLandEntityListener(this);
+            commandListener = new iCoLandCommandListener();
+            getCommand("icl").setExecutor(commandListener);
             
             // setup events
             server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);

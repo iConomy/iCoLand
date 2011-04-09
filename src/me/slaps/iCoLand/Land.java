@@ -54,16 +54,7 @@ public class Land {
         valid = ret;
         return ret;
     }
-    
-//    public void changeOwner(String newOwner) {
-//        owner = newOwner;
-//    }
-    
 
-//    public void addPermCanBuild(String playerName, Boolean perm) {
-//        canBuildDestroy.put(playerName, perm);
-//    }
-    
     public boolean contains(Location loc) {
         return location.isIn(loc);
     }
@@ -95,46 +86,19 @@ public class Land {
         }
     }
     
-//    public void addPermission(String playerName, Boolean perm) {
-//        canBuildDestroy.put(playerName, perm);
-//    }
-//    
-//    public void delPermission(String playerName) {
-//        if ( canBuildDestroy.containsKey(playerName) )
-//            canBuildDestroy.remove(playerName);
-//    }
-//    
-//    public void giveAddon(String addon) {
-//        addons.put(addon, true);
-//    }
-//    
-//    public void removeAddon(String addon) {
-//        addons.remove(addon);
-//    }
-    
-
-    
     public Location getCenter() {
         return location.getCenter();
     }
-    
-//    public void addAddon(String addon) {
-//        addons.put(addon, true);
-//    }
 
     public double getAddonPrice(CommandSender sender, String addon) {
-//        if ( !iCoLand.hasPermission(sender, "nocost") ) {
             if ( Config.isAddon(addon) ) {
                 return Config.pricePerBlock.get(addon)*location.volume();
             } else {
                 return 0;
             }
-//        } else {
-//            return 0;
-//        }
     }
     
-    public double getSalePrice(CommandSender sender) {
+    public double getTotalPrice(CommandSender sender) {
         double price = 0;
         Set<String> addonsBought = addons.keySet();
         
@@ -147,33 +111,10 @@ public class Land {
         price += iCoLand.landMgr.getPrice(sender, location);
         
         // take out sales tax
-        price *= Config.sellTax;
+        //price *= Config.sellTax;
         
         return price;
     }
-    
-    
-//    public void modifyBuildDestroyWithTags(String tagString) {
-//        if ( tagString.isEmpty() ) return;
-//        String[] split = tagString.split(" ");
-//        for(String tag : split ) {
-//            String[] keys = tag.split(":");
-//            if ( keys.length == 2 ) {
-//                if ( keys[1].equals("-") ) {
-//                    canBuildDestroy.remove(keys[0]);
-//                } else if ( keys[1].startsWith("f") ) {
-//                    canBuildDestroy.put(keys[0], false);
-//                } else if ( keys[1].startsWith("t") ) {
-//                    canBuildDestroy.put(keys[0], true);
-//                } else { 
-//                    iCoLand.warning("Error parsing tag: "+tag);
-//                }
-//            } else {
-//                iCoLand.warning("Error parsing tag: "+tag);
-//            }
-//        }
-//    }
-    
     
     
     

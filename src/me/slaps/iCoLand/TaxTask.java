@@ -25,6 +25,7 @@ public class TaxTask implements Runnable {
                 double tax = land.location.volume()*Config.taxRate;
                 
                 Account acc = iConomy.getBank().getAccount(land.owner);
+                Account bank = iConomy.getBank().getAccount(Config.bankName);
                 
                 if ( acc == null ) {
                     iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
@@ -35,6 +36,7 @@ public class TaxTask implements Runnable {
                     
                     // subtract tax out
                     acc.subtract(tax);
+                    bank.add(tax);
                     
                     int i = playerInList(players, land.owner);
                     if ( i > -1 ) {

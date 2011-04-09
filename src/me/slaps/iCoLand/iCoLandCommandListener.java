@@ -337,6 +337,24 @@ public class iCoLandCommandListener implements CommandExecutor {
         return lo+i;
     }
     
+    public boolean selectArea(Player player) {
+        String playerName = player.getName();
+        Messaging mess = new Messaging((CommandSender)player);
+        if ( iCoLand.cmdMap.containsKey(playerName) && iCoLand.cmdMap.get(playerName).equals("select") ) {
+            mess.send("{ERR}Cancelling selection command.");
+            iCoLand.cmdMap.remove(playerName);
+        }
+        
+        if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
+            mess.send("{ERR}Unselecting current cuboid");
+            iCoLand.tmpCuboidMap.remove(playerName);
+        }
+            
+        mess.send("{}Left Click 1st Corner");
+        iCoLand.cmdMap.put(playerName,"select");
+        return true;
+    }
+    
     public void editLand(Player player, Integer id, String category, String args) {
         Messaging mess = new Messaging(player);
         if ( category.equals("perms") ) {
@@ -409,13 +427,13 @@ public class iCoLandCommandListener implements CommandExecutor {
         
     }
  
-
     public void buyAddon(Player sender, String addon, Integer id) {
         Messaging mess = new Messaging(sender);
         Land land = iCoLand.landMgr.getLandById(id);
 
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
+            Account bank = iConomy.getBank().getAccount(Config.bankName);
             double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(sender, addon)));
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
@@ -426,6 +444,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             } else if ( acc.getBalance() > price ) {
                 if ( iCoLand.landMgr.addAddon(id, addon) ) {
                     acc.subtract(price);
+                    bank.add(price);
                     
                     mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iCoLand.df.format(price));
                     mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
@@ -447,7 +466,9 @@ public class iCoLandCommandListener implements CommandExecutor {
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(sender,addon)*Config.sellTax));
+            Account bank = iConomy.getBank().getAccount(Config.bankName);
+            double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(sender,addon)));
+            double sellPrice = price*Config.sellTax;
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
                 if ( iCoLand.landMgr.removeAddon(id, addon) )
@@ -456,7 +477,8 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{ERR}Error selling addon");
             } else {
                 if ( iCoLand.landMgr.removeAddon(id, addon) ) {
-                    acc.add(price);
+                    acc.add(sellPrice);
+                    bank.subtract(sellPrice);
                     mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
                     mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
                 } else {
@@ -474,6 +496,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         Messaging mess = new Messaging(player);
         String playerName = player.getName();
         Account acc = iConomy.getBank().getAccount(playerName);        
+        Account bank = iConomy.getBank().getAccount(Config.bankName);
         double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(player, newCuboid)));
         if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "nocost") ) {
             if ( iCoLand.landMgr.addLand(newCuboid, playerName, playerName+":t", "") ) {
@@ -481,6 +504,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{}Bought selected land for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
                 } else {
                     acc.subtract(price);
+                    bank.add(price);
                     mess.send("{}Bought selected land for {PRM}"+iCoLand.df.format(price));
                     mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
                 }
@@ -540,13 +564,17 @@ public class iCoLandCommandListener implements CommandExecutor {
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iCoLand.df.format(land.getSalePrice(sender)));
+            Account bank = iConomy.getBank().getAccount(Config.bankName);
+            double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice(sender)));
+            double sellPrice = Double.valueOf(iCoLand.df.format(price*Config.sellTax));
 
             if ( iCoLand.hasPermission(sender, "nocost") ) {
                 iCoLand.landMgr.removeLandById(id);
-                mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+price+"{BKT})");
+                mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+sellPrice+"{BKT})");
             } else {
-                acc.add(price);
+                acc.add(sellPrice);
+                bank.subtract(sellPrice);
+                
                 iCoLand.landMgr.removeLandById(id);
                 mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}"+price);
                 mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
@@ -554,67 +582,6 @@ public class iCoLandCommandListener implements CommandExecutor {
             
         } else {
             mess.send("{ERR}Not owner of land ID# {PRM}"+id);
-        }
-    }
-    
-    
-    public void showLandInfo(Player sender, String... args) {
-        Messaging mess = new Messaging(sender);
-        
-        // use location search or selected search
-        String playerName = sender.getName();
-        if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
-            Cuboid select = iCoLand.tmpCuboidMap.get(playerName);
-            if ( select.isValid() ) {
-                iCoLand.landMgr.showSelectLandInfo((CommandSender)sender, select);
-            } else {
-                mess.send("{ERR}Current selection invalid! Use {CMD}/lwc select{} to cancel");
-            }
-        } else {
-            Location loc = sender.getLocation();
-            Integer landid = iCoLand.landMgr.getLandId(loc);
-            if ( landid > 0 ) {
-                iCoLand.landMgr.showSelectLandInfo((CommandSender)sender, landid);
-            } else {
-                mess.send("{ERR}No current selection, not on owned land");
-            }
-        }
-            
-    }
-    
-    public void showLandInfo(CommandSender sender, String... args) {
-        Messaging mess = new Messaging(sender);
-
-        if ( args.length == 0 ) {
-            showHelp(sender,"info");
-        } else {
-            Integer id = 0;          
-            if ( args[0].equalsIgnoreCase("here") ) {
-                id = iCoLand.landMgr.getLandId(((Player)sender).getLocation());
-                if ( id > 0 ) {
-                    iCoLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
-                } else {
-                    mess.send("{ERR}No land claimed where you are standing.");
-                }
-            } else {
-                try {
-                    id = Integer.parseInt(args[0]);
-                } catch (NumberFormatException e ) {
-                    id = 0;
-                }
-                if ( id > 0 ) {
-                    if ( iCoLand.landMgr.landIdExists(id)) {
-                        iCoLand.landMgr.showSelectLandInfo((CommandSender)sender, id);
-                    } else {
-                        mess.send("{ERR}Land ID# "+id+" does not exist");
-                    }
-                } else {
-                    if ( sender instanceof Player ) 
-                        showLandInfo((Player)sender, args);
-                    else
-                        showHelp(sender,"info");
-                }
-            }
         }
     }
     
@@ -694,26 +661,108 @@ public class iCoLandCommandListener implements CommandExecutor {
         }
 
     }
-    
-    public boolean selectArea(Player player) {
-        String playerName = player.getName();
-        Messaging mess = new Messaging((CommandSender)player);
-        if ( iCoLand.cmdMap.containsKey(playerName) && iCoLand.cmdMap.get(playerName).equals("select") ) {
-            mess.send("{ERR}Cancelling selection command.");
-            iCoLand.cmdMap.remove(playerName);
+
+    public void showSelectLandInfo(CommandSender sender, Cuboid select) {
+        Messaging mess = new Messaging(sender);
+        Integer id = iCoLand.landMgr.intersectsExistingLand(select);
+        
+        if ( id > 0 && iCoLand.landMgr.getLandById(id).location.equals(select) ) {
+            showExistingLandInfo(sender, iCoLand.landMgr.getLandById(id));
+        } else if ( id > 0 ) {
+            mess.send("{ERR}Intersects existing land ID# "+id);
+            mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
+            iCoLand.tmpCuboidMap.put(((Player)sender).getName(), iCoLand.landMgr.getLandById(id).location );
+            showExistingLandInfo(sender, iCoLand.landMgr.getLandById(id));
+        } else {
+            mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
+            mess.send("Dimensoins: " + select.toDimString() );
+            mess.send("Volume: " + select.volume() );
+            mess.send("Price: " + iCoLand.df.format(iCoLand.landMgr.getPrice(sender, select)));
         }
         
-        if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
-            mess.send("{ERR}Unselecting current cuboid");
-            iCoLand.tmpCuboidMap.remove(playerName);
-        }
-            
-        mess.send("{}Left Click 1st Corner");
-        iCoLand.cmdMap.put(playerName,"select");
-        return true;
     }
     
+    public void showSelectLandInfo(CommandSender sender, Integer id) {
+        showExistingLandInfo(sender, iCoLand.landMgr.getLandById(id));
+    }
+    
+    public void showExistingLandInfo(CommandSender sender, Land land) {
+        Messaging mess = new Messaging(sender);
+        mess.send("{}"+Misc.headerify("{} Land ID# {PRM}"+land.getID()+"{} --"+
+                                      (land.locationName.isEmpty()?"":" {PRM}"+land.locationName+" {}")
+                                     ));
+        mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
+        mess.send("{CMD}Owner: {}"+land.owner);
+        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"bypass") ) {
+            if ( !land.locationName.isEmpty() )
+                mess.send("{CMD}Name: {}"+land.locationName);
+            mess.send("{CMD}Created: {}"+land.dateCreated);
+            mess.send("{CMD}Taxed: {}"+land.dateTaxed);
+            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
+            mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
+            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));
+        }
+    }
+    
+    public void showLandInfo(Player sender, String... args) {
+        Messaging mess = new Messaging(sender);
+        
+        // use location search or selected search
+        String playerName = sender.getName();
+        if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
+            Cuboid select = iCoLand.tmpCuboidMap.get(playerName);
+            if ( select.isValid() ) {
+                showSelectLandInfo((CommandSender)sender, select);
+            } else {
+                mess.send("{ERR}Current selection invalid! Use {CMD}/lwc select{} to cancel");
+            }
+        } else {
+            Location loc = sender.getLocation();
+            Integer landid = iCoLand.landMgr.getLandId(loc);
+            if ( landid > 0 ) {
+                showSelectLandInfo((CommandSender)sender, landid);
+            } else {
+                mess.send("{ERR}No current selection, not on owned land");
+            }
+        }
+            
+    }
+    
+    public void showLandInfo(CommandSender sender, String... args) {
+        Messaging mess = new Messaging(sender);
 
+        if ( args.length == 0 ) {
+            showHelp(sender,"info");
+        } else {
+            Integer id = 0;          
+            if ( args[0].equalsIgnoreCase("here") ) {
+                id = iCoLand.landMgr.getLandId(((Player)sender).getLocation());
+                if ( id > 0 ) {
+                    showSelectLandInfo((CommandSender)sender, id);
+                } else {
+                    mess.send("{ERR}No land claimed where you are standing.");
+                }
+            } else {
+                try {
+                    id = Integer.parseInt(args[0]);
+                } catch (NumberFormatException e ) {
+                    id = 0;
+                }
+                if ( id > 0 ) {
+                    if ( iCoLand.landMgr.landIdExists(id)) {
+                        showSelectLandInfo((CommandSender)sender, id);
+                    } else {
+                        mess.send("{ERR}Land ID# "+id+" does not exist");
+                    }
+                } else {
+                    if ( sender instanceof Player ) 
+                        showLandInfo((Player)sender, args);
+                    else
+                        showHelp(sender,"info");
+                }
+            }
+        }
+    }
     
     
     

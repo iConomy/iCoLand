@@ -60,6 +60,30 @@ public class LandDBH2 implements LandDB {
         }
         return conn;
     }
+    
+    public boolean indexExists(String index) {
+        boolean ret = false;
+        Connection conn = getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String sql = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.INDEXES WHERE ORDINAL_POSITION=1 AND INDEX_NAME="+index.toUpperCase()+";";
+            ps = conn.prepareStatement(sql);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                if (rs.getString(1).equals(index.toUpperCase())) {
+                    ret = true;
+                }
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return ret;
+    }
 
     public boolean tableExists(String table) {
         boolean ret = false;

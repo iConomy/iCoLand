@@ -25,6 +25,7 @@ public class Config {
     // sales tax and periodic tax rate settings
     public static double sellTax;
     public static double taxRate;
+    public static String bankName;
     
     // land limit settings
     public static Integer maxBlocksClaimable;
@@ -97,6 +98,8 @@ public class Config {
         unclaimedLandCanBurn = true;
         
         allLandFullHeight = false;
+        
+        bankName = "iCoLand";
 
         
         // write default config file if it doesn't exist
@@ -130,6 +133,8 @@ public class Config {
             taxRate = taxes.getDouble("TaxRate", 5.0)/100.0;
             if ( taxRate < 0 ) taxRate = 0;
             if ( taxRate > 1 ) taxRate = 1;
+            
+            bankName = taxes.getString("iConomy-Tax-Account-Name", "iCoLand");
         }
 
         ConfigurationNode timers = config.getNode("Timer-Settings");
@@ -198,6 +203,7 @@ public class Config {
         
         config.setProperty("Tax-Settings.SalesTaxPercent", sellTax*100.0);
         config.setProperty("Tax-Settings.TaxRate", taxRate*100.0);
+        config.setProperty("Tax-Settings.iConomy-Tax-Account-Name", bankName);
         
         config.setProperty("Timer-Settings.Heal-Interval", healTime);
         config.setProperty("Timer-Settings.Mob-Removal-Interval", mobRemovalTime);

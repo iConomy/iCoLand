@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.nijiko.coelho.iConomy.iConomy;
+
 public class LandManager {
 	
     Random rn = new Random();
@@ -20,19 +22,18 @@ public class LandManager {
 	
 	public LandManager(LandDB db) {
 	    landDB = db;
+	    
+	    if ( !iConomy.getBank().hasAccount(Config.bankName) ) {
+	        iCoLand.info("Creating iConomy Tax/Bank account: "+Config.bankName);
+	        iConomy.getBank().addAccount(Config.bankName);
+	    } else {
+	        iCoLand.info("Found iConomy Tax/Bank account: "+Config.bankName);
+	    }
 	}
 	
 	public void close() {
 	    landDB.close();
 	}
-	
-//	public void save() {
-//	    //landDB.save();
-//	}
-//	
-//	public void load() {
-//	    //landDB.load();
-//	}
 	
 	public boolean addLand(Cuboid sl, String owner, String perms, String addons) {
 	    if ( !sl.isValid() ) return false;
@@ -118,49 +119,7 @@ public class LandManager {
 	public int intersectsExistingLand(Cuboid loc) {
 	    return landDB.intersectsExistingLand(loc);
 	}
-	
-	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
-	    Messaging mess = new Messaging(sender);
-	    Integer id = intersectsExistingLand(select);
-	    
-	    if ( id > 0 && iCoLand.landMgr.getLandById(id).location.equals(select) ) {
-	        showExistingLandInfo(sender, landDB.getLandById(id));
-	    } else if ( id > 0 ) {
-            mess.send("{ERR}Intersects existing land ID# "+id);
-            mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
-            iCoLand.tmpCuboidMap.put(((Player)sender).getName(), iCoLand.landMgr.getLandById(id).location );
-            showExistingLandInfo(sender, landDB.getLandById(id));
-	    } else {
-            mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
-            mess.send("Dimensoins: " + select.toDimString() );
-            mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + iCoLand.df.format(getPrice(sender, select)));
-	    }
-	    
-	}
-	
-	public void showSelectLandInfo(CommandSender sender, Integer id) {
-	    showExistingLandInfo(sender, landDB.getLandById(id));
-	}
-	
-	public void showExistingLandInfo(CommandSender sender, Land land) {
-	    Messaging mess = new Messaging(sender);
-	    mess.send("{}"+Misc.headerify("{} Land ID# {PRM}"+land.getID()+"{} --"+
-	                                  (land.locationName.isEmpty()?"":" {PRM}"+land.locationName+" {}")
-	                                 ));
-	    mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
-        mess.send("{CMD}Owner: {}"+land.owner);
-        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"bypass") ) {
-            if ( !land.locationName.isEmpty() )
-                mess.send("{CMD}Name: {}"+land.locationName);
-            mess.send("{CMD}Created: {}"+land.dateCreated);
-            mess.send("{CMD}Taxed: {}"+land.dateTaxed);
-            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
-            mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
-            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));
-        }
-	}
-	
+
 	public double getPrice(CommandSender sender, Cuboid target) {
 	    double sum = 0;
 	    Integer sx = target.LocMax.getBlockX()-target.LocMin.getBlockX()+1;
@@ -178,11 +137,7 @@ public class LandManager {
 	}
 	
 	public double getPriceOfBlock(CommandSender sender, Location target) {
-//	    if ( iCoLand.hasPermission(sender, "nocost") ) {
-//	        return 0;
-//	    } else {
-	        return Config.pricePerBlock.get("raw");
-//	    }
+        return Config.pricePerBlock.get("raw");
 	}
 	
 	public boolean canClaimMoreLands(String playerName) {

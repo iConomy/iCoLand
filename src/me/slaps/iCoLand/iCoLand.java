@@ -11,9 +11,6 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import me.slaps.iCoLand.iCoLandBlockListener;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.ItemInWorldManager;
-import net.minecraft.server.World;
 
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
@@ -21,9 +18,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.nijiko.coelho.iConomy.iConomy;

@@ -416,7 +416,7 @@ public class iCoLandCommandListener implements CommandExecutor {
 
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(sender, addon)));
+            double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(addon)));
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
                 if ( iCoLand.landMgr.addAddon(id, addon) )
@@ -447,7 +447,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(sender,addon)*Config.sellTax));
+            double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(addon)*Config.sellTax));
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
                 if ( iCoLand.landMgr.removeAddon(id, addon) )
@@ -474,7 +474,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         Messaging mess = new Messaging(player);
         String playerName = player.getName();
         Account acc = iConomy.getBank().getAccount(playerName);        
-        double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(player, newCuboid)));
+        double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(newCuboid)));
         if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "nocost") ) {
             if ( iCoLand.landMgr.addLand(newCuboid, playerName, playerName+":t", "") ) {
                 if ( iCoLand.hasPermission(player, "nocost") ) {
@@ -540,7 +540,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
-            double price = Double.valueOf(iCoLand.df.format(land.getSalePrice(sender)));
+            double price = Double.valueOf(iCoLand.df.format(land.getSalePrice()));
 
             if ( iCoLand.hasPermission(sender, "nocost") ) {
                 iCoLand.landMgr.removeLandById(id);

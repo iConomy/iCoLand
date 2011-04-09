@@ -40,7 +40,7 @@ public class LandManager {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
-		        Land.parseAddonTags(addons), now, now));
+		        Land.parseAddonTags(addons), now, now, true));
 	}
 	
 	public boolean removeLandById(Integer id) {
@@ -134,7 +134,7 @@ public class LandManager {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + iCoLand.df.format(getPrice(sender, select)));
+            mess.send("Price: " + iCoLand.df.format(getPrice(select)));
 	    }
 	    
 	}
@@ -161,7 +161,7 @@ public class LandManager {
         }
 	}
 	
-	public double getPrice(CommandSender sender, Cuboid target) {
+	public double getPrice(Cuboid target) {
 	    double sum = 0;
 	    Integer sx = target.LocMax.getBlockX()-target.LocMin.getBlockX()+1;
 	    Integer sy = target.LocMax.getBlockY()-target.LocMin.getBlockY()+1;
@@ -169,7 +169,7 @@ public class LandManager {
 	    for(int x=0;x<sx;x++) {
 	        for(int y=0;y<sy;y++) {
 	            for(int z=0;z<sz;z++) {
-	                sum += getPriceOfBlock(sender, new Location(target.setLoc1.getWorld(), 
+	                sum += getPriceOfBlock(new Location(target.setLoc1.getWorld(), 
 	                        target.LocMin.getBlockX()+x, target.LocMin.getBlockY()+y, target.LocMin.getBlockZ()+z));
 	            }
 	        }
@@ -177,12 +177,8 @@ public class LandManager {
 	    return sum;
 	}
 	
-	public double getPriceOfBlock(CommandSender sender, Location target) {
-//	    if ( iCoLand.hasPermission(sender, "nocost") ) {
-//	        return 0;
-//	    } else {
+	public double getPriceOfBlock(Location target) {
 	        return Config.pricePerBlock.get("raw");
-//	    }
 	}
 	
 	public boolean canClaimMoreLands(String playerName) {
@@ -220,6 +216,10 @@ public class LandManager {
     
     public boolean updateTaxTime(int id, Timestamp time) {
         return landDB.updateTaxTime(id, time);
+    }
+    
+    public boolean updateActive(int id, Boolean active) {
+        return landDB.updateActive(id, active);
     }
     
     public boolean toggleAddons(int id, String tags) {

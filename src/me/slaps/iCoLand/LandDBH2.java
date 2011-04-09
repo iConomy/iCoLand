@@ -341,7 +341,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
                     ((playerName != null)?" WHERE owner = ?":"")+
                     " ORDER BY id ASC"+
                     ((limit > 0)?" LIMIT ? OFFSET ?;":";")
@@ -370,7 +370,7 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                 
                 ret.add(new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4)
+                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
                                 ));
             }
             
@@ -391,7 +391,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
                     " WHERE dateTaxed < ? AND active = TRUE "+
                     " ORDER BY id ASC"
                     );
@@ -414,7 +414,7 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                 
                 ret.add(new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4)
+                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
                                 ));
             }
             
@@ -574,7 +574,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
@@ -595,7 +595,7 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                     
                 ret = new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                               Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4)
+                               Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
                               );
             }
                 
@@ -786,6 +786,25 @@ public class LandDBH2 implements LandDB {
         return (ret>0);
     }
     
+    public boolean updateActive(int id, Boolean active) {
+        int ret = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET active = ? WHERE id = ?");
+            ps.setBoolean(1, active);
+            ps.setInt(2, id);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ret = ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return (ret>0);
+    }
 
     public boolean updateTaxTime(int id, Timestamp time) {
         int ret = 0;
@@ -852,8 +871,10 @@ public class LandDBH2 implements LandDB {
             String dateCreated = shopkeys.get("dateCreated");
             String dateTaxed = shopkeys.get("dateTaxed");
             String locationName = shopkeys.get("name");
+            
+            Boolean active = (shopkeys.containsKey("active")?shopkeys.get("active").equalsIgnoreCase("true"):true);
 
-            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(dateTaxed)));
+            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(dateTaxed), active));
 
         }
         
@@ -892,6 +913,7 @@ public class LandDBH2 implements LandDB {
             tmpmap.put("corner2x",land.location.setLoc2.getBlockX());
             tmpmap.put("corner2y",land.location.setLoc2.getBlockY());
             tmpmap.put("corner2z",land.location.setLoc2.getBlockZ());
+            tmpmap.put("active", land.active?"true":"false");
 
             tmpshops.add(tmpmap);           
         }

@@ -187,18 +187,8 @@ public class iCoLand extends JavaPlugin {
     }
     
     public static boolean hasPermission(String world, String playerName, String permString) {
-        CraftServer cs = (CraftServer)server;
-        
-        World w = ((CraftWorld)server.getWorld(world)).getHandle();
-        
-        ItemInWorldManager iiwm = new ItemInWorldManager(w);
-        
-        EntityPlayer ep = new EntityPlayer(cs.getServer(), w, playerName, iiwm);
-        
-        CraftPlayer cp = new CraftPlayer(cs, ep);
-        
-        return Permissions.Security.permission((Player)cp, name.toLowerCase() + "." + permString);
-        
+        OfflinePlayer player = new OfflinePlayer(server, server.getWorld(world), playerName);
+        return Permissions.Security.permission((Player)player, name.toLowerCase() + "." + permString);
     }
 
 	

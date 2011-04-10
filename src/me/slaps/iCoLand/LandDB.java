@@ -35,6 +35,7 @@ public interface LandDB {
     abstract public boolean updateLandPerms(int id, String perms);
     abstract public boolean updateLandAddons(int id, String addons);
     abstract public boolean updateTaxTime(int id, Timestamp time);
+    abstract public boolean updateActive(int id, Boolean active);
     
     abstract public boolean hasPermission(int id, String playerName);
     

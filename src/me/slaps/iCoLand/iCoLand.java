@@ -176,8 +176,14 @@ public class iCoLand extends JavaPlugin {
     
     public static boolean hasPermission(CommandSender sender, String permString) {
         if (sender instanceof Player)
-            return Permissions.Security.permission((Player) sender, name.toLowerCase() + "." + permString);
+            return hasPermission(((Player)sender).getWorld().getName(), ((Player)sender).getName(), permString);
+            //return Permissions.Security.permission((Player) sender, name.toLowerCase() + "." + permString);
         return true;
+    }
+    
+    public static boolean hasPermission(String world, String playerName, String permString) {
+        OfflinePlayer player = new OfflinePlayer(server, server.getWorld(world), playerName);
+        return Permissions.Security.permission((Player)player, name.toLowerCase() + "." + permString);
     }
 
 	

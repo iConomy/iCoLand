@@ -41,7 +41,7 @@ public class LandManager {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
-		        Land.parseAddonTags(addons), now, now));
+		        Land.parseAddonTags(addons), now, now, true));
 	}
 	
 	public boolean removeLandById(Integer id) {
@@ -119,8 +119,50 @@ public class LandManager {
 	public int intersectsExistingLand(Cuboid loc) {
 	    return landDB.intersectsExistingLand(loc);
 	}
+	
+	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
+	    Messaging mess = new Messaging(sender);
+	    Integer id = intersectsExistingLand(select);
+	    
+	    if ( id > 0 && iCoLand.landMgr.getLandById(id).location.equals(select) ) {
+	        showExistingLandInfo(sender, landDB.getLandById(id));
+	    } else if ( id > 0 ) {
+            mess.send("{ERR}Intersects existing land ID# "+id);
+            mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
+            iCoLand.tmpCuboidMap.put(((Player)sender).getName(), iCoLand.landMgr.getLandById(id).location );
+            showExistingLandInfo(sender, landDB.getLandById(id));
+	    } else {
+            mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
+            mess.send("Dimensoins: " + select.toDimString() );
+            mess.send("Volume: " + select.volume() );
+            mess.send("Price: " + iCoLand.df.format(getPrice(select)));
+	    }
+	    
+	}
+	
+	public void showSelectLandInfo(CommandSender sender, Integer id) {
+	    showExistingLandInfo(sender, landDB.getLandById(id));
+	}
+	
+	public void showExistingLandInfo(CommandSender sender, Land land) {
+	    Messaging mess = new Messaging(sender);
+	    mess.send("{}"+Misc.headerify("{} Land ID# {PRM}"+land.getID()+"{} --"+
+	                                  (land.locationName.isEmpty()?"":" {PRM}"+land.locationName+" {}")
+	                                 ));
+	    mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
+        mess.send("{CMD}Owner: {}"+land.owner);
+        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"bypass") ) {
+            if ( !land.locationName.isEmpty() )
+                mess.send("{CMD}Name: {}"+land.locationName);
+            mess.send("{CMD}Created: {}"+land.dateCreated);
+            mess.send("{CMD}Taxed: {}"+land.dateTaxed);
+            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
+            mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
+            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));
+        }
+	}
 
-	public double getPrice(CommandSender sender, Cuboid target) {
+	public double getPrice(Cuboid target) {
 	    double sum = 0;
 	    Integer sx = target.LocMax.getBlockX()-target.LocMin.getBlockX()+1;
 	    Integer sy = target.LocMax.getBlockY()-target.LocMin.getBlockY()+1;
@@ -128,7 +170,7 @@ public class LandManager {
 	    for(int x=0;x<sx;x++) {
 	        for(int y=0;y<sy;y++) {
 	            for(int z=0;z<sz;z++) {
-	                sum += getPriceOfBlock(sender, new Location(target.setLoc1.getWorld(), 
+	                sum += getPriceOfBlock(new Location(target.setLoc1.getWorld(), 
 	                        target.LocMin.getBlockX()+x, target.LocMin.getBlockY()+y, target.LocMin.getBlockZ()+z));
 	            }
 	        }
@@ -136,8 +178,8 @@ public class LandManager {
 	    return sum;
 	}
 	
-	public double getPriceOfBlock(CommandSender sender, Location target) {
-        return Config.pricePerBlock.get("raw");
+	public double getPriceOfBlock(Location target) {
+	        return Config.pricePerBlock.get("raw");
 	}
 	
 	public boolean canClaimMoreLands(String playerName) {
@@ -175,6 +217,10 @@ public class LandManager {
     
     public boolean updateTaxTime(int id, Timestamp time) {
         return landDB.updateTaxTime(id, time);
+    }
+    
+    public boolean updateActive(int id, Boolean active) {
+        return landDB.updateActive(id, active);
     }
     
     public boolean toggleAddons(int id, String tags) {

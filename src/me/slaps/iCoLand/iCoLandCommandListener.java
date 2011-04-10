@@ -434,7 +434,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
             Account bank = iConomy.getBank().getAccount(Config.bankName);
-            double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(sender, addon)));
+            double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(addon)));
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
                 if ( iCoLand.landMgr.addAddon(id, addon) )
@@ -467,7 +467,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
             Account bank = iConomy.getBank().getAccount(Config.bankName);
-            double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(sender,addon)));
+            double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(addon)));
             double sellPrice = price*Config.sellTax;
             
             if ( iCoLand.hasPermission(sender, "nocost") ) {
@@ -497,7 +497,8 @@ public class iCoLandCommandListener implements CommandExecutor {
         String playerName = player.getName();
         Account acc = iConomy.getBank().getAccount(playerName);        
         Account bank = iConomy.getBank().getAccount(Config.bankName);
-        double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(player, newCuboid)));
+        double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(newCuboid)));
+        
         if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "nocost") ) {
             if ( iCoLand.landMgr.addLand(newCuboid, playerName, playerName+":t", "") ) {
                 if ( iCoLand.hasPermission(player, "nocost") ) {
@@ -565,7 +566,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             Account acc = iConomy.getBank().getAccount(sender.getName());
             Account bank = iConomy.getBank().getAccount(Config.bankName);
-            double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice(sender)));
+            double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
             double sellPrice = Double.valueOf(iCoLand.df.format(price*Config.sellTax));
 
             if ( iCoLand.hasPermission(sender, "nocost") ) {
@@ -677,7 +678,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
             mess.send("Volume: " + select.volume() );
-            mess.send("Price: " + iCoLand.df.format(iCoLand.landMgr.getPrice(sender, select)));
+            mess.send("Price: " + iCoLand.df.format(iCoLand.landMgr.getPrice(select)));
         }
         
     }

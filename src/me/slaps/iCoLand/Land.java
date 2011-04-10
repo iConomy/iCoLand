@@ -82,8 +82,12 @@ public class Land {
     }
 
     public boolean hasAddon(String addon) {
-        if ( addons.containsKey(addon) ) {
-            return addons.get(addon);
+        if ( active ) {
+            if ( addons.containsKey(addon) ) {
+                return addons.get(addon);
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

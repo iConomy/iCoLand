@@ -28,7 +28,7 @@ public class TaxTask implements Runnable {
             Account acc = iConomy.getBank().getAccount(land.owner);
             
             if ( acc == null ) {
-                iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
+                iCoLand.warning("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
             } else {
                 if (!iCoLand.landMgr.updateTaxTime(land.getID(), now))
                     iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());

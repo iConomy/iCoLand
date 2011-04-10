@@ -18,8 +18,8 @@ public class TaxTask implements Runnable {
 
         ArrayList<Land> lands = iCoLand.landMgr.listLandPastTaxTime(timeThreshold);
 
-//        if ( Config.debugMode ) 
-//            iCoLand.info("Starting tax task...  "+now);
+        if ( Config.debugMode1 ) 
+            iCoLand.info("Starting tax task...  "+now);
         
         for(Land land : lands) {
             double tax = land.location.volume()*Config.taxRate;

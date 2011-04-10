@@ -12,6 +12,7 @@ public class Config {
     
     // debug settings
     public static boolean debugMode;
+    public static boolean debugMode1;
     public static boolean debugModeSQL;
     
     // database settings
@@ -58,6 +59,7 @@ public class Config {
         
         // setup defaults
         debugMode = false;
+        debugMode1 = false;
         debugModeSQL = false;
         
         sellTax = 0.80;
@@ -121,6 +123,7 @@ public class Config {
         ConfigurationNode debug = config.getNode("Debug");
         if ( debug != null ) {
             debugMode = debug.getBoolean("debug", false);
+            debugMode1 = debug.getBoolean("debug-more-1", false);
             debugModeSQL = debug.getBoolean("debugSQL", false);
         }
         
@@ -199,6 +202,7 @@ public class Config {
         Configuration config = new Configuration(configFile);
         
         config.setProperty("Debug.debug", debugMode);
+        config.setProperty("Debug.debug-more-1", debugMode1);
         config.setProperty("Debug.debugSQL", debugModeSQL);
         
         config.setProperty("Tax-Settings.SalesTaxPercent", sellTax*100.0);

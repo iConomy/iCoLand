@@ -20,16 +20,12 @@ public class iCoLandCommandListener implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         Messaging mess = new Messaging(sender);
 
-        if ( Config.debugMode ) {
+        if ( Config.debugMode1 ) {
             String debug = "iCoLand.onCommand(): " + ((sender instanceof Player) ? "Player " + ((Player) sender).getName() : "Console") + " Command " + cmd.getName() + " args: ";
             for (int i = 0; i < args.length; i++) 
                 debug += args[i] + " ";
             iCoLand.info(debug);
         }
-
-        // temporary
-        if (!(sender instanceof Player))
-        	return false;
 
         // is our command?
         if ( Misc.isAny(cmd.getName(), "icl", "iCoLand", "iCoLand:icl", "iCoLand:iCoLand") ) {
@@ -109,7 +105,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 }
                 return true;
                 
-            // /icl modify <id> <perms|addons> <tags>
+            // /icl modify <id> <perms|addons|name> <tags>
             } else if (args[0].equalsIgnoreCase("modify") ) {
                 if ( iCoLand.hasPermission(sender, "modify") ) {
                     if ( args.length < 4 ) {
@@ -126,7 +122,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                         if ( !iCoLand.landMgr.landIdExists(id) ) {
                             mess.send("{ERR}Land ID# {PRM}" + id + " {ERR}doesn't exist");
                         } else {
-                            if ( Misc.isAny(args[2], "perms", "addons", "owner") ) {
+                            if ( Misc.isAny(args[2], "perms", "addons", "owner", "name") ) {
                                 String tags = args[3];
                                 for(int i=4;i<args.length;i++) tags += args[i];
                                 adminEditLand(sender, id, args[2], tags);
@@ -373,9 +369,10 @@ public class iCoLandCommandListener implements CommandExecutor {
     public void adminEditLand(CommandSender sender, Integer id, String category, String tags) {
         Messaging mess = new Messaging(sender);
         if ( category.equals("perms") ) {
-            editLand((Player)sender, id, category, tags);
-        } else if ( category.equalsIgnoreCase("name") ) {
-            editLand((Player)sender, id, category, tags);
+            if (iCoLand.landMgr.modifyPermTags(id, tags)) 
+                mess.send("{}Permissions modified");
+            else
+                mess.send("{ERR}Problem modify permissions");
         } else if ( category.equalsIgnoreCase("owner") ) {
             if ( iCoLand.landMgr.updateOwner(id, tags) )
                 mess.send("{}Owner changed");
@@ -386,6 +383,14 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("{}Addons modified");
             else
                 mess.send("{ERR}Error modifying addons");
+        } else if ( category.equalsIgnoreCase("name") ) {
+            if ( iCoLand.landMgr.updateName(id, tags.substring(0, (tags.length()>35)?35:tags.length())) )
+                mess.send("{}Location name changed");
+            else
+                mess.send("{ERR}Error changing location name");
+
+        } else {
+            mess.send("{ERR}Bad category");
         }
         
     }
@@ -599,7 +604,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             if ( iCoLand.hasPermission(sender, "info") ) topics += " info";
             if ( iCoLand.hasPermission(sender, "edit") ) topics += " edit";
             if ( iCoLand.hasPermission(sender, "buy") ) topics += " buy";
-            if ( iCoLand.hasPermission(sender, "sell") ) topics += " buy";
+            if ( iCoLand.hasPermission(sender, "sell") ) topics += " sell";
             if ( iCoLand.hasPermission(sender, "modify") ) topics += " modify";
     	    
     	    mess.send(" {} help topics: {CMD}" + topics);
@@ -656,7 +661,7 @@ public class iCoLandCommandListener implements CommandExecutor {
 
         } else if ( topic.equalsIgnoreCase("modify") ) {
             if ( iCoLand.hasPermission(sender, "modify") ) { 
-                mess.send(" {CMD}/icl {PRM}modify {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}addons{BKT}> <{PRM}tags{BKT}> {}- modify land settings");
+                mess.send(" {CMD}/icl {PRM}modify {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}addons{BKT}|{PRM}owner{BKT}|{PRM}name{BKT}> <{PRM}tags{BKT}> {}- modify land settings");
             }
             
         }
@@ -735,13 +740,17 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( args.length == 0 ) {
             showHelp(sender,"info");
         } else {
-            Integer id = 0;          
+            Integer id = 0;
             if ( args[0].equalsIgnoreCase("here") ) {
-                id = iCoLand.landMgr.getLandId(((Player)sender).getLocation());
-                if ( id > 0 ) {
-                    showSelectLandInfo((CommandSender)sender, id);
+                if ( sender instanceof Player ) {
+                    id = iCoLand.landMgr.getLandId(((Player)sender).getLocation());
+                    if ( id > 0 ) {
+                        showSelectLandInfo((CommandSender)sender, id);
+                    } else {
+                        mess.send("{ERR}No land claimed where you are standing.");
+                    }
                 } else {
-                    mess.send("{ERR}No land claimed where you are standing.");
+                    mess.send("{ERR}Console can't use here");
                 }
             } else {
                 try {

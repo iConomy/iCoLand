@@ -452,8 +452,8 @@ public class LandDBH2 implements LandDB {
         return ret;
     }
 
-    public int getLandId(Location loc) {
-        int ret = 0;
+    public ArrayList<Integer> getLandIds(Location loc) {
+        ArrayList<Integer> ret = new ArrayList<Integer>();
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -472,13 +472,8 @@ public class LandDBH2 implements LandDB {
         }
         
         try {
-            int i = 0;
-            while ( rs.next() ) {
-                i++;
-                if ( i > 1 ) 
-                    iCoLand.warning("more than 1 land found");
-                ret = rs.getInt(1);
-            }
+            while ( rs.next() )
+                ret.add(rs.getInt(1));
             
             rs.close();
             ps.close();
@@ -558,34 +553,35 @@ public class LandDBH2 implements LandDB {
     }
     
     public int intersectsExistingLand(Cuboid cub) {
-        int id = 0;
-        id = containsLandId(cub);
+        ArrayList<Integer> ids;
+        
+        int id = containsLandId(cub);
         if ( id > 0 ) return id;
         
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMin.getBlockX(), cub.LocMin.getBlockY(), cub.LocMin.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMin.getBlockX(), cub.LocMin.getBlockY(), cub.LocMax.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMin.getBlockX(), cub.LocMax.getBlockY(), cub.LocMin.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMin.getBlockX(), cub.LocMax.getBlockY(), cub.LocMax.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMax.getBlockX(), cub.LocMin.getBlockY(), cub.LocMin.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMax.getBlockX(), cub.LocMin.getBlockY(), cub.LocMax.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMax.getBlockX(), cub.LocMax.getBlockY(), cub.LocMin.getBlockZ()));
-        if ( id > 0 ) return id;
-        id = getLandId(new Location(cub.LocMin.getWorld(), 
+        if ( ids.size() > 0 ) return ids.get(0);
+        ids = getLandIds(new Location(cub.LocMin.getWorld(), 
                 cub.LocMax.getBlockX(), cub.LocMax.getBlockY(), cub.LocMax.getBlockZ()));
-        if ( id > 0 ) return id;
+        if ( ids.size() > 0 ) return ids.get(0);
         
         return 0;
     }
@@ -850,10 +846,23 @@ public class LandDBH2 implements LandDB {
         return (ret>0);
     }
 
-
-    public boolean hasPermission(int id, String playerName) {
-        HashMap<String, Boolean> perms = Land.parsePermTags(getLandPerms(id));
-        return (perms.containsKey(playerName)?perms.get(playerName):false);
+    public boolean hasPermission(String playerName, Location loc) {
+        ArrayList<Integer> ids = getLandIds(loc);
+        if ( ids.size() == 1 ) {
+            HashMap<String, Boolean> perms = Land.parsePermTags(getLandPerms(ids.get(0)));
+            return (perms.containsKey(playerName)?perms.get(playerName):false);
+        } else {
+            if ( ids.size() == 0 ) {
+                if ( !Config.unclaimedLandCanBuild ) {
+                    return iCoLand.hasPermission(loc.getWorld().getName(), playerName, "canbuild");
+                } else {
+                    return true;
+                }
+            } else {
+                iCoLand.severe("More than one land at this location!");
+                return false;
+            }
+        }
     }
     
     public void importDB(File landYMLFile) {

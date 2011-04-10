@@ -724,9 +724,9 @@ public class iCoLandCommandListener implements CommandExecutor {
             }
         } else {
             Location loc = sender.getLocation();
-            Integer landid = iCoLand.landMgr.getLandId(loc);
-            if ( landid > 0 ) {
-                showSelectLandInfo((CommandSender)sender, landid);
+            ArrayList<Integer> landids = iCoLand.landMgr.getLandIds(loc);
+            if ( landids.size() > 0 ) {
+                showSelectLandInfo((CommandSender)sender, landids.get(0));
             } else {
                 mess.send("{ERR}No current selection, not on owned land");
             }
@@ -740,12 +740,11 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( args.length == 0 ) {
             showHelp(sender,"info");
         } else {
-            Integer id = 0;
             if ( args[0].equalsIgnoreCase("here") ) {
                 if ( sender instanceof Player ) {
-                    id = iCoLand.landMgr.getLandId(((Player)sender).getLocation());
-                    if ( id > 0 ) {
-                        showSelectLandInfo((CommandSender)sender, id);
+                    ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(((Player)sender).getLocation());
+                    if ( ids.size() > 0 ) {
+                        showSelectLandInfo((CommandSender)sender, ids.get(0));
                     } else {
                         mess.send("{ERR}No land claimed where you are standing.");
                     }
@@ -753,6 +752,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{ERR}Console can't use here");
                 }
             } else {
+                Integer id = 0;
                 try {
                     id = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e ) {

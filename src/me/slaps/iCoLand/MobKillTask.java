@@ -1,5 +1,6 @@
 package me.slaps.iCoLand;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.World;
@@ -14,8 +15,8 @@ public class MobKillTask implements Runnable {
             List<LivingEntity> entities = world.getLivingEntities();
             for(LivingEntity entity : entities) {
                 if ( !(entity instanceof Player) ) {
-                    Integer id = iCoLand.landMgr.getLandId(entity.getLocation());
-                    if ( id > 0 ) {
+                    ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(entity.getLocation());
+                    for(Integer id : ids) {
                         if ( iCoLand.landMgr.getLandById(id).hasAddon("nospawn") ) {
                             entity.remove();
                         }

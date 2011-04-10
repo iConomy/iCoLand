@@ -1,5 +1,6 @@
 package me.slaps.iCoLand;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Location;
@@ -71,9 +72,9 @@ public class iCoLandPlayerListener extends PlayerListener {
                 loc.setX(loc.getX()+mod.getModX());
                 loc.setY(loc.getY()+mod.getModY());
                 loc.setZ(loc.getZ()+mod.getModZ());
-	            Integer id = iCoLand.landMgr.getLandId(loc);
-	            if ( id > 0 ) {
-	                if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
+                ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(loc);
+	            if ( ids.size() > 0 ) {
+	                if ( !iCoLand.hasPermission(player, "bypass") && !iCoLand.landMgr.canBuildDestroy(player, loc) ) {
 	                    event.setCancelled(true);
 	                    Messaging mess = new Messaging((CommandSender)player);
 	                    mess.send("{ERR}You can't do that here.");
@@ -90,11 +91,14 @@ public class iCoLandPlayerListener extends PlayerListener {
 	    if ( !checkNow(player) ) return;
 
         String playerName = player.getName();
+        
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(player.getLocation());
+        Integer landId = (ids.size()>0)?ids.get(0):0;
 	    
-	    if (!locMap.containsKey(playerName)) locMap.put(playerName, iCoLand.landMgr.getLandId(player.getLocation()) );
+	    if (!locMap.containsKey(playerName)) locMap.put(playerName, landId) ;
 	    
 	    int idFrom = locMap.get(playerName);
-		int idTo = iCoLand.landMgr.getLandId(player.getLocation());
+		int idTo = landId;
 		
 		if ( idTo == 0 ) lastNonLandLoc.put(playerName, player.getLocation());
 		

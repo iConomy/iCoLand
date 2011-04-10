@@ -27,6 +27,7 @@ public class Config {
     public static double sellTax;
     public static double taxRate;
     public static String bankName;
+    public static Integer inactiveDeleteTime;
     
     // land limit settings
     public static Integer maxBlocksClaimable;
@@ -64,6 +65,7 @@ public class Config {
         
         sellTax = 0.80;
         taxRate = 0.05;
+        inactiveDeleteTime = 1440;
         
         maxBlocksClaimable = 1000;
         maxLandsClaimable = 10;
@@ -138,6 +140,7 @@ public class Config {
             if ( taxRate > 1 ) taxRate = 1;
             
             bankName = taxes.getString("iConomy-Tax-Account-Name", "iCoLand");
+            inactiveDeleteTime = taxes.getInt("Delete-Unpaid-Zone-Minutes", 1440);
         }
 
         ConfigurationNode timers = config.getNode("Timer-Settings");
@@ -208,6 +211,7 @@ public class Config {
         config.setProperty("Tax-Settings.SalesTaxPercent", sellTax*100.0);
         config.setProperty("Tax-Settings.TaxRate", taxRate*100.0);
         config.setProperty("Tax-Settings.iConomy-Tax-Account-Name", bankName);
+        config.setProperty("Tax-Settings.Delete-Unpaid-Zone-Minutes", inactiveDeleteTime);
         
         config.setProperty("Timer-Settings.Heal-Interval", healTime);
         config.setProperty("Timer-Settings.Mob-Removal-Interval", mobRemovalTime);

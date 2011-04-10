@@ -1,5 +1,7 @@
 package me.slaps.iCoLand;
 
+import java.util.ArrayList;
+
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -19,8 +21,8 @@ public class iCoLandEntityListener extends EntityListener {
     }
     
     public void onCreatureSpawn (CreatureSpawnEvent event) {
-        Integer id = iCoLand.landMgr.getLandId(event.getEntity().getLocation());
-        if ( id > 0 ) {
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
+        for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nospawn") ) {
                 event.setCancelled(true);
             }
@@ -30,24 +32,28 @@ public class iCoLandEntityListener extends EntityListener {
     public void onEntityDamage ( EntityDamageEvent event ) {
         DamageCause cause = event.getCause();
 
-        Integer id = iCoLand.landMgr.getLandId(event.getEntity().getLocation());
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
 
         if ( cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK) ) {
-            if ( id > 0 ) {
+            for(Integer id : ids) {
                 Land land = iCoLand.landMgr.getLandById(id);
                 if ( land.hasAddon("nofire") ) {
                     event.setCancelled(true);
                 }
-            } else if ( !Config.unclaimedLandCanBurn ) {
+            }
+            
+            if ( ids.size() == 0 && !Config.unclaimedLandCanBurn ) {
                 event.setCancelled(true);
             }
         } else if ( cause.equals(DamageCause.BLOCK_EXPLOSION) || cause.equals(DamageCause.ENTITY_EXPLOSION) ) {
-            if ( id > 0 ) {
+            for(Integer id : ids) {
                 Land land = iCoLand.landMgr.getLandById(id);
                 if ( land.hasAddon("noboom") ) {
                     event.setCancelled(true);
                 }
-            } else if ( !Config.unclaimedLandCanBoom ) {
+            } 
+            
+            if ( ids.size() == 0 && !Config.unclaimedLandCanBoom ) {
                 event.setCancelled(true);
             }
             
@@ -55,23 +61,27 @@ public class iCoLandEntityListener extends EntityListener {
     }
     
     public void onEntityExplode ( EntityExplodeEvent event ) {
-        Integer id = iCoLand.landMgr.getLandId(event.getEntity().getLocation());
-        if ( id > 0 ) {
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
+        for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
                 event.setCancelled(true);
             }
-        } else if ( !Config.unclaimedLandCanBoom ) {
+        } 
+
+        if ( ids.size() == 0 && !Config.unclaimedLandCanBoom ) {
             event.setCancelled(true);
         }
     }
     
     public void onExplosionPrime ( ExplosionPrimeEvent event ) {
-        Integer id = iCoLand.landMgr.getLandId(event.getEntity().getLocation());
-        if ( id > 0 ) {
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
+        for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
                 event.setCancelled(true);
             }
-        } else if ( !Config.unclaimedLandCanBoom ) {
+        }
+
+        if ( ids.size() == 0 && !Config.unclaimedLandCanBoom ) {
             event.setCancelled(true);
         }
     }

@@ -73,27 +73,17 @@ public class LandManager {
 	}
 	
 	public boolean canBuildDestroy(Player player, Location loc) {
-
 	    String playerName = player.getName();
-	    Integer id = landDB.getLandId(loc);
-	    if ( id > 0 ) {
-	        return landDB.hasPermission(id, playerName);
-	    } else {
-	        if ( !Config.unclaimedLandCanBuild ) {
-	            return iCoLand.hasPermission(player, "canbuild");
-	        } else {
-	            return true;
-	        }
-	    }
+        return landDB.hasPermission(playerName, loc);
 	}
 	
 	public boolean inLand(Location loc) {
-	    int id = landDB.getLandId(loc);
-	    return (id>0)?true:false;
+	    ArrayList<Integer> id = landDB.getLandIds(loc);
+	    return (id.size()>0)?true:false;
 	}
 	
-	public Integer getLandId(Location loc) {
-	    return landDB.getLandId(loc);
+	public ArrayList<Integer> getLandIds(Location loc) {
+	    return landDB.getLandIds(loc);
 	}
 	
 	public ArrayList<Land> getAllLands() {

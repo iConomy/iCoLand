@@ -1,5 +1,7 @@
 package me.slaps.iCoLand;
 
+import java.util.ArrayList;
+
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -43,12 +45,14 @@ public class iCoLandBlockListener extends BlockListener {
 	}
 	
 	public void onBlockIgnite( BlockIgniteEvent event )  {
-        Integer id = iCoLand.landMgr.getLandId(event.getBlock().getLocation());
-        if ( id > 0 ) {
+	    ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getBlock().getLocation());
+	    for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nofire") ) {
                 event.setCancelled(true);
             }
-        } else if ( !Config.unclaimedLandCanBurn ) {
+	    }
+	    
+	    if ( ids.size() == 0 && !Config.unclaimedLandCanBurn ) {
             event.setCancelled(true);
             if ( event.getCause().equals(BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) ) {
                 Messaging mess = (new Messaging(event.getPlayer()));
@@ -58,19 +62,21 @@ public class iCoLandBlockListener extends BlockListener {
 	}
 	
     public void onBlockBurn( BlockBurnEvent event )  {
-        Integer id = iCoLand.landMgr.getLandId(event.getBlock().getLocation());
-        if ( id > 0 ) {
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getBlock().getLocation());
+        for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nofire") ) {
                 event.setCancelled(true);
             }
-        } else if ( !Config.unclaimedLandCanBurn ) {
+        }
+        
+        if ( ids.size() == 0 && !Config.unclaimedLandCanBurn ) {
             event.setCancelled(true);
         }
     }
     
     public void onBlockFromTo( BlockFromToEvent event ) {
-        Integer id = iCoLand.landMgr.getLandId(event.getToBlock().getLocation());
-        if ( id > 0 ) {
+        ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getToBlock().getLocation());
+        for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("noflow") ) {
                 event.setCancelled(true);
             }

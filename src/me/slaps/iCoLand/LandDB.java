@@ -18,14 +18,13 @@ public interface LandDB {
     abstract public ArrayList<Land> listLandPastTaxTime(Timestamp time);
     
     abstract public int countLandOwnedBy(String playerName);
-    
-    abstract public int getLandId(Location loc);
-    
-    abstract public boolean landIdExists(int id);
-    
-    abstract public int intersectsExistingLand(Cuboid loc);
 
     abstract public Land getLandById(int id);
+
+    abstract public ArrayList<Integer> getLandIds(Location loc);
+    abstract public boolean landIdExists(int id);
+    abstract public int intersectsExistingLand(Cuboid loc);
+
     abstract public String getLandPerms(int id);
     abstract public String getLandAddons(int id);
     abstract public String getLandOwner(int id);
@@ -37,7 +36,7 @@ public interface LandDB {
     abstract public boolean updateTaxTime(int id, Timestamp time);
     abstract public boolean updateActive(int id, Boolean active);
     
-    abstract public boolean hasPermission(int id, String playerName);
+    abstract public boolean hasPermission(String playerName, Location loc);
     
     abstract public void importDB(File landYMLFile);
     abstract public void exportDB(File landYMLFile);

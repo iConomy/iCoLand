@@ -13,8 +13,9 @@ public class TaxTask implements Runnable {
     
     public void run() {
         Player[] players = iCoLand.server.getOnlinePlayers();
-        Timestamp now = new Timestamp(System.currentTimeMillis()-1000);
-        Timestamp timeThreshold = new Timestamp(System.currentTimeMillis()-Config.taxTimeMinutes*60*1000);
+        int timeOffset = Config.taxTimeMinutes*60*1000;
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Timestamp timeThreshold = new Timestamp(System.currentTimeMillis()-timeOffset);
 
         ArrayList<Land> lands = iCoLand.landMgr.listLandPastTaxTime(timeThreshold);
 
@@ -31,7 +32,7 @@ public class TaxTask implements Runnable {
                 iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
             } else if  ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "notax") ) {
                 if ( acc.hasEnough(tax) ) {
-                    if (!iCoLand.landMgr.updateTaxTime(land.getID(), now)) {
+                    if (!iCoLand.landMgr.updateTaxTime(land.getID(), new Timestamp(land.dateTaxed.getTime()+timeOffset))) {
                         iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
                     }
                     // subtract tax out
@@ -58,7 +59,7 @@ public class TaxTask implements Runnable {
                         bank.subtract(price-tax);
                     }
                     
-                    if (!iCoLand.landMgr.updateTaxTime(land.getID(), now)) {
+                    if (!iCoLand.landMgr.updateTaxTime(land.getID(), new Timestamp(land.dateTaxed.getTime()+timeOffset))) {
                         iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
                     }
                     

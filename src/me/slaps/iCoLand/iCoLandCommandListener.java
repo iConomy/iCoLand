@@ -1,6 +1,7 @@
 package me.slaps.iCoLand;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -155,6 +156,21 @@ public class iCoLandCommandListener implements CommandExecutor {
                                 iCoLand.tmpCuboidMap.get(player.getName()).setFullHeight();
                             } else {
                                 mess.send("{ERR}No currently selected land.");
+                            }
+                        } else {
+                            int i = -1;
+                            try {
+                                i = Integer.parseInt(args[1]);
+                            } catch (NumberFormatException ex) {
+                            }
+                            if ( i > 0 ) {
+                                if ( selectLand((Player)sender, i) ) {
+                                    mess.send("{}Selected land ID#{PRM}"+i);
+                                } else {
+                                    mess.send("{ERR}No land ID#{PRM}"+i);
+                                }
+                            } else {
+                                mess.send("Error parsing argument");
                             }
                         }
                     } else {
@@ -333,6 +349,17 @@ public class iCoLandCommandListener implements CommandExecutor {
         return lo+i;
     }
     
+    public boolean selectLand(Player player, int id) {
+        String playerName = player.getName();
+        Land land = iCoLand.landMgr.getLandById(id);
+        if ( land != null ) {
+            iCoLand.tmpCuboidMap.put(playerName, land.location);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     public boolean selectArea(Player player) {
         String playerName = player.getName();
         Messaging mess = new Messaging((CommandSender)player);
@@ -419,7 +446,8 @@ public class iCoLandCommandListener implements CommandExecutor {
                 int i;
                 for(i=0;i<pageSize && i<list.size();i++) {
                     Land land = list.get(i);
-                    mess.send("{PRM}ID#{}"+land.getID()+" "+
+                    mess.send("{PRM}ID#{}"+land.getID()+((land.active?"":"({ERR}I{})"))+
+                            " "+
                             ((land.locationName.isEmpty())?"":land.locationName+" ") +
                             "{PRM}V:{}"+land.location.volume()+" "+
                             "{PRM}[{}"+land.location.toDimString()+
@@ -524,6 +552,30 @@ public class iCoLandCommandListener implements CommandExecutor {
         }
     }
 
+    public void reactivateLand( Player player, int id ) {
+        Messaging mess = new Messaging(player);
+        String playerName = player.getName();
+        Account acc = iConomy.getBank().getAccount(playerName);        
+        Account bank = iConomy.getBank().getAccount(Config.bankName);
+        Land land = iCoLand.landMgr.getLandById(id);
+        double tax = Double.valueOf(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate));
+        
+        
+        if ( iCoLand.hasPermission(player, "nocost") || iCoLand.hasPermission(player, "notax") ) {
+            iCoLand.landMgr.updateActive(id, true);
+            iCoLand.landMgr.updateTaxTime(id, new Timestamp(System.currentTimeMillis()));
+            mess.send("Land bought back for {PRM}0 {}("+iCoLand.df.format(tax)+")");
+        } else if ( acc.hasEnough(tax) ) {
+            acc.subtract(tax);
+            bank.add(tax);
+            iCoLand.landMgr.updateActive(id, true);
+            iCoLand.landMgr.updateTaxTime(id, new Timestamp(System.currentTimeMillis()));
+            mess.send("Land bought back for {PRM}"+iCoLand.df.format(tax));
+        } else {
+            mess.send("{ERR}Not enough money to pay past due taxes of {PRM}"+iCoLand.df.format(tax));
+        }
+        
+    }
     
     public void buyLand(CommandSender sender) {
         Messaging mess = new Messaging(sender);
@@ -531,7 +583,20 @@ public class iCoLandCommandListener implements CommandExecutor {
             String playerName = ((Player)sender).getName();
             if ( iCoLand.tmpCuboidMap.containsKey(playerName) ) {
                 Cuboid newCuboid = iCoLand.tmpCuboidMap.get(playerName);
-                if ( newCuboid.isValid() ) {
+                int id = iCoLand.landMgr.intersectsExistingLand(newCuboid);
+                Land land;
+                if ( id > 0 ) {
+                    land =  iCoLand.landMgr.getLandById(id);
+                    if ( land.location.equals(newCuboid) ) {
+                        if ( land.active ) {
+                            mess.send("{ERR}Can't buy active land");
+                        } else {
+                            reactivateLand((Player)sender, id);
+                        }
+                    } else {
+                        mess.send("{ERR}selection doesn't match zone");
+                    }
+                } else if ( newCuboid.isValid() ) {
                     if ( iCoLand.hasPermission(sender, "nolimits") ) {
                         purchaseLand((Player)sender, newCuboid);
                     } else {
@@ -569,21 +634,26 @@ public class iCoLandCommandListener implements CommandExecutor {
         Land land = iCoLand.landMgr.getLandById(id);
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
-            Account acc = iConomy.getBank().getAccount(sender.getName());
-            Account bank = iConomy.getBank().getAccount(Config.bankName);
-            double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
-            double sellPrice = Double.valueOf(iCoLand.df.format(price*Config.sellTax));
-
-            if ( iCoLand.hasPermission(sender, "nocost") ) {
-                iCoLand.landMgr.removeLandById(id);
-                mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+sellPrice+"{BKT})");
+            if ( land.active ) {
+                Account acc = iConomy.getBank().getAccount(sender.getName());
+                Account bank = iConomy.getBank().getAccount(Config.bankName);
+                double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
+                double sellPrice = Double.valueOf(iCoLand.df.format(price*Config.sellTax));
+    
+                if ( iCoLand.hasPermission(sender, "nocost") ) {
+                    iCoLand.landMgr.removeLandById(id);
+                    mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+sellPrice+"{BKT})");
+                } else {
+                    acc.add(sellPrice);
+                    bank.subtract(sellPrice);
+                    
+                    iCoLand.landMgr.removeLandById(id);
+                    mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}"+sellPrice);
+                    mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                }
             } else {
-                acc.add(sellPrice);
-                bank.subtract(sellPrice);
-                
                 iCoLand.landMgr.removeLandById(id);
-                mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}"+price);
-                mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                mess.send("{}Got rid of inactive land ID# {PRM}"+id);
             }
             
         } else {
@@ -692,9 +762,35 @@ public class iCoLandCommandListener implements CommandExecutor {
         showExistingLandInfo(sender, iCoLand.landMgr.getLandById(id));
     }
     
+    public String formatTimeLeft(long due) {
+        String ret;
+        long now = System.currentTimeMillis();
+        long secsleft = (due-now)/1000;
+        long minsleft = secsleft/60;
+        
+        if ( minsleft > 1440 )  {
+            long daysleft = minsleft/60/24;
+            long hoursleft = (minsleft/60)%daysleft;
+            ret = daysleft+" day"+((daysleft>1)?"s":"")+", "+hoursleft+" minute"+((hoursleft>1)?"s":"");
+        } else if ( minsleft > 60 ) {
+            long hoursleft = minsleft/60;
+            ret = hoursleft+" hour"+((hoursleft>1)?"s":"");
+        } else if ( minsleft > 0 ) {
+            ret = minsleft+" minute"+((minsleft>1)?"s":"");
+        } else if ( secsleft >= 0 ) {
+            ret = secsleft+" second"+((secsleft>1)?"s":"");
+        } else {
+            ret = "past due!";
+            // TODO: calculate time till land destroyed here
+        }
+        return ret;
+    }
+    
     public void showExistingLandInfo(CommandSender sender, Land land) {
         Messaging mess = new Messaging(sender);
-        mess.send("{}"+Misc.headerify("{} Land ID# {PRM}"+land.getID()+"{} --"+
+        mess.send("{}"+Misc.headerify("{} Land ID# {PRM}"+land.getID()+
+                                      ((land.active)?"":" {ERR}INACTIVE")+
+                                      "{} --"+
                                       (land.locationName.isEmpty()?"":" {PRM}"+land.locationName+" {}")
                                      ));
         mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
@@ -702,8 +798,10 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"bypass") ) {
             if ( !land.locationName.isEmpty() )
                 mess.send("{CMD}Name: {}"+land.locationName);
-            mess.send("{CMD}Created: {}"+land.dateCreated);
-            mess.send("{CMD}Taxed: {}"+land.dateTaxed);
+//            mess.send("{CMD}Created: {}"+land.dateCreated);
+            mess.send("{CMD}Taxes Due: {PRM}"+(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate))+" {BKT}({}"+
+                    formatTimeLeft(land.dateTaxed.getTime()+Config.taxTimeMinutes*60*1000)+" left{BKT})");
+//            mess.send("{CMD}Taxed: {PRM}"+iCoLand.landMgr.getPrice(land.location)+" {}"+land.dateTaxed);
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
             mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
             mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));

@@ -34,9 +34,11 @@ public class Land {
         
         this.locationName = locName;
         
+        this.active = active;
+        
         validate();
     }
-    
+
     public int getID() {
         return id;
     }

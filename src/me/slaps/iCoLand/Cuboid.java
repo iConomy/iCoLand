@@ -13,6 +13,25 @@ public class Cuboid {
 		
 	}
 	
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj instanceof Cuboid ) {
+            Cuboid other = (Cuboid)obj;
+            if ( this.valid == other.valid ) {
+                if ( ( other.LocMin.getBlockX() == LocMin.getBlockX() ) && ( other.LocMin.getBlockY() == LocMin.getBlockY() ) && ( other.LocMin.getBlockZ() == LocMin.getBlockZ() ) &&
+                    ( other.LocMax.getBlockX() == LocMax.getBlockX() ) && ( other.LocMax.getBlockY() == LocMax.getBlockY() ) && ( other.LocMax.getBlockZ() == LocMax.getBlockZ() ) ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+	
 	public Cuboid(Cuboid other) {
 	    setLoc1 = other.setLoc1;
 	    setLoc2 = other.setLoc2;

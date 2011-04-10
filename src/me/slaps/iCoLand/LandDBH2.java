@@ -60,7 +60,7 @@ public class LandDBH2 implements LandDB {
     }
     
     public Connection getConnection() {
-        if (Config.debugMode1) iCoLand.info(cp.getActiveConnections()+" active connections"); 
+        if (Config.debugModeSQL) iCoLand.info(cp.getActiveConnections()+" active connections"); 
         Connection conn = null;
         try {
             conn = cp.getConnection();
@@ -282,8 +282,8 @@ public class LandDBH2 implements LandDB {
     		conn = getConnection();
     		String sql = "INSERT INTO "+Config.sqlTableName+
                 "( owner, dateCreated, dateTaxed, name, perms, addons, "+
-                "minX, minY, minZ, maxX, maxY, maxZ, world) " +
-                "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"+
+                "minX, minY, minZ, maxX, maxY, maxZ, world, active) " +
+                "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"+
                 ";";
     		ps = conn.prepareStatement(sql);
     		ps.setString(1, newLand.owner);
@@ -298,7 +298,8 @@ public class LandDBH2 implements LandDB {
     		ps.setInt(10, newLand.location.LocMax.getBlockX());
     		ps.setInt(11, newLand.location.LocMax.getBlockY());
     		ps.setInt(12, newLand.location.LocMax.getBlockZ());
-    		ps.setString(13, newLand.location.LocMax.getWorld().getName());
+            ps.setString(13, newLand.location.LocMax.getWorld().getName());
+            ps.setBoolean(14, newLand.active);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
     		ret = ps.executeUpdate();
     		

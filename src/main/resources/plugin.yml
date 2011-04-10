@@ -1,6 +1,6 @@
 name: iCoLand
 main: me.slaps.iCoLand.iCoLand
-version: v2.22
+version: v2.23
 author: magik
 depend: [ iConomy, Permissions ]
 description: >

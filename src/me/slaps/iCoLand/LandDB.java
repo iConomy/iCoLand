@@ -28,6 +28,7 @@ public interface LandDB {
     abstract public String getLandPerms(int id);
     abstract public String getLandAddons(int id);
     abstract public String getLandOwner(int id);
+    abstract public boolean isActive(int id);
     
     abstract public boolean updateLandOwner(int id, String newOwner);
     abstract public boolean updateLandName(int id, String newName);

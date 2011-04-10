@@ -726,6 +726,36 @@ public class LandDBH2 implements LandDB {
         return ret;
     }
 
+    public boolean isActive(int id) {
+        boolean ret = false;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("SELECT active FROM "+Config.sqlTableName+
+                    " WHERE id = ?");
+            ps.setInt(1, id);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            rs = ps.executeQuery();
+            
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        try {
+            while( rs.next() ) {
+                ret = rs.getBoolean(1);
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return ret;
+    }
+    
     public boolean updateLandOwner(int id, String newOwner) {
         int ret = 0;
         Connection conn = null;
@@ -845,12 +875,20 @@ public class LandDBH2 implements LandDB {
         
         return (ret>0);
     }
-
+    
     public boolean hasPermission(String playerName, Location loc) {
         ArrayList<Integer> ids = getLandIds(loc);
         if ( ids.size() == 1 ) {
-            HashMap<String, Boolean> perms = Land.parsePermTags(getLandPerms(ids.get(0)));
-            return (perms.containsKey(playerName)?perms.get(playerName):false);
+            if ( isActive(ids.get(0)) ) {
+                HashMap<String, Boolean> perms = Land.parsePermTags(getLandPerms(ids.get(0)));
+                return (perms.containsKey(playerName)?perms.get(playerName):false);
+            } else {
+                if ( !Config.unclaimedLandCanBuild ) {
+                    return iCoLand.hasPermission(loc.getWorld().getName(), playerName, "canbuild");
+                } else {
+                    return true;
+                }
+            }
         } else {
             if ( ids.size() == 0 ) {
                 if ( !Config.unclaimedLandCanBuild ) {

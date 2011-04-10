@@ -2,6 +2,7 @@ package me.slaps.iCoLand;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -765,15 +766,18 @@ public class iCoLandCommandListener implements CommandExecutor {
     public String formatTimeLeft(long due) {
         String ret;
         long now = System.currentTimeMillis();
-        long secsleft = (due-now)/1000;
-        long minsleft = secsleft/60;
+        
+        DecimalFormat df = new DecimalFormat("#");
+        
+        long secsleft = Long.parseLong(df.format((due-now)/1000.0));
+        long minsleft = Long.parseLong(df.format(secsleft/60.0));
         
         if ( minsleft > 1440 )  {
-            long daysleft = minsleft/60/24;
+            long daysleft = Long.parseLong(df.format(secsleft/1000.0/60.0/24.0));
             long hoursleft = (minsleft/60)%daysleft;
             ret = daysleft+" day"+((daysleft>1)?"s":"")+", "+hoursleft+" minute"+((hoursleft>1)?"s":"");
         } else if ( minsleft > 60 ) {
-            long hoursleft = minsleft/60;
+            long hoursleft = Long.parseLong(df.format(minsleft/60.0));
             ret = hoursleft+" hour"+((hoursleft>1)?"s":"");
         } else if ( minsleft > 0 ) {
             ret = minsleft+" minute"+((minsleft>1)?"s":"");
@@ -800,7 +804,11 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("{CMD}Name: {}"+land.locationName);
 //            mess.send("{CMD}Created: {}"+land.dateCreated);
             mess.send("{CMD}Taxes Due: {PRM}"+(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate))+" {BKT}({}"+
-                    formatTimeLeft(land.dateTaxed.getTime()+Config.taxTimeMinutes*60*1000)+" left{BKT})");
+                    (land.active?
+                    formatTimeLeft(land.dateTaxed.getTime()+Config.taxTimeMinutes*60*1000):
+                    formatTimeLeft(land.dateTaxed.getTime()+Config.inactiveDeleteTime*60*1000))
+                    +" left{BKT})"
+                    );
 //            mess.send("{CMD}Taxed: {PRM}"+iCoLand.landMgr.getPrice(land.location)+" {}"+land.dateTaxed);
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
             mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));

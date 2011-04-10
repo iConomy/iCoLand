@@ -16,6 +16,7 @@ public interface LandDB {
     abstract public ArrayList<Land> listAllLand();
     abstract public ArrayList<Land> listLandOwnedBy(String playerName, int limit, int offset);
     abstract public ArrayList<Land> listLandPastTaxTime(Timestamp time);
+    abstract public ArrayList<Land> listLandInactivePastTime(Timestamp time);
     
     abstract public int countLandOwnedBy(String playerName);
 

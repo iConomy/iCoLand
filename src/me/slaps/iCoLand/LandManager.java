@@ -63,6 +63,10 @@ public class LandManager {
 	    return landDB.listLandPastTaxTime(time);
 	}
 	
+	public ArrayList<Land> listLandPastInactiveTime(Timestamp time) {
+	    return landDB.listLandInactivePastTime(time);
+	}
+	
 	public Location getCenterOfLand(Integer id) {
 	    Land land = landDB.getLandById(id);
 	    return land.getCenter();

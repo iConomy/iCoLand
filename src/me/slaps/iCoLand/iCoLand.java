@@ -94,7 +94,7 @@ public class iCoLand extends JavaPlugin {
         iCoLand.enabled = false;
         Config.loaded = false;
         
-        // TODO - need to kill scheduled tasks here
+        server.getScheduler().cancelTasks(this);
         
 		info("Version ["+version+"] ("+codename+") disabled");
 	}
@@ -167,8 +167,10 @@ public class iCoLand extends JavaPlugin {
                 server.getScheduler().scheduleSyncRepeatingTask(this, new TaxTask(), 100, 20*20);
             
             // setup location manager
-            iCoLand.info("Initializing land manager...");
-            iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
+            if ( iCoLand.landMgr == null ) {
+                iCoLand.info("Initializing land manager...");
+                iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
+            }
             
             //iCoLand.landMgr.test();
         }

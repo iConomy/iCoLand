@@ -56,9 +56,11 @@ public class LandDBH2 implements LandDB {
     
     public void close() {
         cp.dispose();
+        cp = null;
     }
     
     public Connection getConnection() {
+        if (Config.debugMode1) iCoLand.info(cp.getActiveConnections()+" active connections"); 
         Connection conn = null;
         try {
             conn = cp.getConnection();
@@ -347,7 +349,9 @@ public class LandDBH2 implements LandDB {
             while ( rs.next() ) {
                 count = rs.getInt(1);
             }
-            
+            rs.close();
+            ps.close();
+            conn.close();
         } catch ( SQLException ex ) {
             ex.printStackTrace();
         }

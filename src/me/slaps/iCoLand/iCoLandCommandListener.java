@@ -73,7 +73,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             } else if (args[0].equalsIgnoreCase("edit") ) {
                 if ( !(sender instanceof Player) ) {
                     mess.send("{ERR}Console can not edit with this command");
-                } else if ( iCoLand.hasPermission(sender, "edit") ) {
+                } else if ( iCoLand.hasPermission(sender, "land.edit") ) {
                     Player player = (Player)sender;
                     if ( args.length > 3 ) {
                         Integer id;
@@ -109,7 +109,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 
             // /icl modify <id> <perms|addons|name> <tags>
             } else if (args[0].equalsIgnoreCase("modify") ) {
-                if ( iCoLand.hasPermission(sender, "modify") ) {
+                if ( iCoLand.hasPermission(sender, "admin.modify") ) {
                     if ( args.length < 4 ) {
                         mess.send("{ERR}Not enough arguments");
                         showHelp(sender, "modify");
@@ -140,7 +140,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 
             // /icl select
             } else if (args[0].equalsIgnoreCase("select") ) {
-                if ( iCoLand.hasPermission(sender, "select") ) {
+                if ( iCoLand.hasPermission(sender, "basic.select") ) {
                     if ( !(sender instanceof Player) ) {
                         mess.send("Console can't select");
                     } else if ( args.length == 1 ) {
@@ -185,7 +185,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 
             // /icl info [here|LANDID]
             } else if (args[0].equalsIgnoreCase("info") ) {
-                if ( iCoLand.hasPermission(sender, "info") ) {
+                if ( iCoLand.hasPermission(sender, "basic.info") ) {
                     if ( (args.length == 1) ) {
                         if ( sender instanceof Player )
                             showLandInfo(sender, "");
@@ -207,7 +207,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             } else if (args[0].equalsIgnoreCase("buy") ) {
                 if ( !(sender instanceof Player) ) {
                     mess.send("{ERR}Console can't buy");
-                } else if ( iCoLand.hasPermission(sender, "buy") ) {
+                } else if ( iCoLand.hasPermission(sender, "land.buy") ) {
                     if ( args.length == 1 ) {
                         mess.send("{ERR}Not enough arguments");
                         showHelp(sender,"buy");
@@ -248,7 +248,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             } else if (args[0].equalsIgnoreCase("sell") ) {
                 if ( !(sender instanceof Player) ) {
                     mess.send("{ERR}Console can't sell land");
-                } else if ( iCoLand.hasPermission(sender, "sell") ){
+                } else if ( iCoLand.hasPermission(sender, "land.sell") ){
                     if ( args.length == 3 && args[1].equalsIgnoreCase("land") ) {
                         Integer id = 0;
                         try {
@@ -289,7 +289,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 return true;
                 
             } else if ( args[0].equalsIgnoreCase("importdb") ) {
-                if ( iCoLand.hasPermission(sender, "importdb") ) {
+                if ( iCoLand.hasPermission(sender, "admin.importdb") ) {
                     iCoLand.landMgr.importDB(new File(iCoLand.pluginDirectory + File.separator + Config.importFile));
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -297,7 +297,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 return true;
                 
             } else if ( args[0].equalsIgnoreCase("exportdb") ) {
-                if ( iCoLand.hasPermission(sender, "exportdb") ) {
+                if ( iCoLand.hasPermission(sender, "admin.exportdb") ) {
                     iCoLand.landMgr.exportDB(new File(iCoLand.pluginDirectory + File.separator + Config.exportFile));
                 } else {
                     mess.send("{ERR}No access for that...");
@@ -305,7 +305,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 return true;
 
             } else if ( args[0].equalsIgnoreCase("fakedata") ) {
-                if ( iCoLand.hasPermission(sender, "fakedata") ) {
+                if ( iCoLand.hasPermission(sender, "admin.fakedata") ) {
                     if ( args.length > 1 ) {
                         Integer numLands = 0;
                         try { 
@@ -670,9 +670,9 @@ public class iCoLandCommandListener implements CommandExecutor {
     	    mess.send(" {CMD}/icl {}- main command");
     	    mess.send(" {CMD}/icl {PRM}help {BKT}[{PRM}topic{BKT}] {}- help topics");
     	    String topics = "";
-            if ( iCoLand.hasPermission(sender, "basic.select") ) topics += " select";
+            if ( iCoLand.hasPermission(sender, "basic.select") ) topics += "select";
             if ( iCoLand.hasPermission(sender, "basic.info") ) topics += " info";
-            if ( iCoLand.hasPermission(sender, "land.list") ) topics += "list";
+            if ( iCoLand.hasPermission(sender, "land.list") ) topics += " list";
             if ( iCoLand.hasPermission(sender, "land.edit") ) topics += " edit";
             if ( iCoLand.hasPermission(sender, "land.buy") ) topics += " buy";
             if ( iCoLand.hasPermission(sender, "land.sell") ) topics += " sell";

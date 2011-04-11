@@ -30,7 +30,7 @@ public class TaxTask implements Runnable {
             
             if ( acc == null ) {
                 iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
-            } else if  ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "notax") ) {
+            } else if  ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "admin.notax") ) {
                 if ( acc.hasEnough(tax) ) {
                     if (!iCoLand.landMgr.updateTaxTime(land.getID(), new Timestamp(land.dateTaxed.getTime()+timeOffset))) {
                         iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
@@ -105,7 +105,7 @@ public class TaxTask implements Runnable {
                 } 
                 
                 Double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
-                if ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "notax" ) ) {
+                if ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "admin.notax" ) ) {
                     acc.add(price-tax);
                     bank.subtract(price-tax);
                 }

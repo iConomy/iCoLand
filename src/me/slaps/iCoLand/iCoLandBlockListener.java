@@ -27,7 +27,7 @@ public class iCoLandBlockListener extends BlockListener {
 	public void onBlockBreak( BlockBreakEvent event ) {
         Location loc = event.getBlock().getLocation();
         Player player = event.getPlayer();
-        if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
+        if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "admin.bypass") ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);
             mess.send("{ERR}You can't do that here.");
@@ -37,7 +37,7 @@ public class iCoLandBlockListener extends BlockListener {
 	public void onBlockPlace( BlockPlaceEvent event )    {
         Location loc = event.getBlock().getLocation();
         Player player = event.getPlayer();
-        if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "bypass") ) {
+        if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "admin.bypass") ) {
             event.setCancelled(true);
             Messaging mess = new Messaging((CommandSender)player);
             mess.send("{ERR}You can't do that here.");

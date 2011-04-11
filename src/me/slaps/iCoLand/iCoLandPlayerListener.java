@@ -74,7 +74,7 @@ public class iCoLandPlayerListener extends PlayerListener {
                 loc.setZ(loc.getZ()+mod.getModZ());
                 ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(loc);
 	            if ( ids.size() > 0 ) {
-	                if ( !iCoLand.hasPermission(player, "bypass") && !iCoLand.landMgr.canBuildDestroy(player, loc) ) {
+	                if ( !iCoLand.hasPermission(player, "admin.bypass") && !iCoLand.landMgr.canBuildDestroy(player, loc) ) {
 	                    event.setCancelled(true);
 	                    Messaging mess = new Messaging((CommandSender)player);
 	                    mess.send("{ERR}You can't do that here.");
@@ -113,7 +113,7 @@ public class iCoLandPlayerListener extends PlayerListener {
         
 		if ( Config.addonsEnabled.get("noenter") && 
 		     landTo != null && idTo != 0 && landTo.hasAddon("noenter") && !landTo.hasPermission(playerName) && 
-		     !iCoLand.hasPermission(player, "bypass") ) {
+		     !iCoLand.hasPermission(player, "dmin.abypass") ) {
             Location loc = lastNonLandLoc.get(playerName);
             if ( loc != null ) {
                 locMap.put(playerName, 0);

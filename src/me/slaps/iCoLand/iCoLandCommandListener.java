@@ -49,7 +49,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 
             // /icl list
             } else if (args[0].equalsIgnoreCase("list") ) {
-                if ( iCoLand.hasPermission(sender, "list") ) { 
+                if ( iCoLand.hasPermission(sender, "land.list") ) { 
                     if ( args.length > 1 ) {
                         Integer page;
                         try { 
@@ -470,7 +470,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             Account bank = iConomy.getBank().getAccount(Config.bankName);
             double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(addon)));
             
-            if ( iCoLand.hasPermission(sender, "nocost") ) {
+            if ( iCoLand.hasPermission(sender, "admin.nocost") ) {
                 if ( iCoLand.landMgr.addAddon(id, addon) )
                     mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
                 else
@@ -504,7 +504,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(addon)));
             double sellPrice = price*Config.sellTax;
             
-            if ( iCoLand.hasPermission(sender, "nocost") ) {
+            if ( iCoLand.hasPermission(sender, "admin.nocost") ) {
                 if ( iCoLand.landMgr.removeAddon(id, addon) )
                     mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+price+"{BKT})");
                 else
@@ -533,9 +533,9 @@ public class iCoLandCommandListener implements CommandExecutor {
         Account bank = iConomy.getBank().getAccount(Config.bankName);
         double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(newCuboid)));
         
-        if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "nocost") ) {
+        if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "admin.nocost") ) {
             if ( iCoLand.landMgr.addLand(newCuboid, playerName, playerName+":t", "") ) {
-                if ( iCoLand.hasPermission(player, "nocost") ) {
+                if ( iCoLand.hasPermission(player, "admin.nocost") ) {
                     mess.send("{}Bought selected land for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
                 } else {
                     acc.subtract(price);
@@ -562,7 +562,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         double tax = Double.valueOf(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate));
         
         
-        if ( iCoLand.hasPermission(player, "nocost") || iCoLand.hasPermission(player, "notax") ) {
+        if ( iCoLand.hasPermission(player, "admin.nocost") || iCoLand.hasPermission(player, "admin.notax") ) {
             iCoLand.landMgr.updateActive(id, true);
             iCoLand.landMgr.updateTaxTime(id, new Timestamp(System.currentTimeMillis()));
             mess.send("Land bought back for {PRM}0 {}("+iCoLand.df.format(tax)+")");
@@ -598,7 +598,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                         mess.send("{ERR}selection doesn't match zone");
                     }
                 } else if ( newCuboid.isValid() ) {
-                    if ( iCoLand.hasPermission(sender, "nolimits") ) {
+                    if ( iCoLand.hasPermission(sender, "admin.nolimits") ) {
                         purchaseLand((Player)sender, newCuboid);
                     } else {
                         if ( newCuboid.volume() <= Config.maxLandVolume ) {
@@ -641,7 +641,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
                 double sellPrice = Double.valueOf(iCoLand.df.format(price*Config.sellTax));
     
-                if ( iCoLand.hasPermission(sender, "nocost") ) {
+                if ( iCoLand.hasPermission(sender, "admin.nocost") ) {
                     iCoLand.landMgr.removeLandById(id);
                     mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+sellPrice+"{BKT})");
                 } else {
@@ -670,23 +670,23 @@ public class iCoLandCommandListener implements CommandExecutor {
     	    mess.send(" {CMD}/icl {}- main command");
     	    mess.send(" {CMD}/icl {PRM}help {BKT}[{PRM}topic{BKT}] {}- help topics");
     	    String topics = "";
-            if ( iCoLand.hasPermission(sender, "list") ) topics += "list";
-            if ( iCoLand.hasPermission(sender, "select") ) topics += " select";
-            if ( iCoLand.hasPermission(sender, "info") ) topics += " info";
-            if ( iCoLand.hasPermission(sender, "edit") ) topics += " edit";
-            if ( iCoLand.hasPermission(sender, "buy") ) topics += " buy";
-            if ( iCoLand.hasPermission(sender, "sell") ) topics += " sell";
-            if ( iCoLand.hasPermission(sender, "modify") ) topics += " modify";
+            if ( iCoLand.hasPermission(sender, "basic.select") ) topics += " select";
+            if ( iCoLand.hasPermission(sender, "basic.info") ) topics += " info";
+            if ( iCoLand.hasPermission(sender, "land.list") ) topics += "list";
+            if ( iCoLand.hasPermission(sender, "land.edit") ) topics += " edit";
+            if ( iCoLand.hasPermission(sender, "land.buy") ) topics += " buy";
+            if ( iCoLand.hasPermission(sender, "land.sell") ) topics += " sell";
+            if ( iCoLand.hasPermission(sender, "admin.modify") ) topics += " modify";
     	    
     	    mess.send(" {} help topics: {CMD}" + topics);
     	    
     	} else if ( topic.equalsIgnoreCase("list") ) {
-            if ( iCoLand.hasPermission(sender, "list") ) { 
+            if ( iCoLand.hasPermission(sender, "land.list") ) { 
                 mess.send(" {CMD}/icl {PRM}list {BKT}[{PRM}PAGE{BKT}] {}- lists owned land");
             }
             
         } else if ( topic.equalsIgnoreCase("select") ) {
-            if ( iCoLand.hasPermission(sender, "select") ) { 
+            if ( iCoLand.hasPermission(sender, "basic.select") ) { 
                 mess.send(" {CMD}/icl {PRM}select {}- start cuboid selection process");
                 mess.send("    {}After typing this command, left click a block to set the first corner,");
                 mess.send("    {}then left click a 2nd block to set the second corner.  This selects");
@@ -696,14 +696,14 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("    {}or pass fullheight to modify your selection to be the full height.");
             }
         } else if ( topic.equalsIgnoreCase("info") ) {
-            if ( iCoLand.hasPermission(sender, "info") ) { 
+            if ( iCoLand.hasPermission(sender, "basic.info") ) { 
                 mess.send(" {CMD}/icl {PRM}info {BKT}[{PRM}here{BKT}|{PRM}LANDID{BKT] {}- gets land info");
                 mess.send("    {}Optional arguments 'here' or <LANDID>");
                 mess.send("    {}Will give info on the selected land, or current location, or specific land ID#");
             }
             
         } else if ( topic.equalsIgnoreCase("buy") ) {
-            if ( iCoLand.hasPermission(sender, "buy") ) { 
+            if ( iCoLand.hasPermission(sender, "land.buy") ) { 
                 mess.send(" {CMD}/icl {PRM}buy {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}- purchase land or addons");
                 mess.send("    {}this command can be used to purchase land: {CMD}/icl buy land");
                 mess.send("    {}it can also be used to buy addons for a specific land ID# with:");
@@ -711,7 +711,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             }
             
         } else if ( topic.equalsIgnoreCase("sell") ) {
-            if ( iCoLand.hasPermission(sender, "sell") ) { 
+            if ( iCoLand.hasPermission(sender, "land.sell") ) { 
                 mess.send(" {CMD}/icl {PRM}sell {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}- purchase land or addons");
                 mess.send("    {}this command can be used to sell land: {CMD}/icl sell land");
                 mess.send("    {}it can also be used to sell addons for a specific land ID# with:");
@@ -719,7 +719,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             }
 
         } else if ( topic.equalsIgnoreCase("edit") ) {
-            if ( iCoLand.hasPermission(sender, "edit") ) {
+            if ( iCoLand.hasPermission(sender, "land.edit") ) {
                 mess.send(" {CMD}/icl {PRM}edit {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}name{BKT}> <{PRM}tags{BKT}>");
                 mess.send("    {}modifies config for land ( permissions, names )");
                 mess.send("    {}change location name example: {CMD}/icl edit 4 name This Land");
@@ -731,7 +731,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             }
 
         } else if ( topic.equalsIgnoreCase("modify") ) {
-            if ( iCoLand.hasPermission(sender, "modify") ) { 
+            if ( iCoLand.hasPermission(sender, "admin.modify") ) { 
                 mess.send(" {CMD}/icl {PRM}modify {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}addons{BKT}|{PRM}owner{BKT}|{PRM}name{BKT}> <{PRM}tags{BKT}> {}- modify land settings");
             }
             
@@ -799,7 +799,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                                      ));
         mess.send("{CMD}C: {}"+land.location.toCenterCoords()+" {CMD}V: {}"+land.location.volume()+" {CMD}D: {}"+land.location.toDimString());
         mess.send("{CMD}Owner: {}"+land.owner);
-        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"bypass") ) {
+        if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"admin.bypass") ) {
             if ( !land.locationName.isEmpty() )
                 mess.send("{CMD}Name: {}"+land.locationName);
 //            mess.send("{CMD}Created: {}"+land.dateCreated);

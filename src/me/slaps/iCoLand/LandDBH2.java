@@ -979,7 +979,7 @@ public class LandDBH2 implements LandDB {
                 return (perms.containsKey(playerName)?perms.get(playerName):false);
             } else {
                 if ( !Config.unclaimedLandCanBuild ) {
-                    return iCoLand.hasPermission(loc.getWorld().getName(), playerName, "canbuild");
+                    return iCoLand.hasPermission(loc.getWorld().getName(), playerName, "misc.canbuild");
                 } else {
                     return true;
                 }

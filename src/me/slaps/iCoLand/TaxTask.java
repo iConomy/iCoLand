@@ -65,10 +65,10 @@ public class TaxTask implements Runnable {
                         mess.send("{}Land ID# {PRM}"+land.getID()+"{} marked inactive");
                     }
 
-                    if ( Config.debugMode ) {
+ //                   if ( Config.debugMode ) {
                         iCoLand.info(land.owner+" didn't have enough money to pay tax of "+tax+" on land ID# "+land.getID());
                         iCoLand.info("Land ID# "+land.getID()+" marked inactive");
-                    }
+ //                   }
                 }
                 
             } else {
@@ -79,7 +79,7 @@ public class TaxTask implements Runnable {
                     mess.send("{}Land ID# {PRM}"+land.getID()+" {}taxed for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(tax)+"{BKT})");
                 }
                 
-                if ( Config.debugMode ) 
+//                if ( Config.debugMode ) 
                     iCoLand.info(land.owner+ " - Land ID# "+land.getID()+" taxed for 0 ("+iCoLand.df.format(tax)+") - notax perm");
             }
         }
@@ -116,7 +116,7 @@ public class TaxTask implements Runnable {
                     mess.send("{}Land ID# {PRM}"+land.getID()+"{} sold for {PRM}"+(price-tax));
                 } 
                 
-                if ( Config.debugMode )
+//                if ( Config.debugMode )
                     iCoLand.info("Land ID# "+land.getID()+" ("+land.owner+") sold for "+(price-tax));
                 
             } else {

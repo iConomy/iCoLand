@@ -60,6 +60,13 @@ public class LandDBH2 implements LandDB {
                 iCoLand.warning("Unable to add index TaxActive to table definition!");
             }
         }
+        if ( !columnExists("parent") ) {
+            if ( addColumnParent() ) {
+                iCoLand.info("Column Parent added to table.");
+            } else {
+                iCoLand.warning("Unable to add column Parent to table definition!");
+            }
+        }
     }
     
     public void close() {
@@ -94,7 +101,23 @@ public class LandDBH2 implements LandDB {
         }
         return indexExists("TaxActive");
     }
-    
+
+    public boolean addColumnParent() {
+        Connection conn = getConnection();
+        PreparedStatement ps = null;
+        try {
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD IF NOT EXISTS parent INT DEFAULT NULL;";
+            ps = conn.prepareStatement(sql);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return columnExists("parent");
+    }
+
     public boolean addColumnActive() {
         Connection conn = getConnection();
         PreparedStatement ps = null;

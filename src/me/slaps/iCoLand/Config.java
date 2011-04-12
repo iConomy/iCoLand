@@ -146,6 +146,7 @@ public class Config {
         ConfigurationNode timers = config.getNode("Timer-Settings");
         if ( timers != null ) {
             healTime = timers.getInt("Heal-Interval", 30);
+            if ( healTime <= 0 ) healTime = 1;
             mobRemovalTime = timers.getInt("Mob-Removal-Interval", 2);
             taxTimeMinutes = timers.getInt("Tax-Interval-Minutes", 0);
             announceCheckInterval = timers.getInt("Announce-Check-Interval-ms", 1000);

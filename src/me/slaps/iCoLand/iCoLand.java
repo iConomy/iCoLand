@@ -141,9 +141,11 @@ public class iCoLand extends JavaPlugin {
         
          if ( Config.loaded && ( iCoLand.ic != null && iCoLand.perms != null ) ) {
              setup();
-             iCoLand.info("Version ["+iCoLand.version+"] ("+iCoLand.codename+") enabled. "+
-                     iCoLand.landMgr.countLandsOwnedBy(null)+" lands found."+
-                     (Config.debugMode?" **DEBUG MODE ENABLED**":""));
+             if ( enabled ) {
+                 iCoLand.info("Version ["+iCoLand.version+"] ("+iCoLand.codename+") enabled. "+
+                         iCoLand.landMgr.countLandsOwnedBy(null)+" lands found."+
+                         (Config.debugMode?" **DEBUG MODE ENABLED**":""));
+             }
          }
     }	
 	
@@ -151,7 +153,15 @@ public class iCoLand extends JavaPlugin {
     
     public void setup() {
         if ( !enabled ) {
-            enabled = true;
+            // setup location manager
+            iCoLand.info("Initializing land manager...");
+            LandDBH2 landDB = new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile);
+            if ( !landDB.enabled ) {
+                iCoLand.severe("Could not initialize land manager, not enabling plugin");
+                return;
+            }
+                
+            iCoLand.landMgr = new LandManager(landDB);
 
             // setup listeners
             blockListener =  new iCoLandBlockListener(this);
@@ -164,13 +174,9 @@ public class iCoLand extends JavaPlugin {
             server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
             server.getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
             if ( Config.taxTimeMinutes > 0 ) 
-                server.getScheduler().scheduleSyncRepeatingTask(this, new TaxTask(), 100, 20*20);
-            
-            // setup location manager
-            if ( iCoLand.landMgr == null ) {
-                iCoLand.info("Initializing land manager...");
-                iCoLand.landMgr = new LandManager((LandDB)(new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile)));
-            }
+                server.getScheduler().scheduleSyncRepeatingTask(this, new TaxTask(), 100, 300*20);
+
+            enabled = true;
             
             //iCoLand.landMgr.test();
         }

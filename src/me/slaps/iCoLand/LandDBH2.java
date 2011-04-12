@@ -26,20 +26,34 @@ public class LandDBH2 implements LandDB {
     private String dbPath;
     private static JdbcConnectionPool cp;
     
+    public boolean enabled;
+    
     public LandDBH2(String pathToDB) {
+        enabled = false;
         dbPath = pathToDB;
-        
         initDB();
     }
     
     public void initDB() {
+        boolean err = false;
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
+            err = true;
         }
         
-        cp = JdbcConnectionPool.create("jdbc:h2:"+dbPath+";AUTO_RECONNECT=TRUE;CACHE_SIZE=32768;MODE=MYSQL", "sa", "sa");
+        if ( !err ) {
+            cp = JdbcConnectionPool.create("jdbc:h2:"+dbPath+";AUTO_RECONNECT=TRUE;CACHE_SIZE=32768;MODE=MYSQL", "sa", "sa");
+            enabled = true;
+            Connection test = getConnection();
+            if ( test != null ) {
+               enabled = true;
+            } else {
+                enabled = false;
+                return;
+            }
+        }
         
         if ( !tableExists(Config.sqlTableName) ) {
             createTable();
@@ -75,15 +89,23 @@ public class LandDBH2 implements LandDB {
     }
     
     public Connection getConnection() {
-        if (Config.debugModeSQL) iCoLand.info(cp.getActiveConnections()+" active connections"); 
-        Connection conn = null;
-        try {
-            conn = cp.getConnection();
-        } catch( SQLException ex ) {
-            ex.printStackTrace();
-            iCoLand.severe("Could not connect to database!");
+        if ( enabled ) {
+            if (Config.debugModeSQL) iCoLand.info(cp.getActiveConnections()+" active connections"); 
+            Connection conn = null;
+            try {
+                conn = cp.getConnection();
+            } catch( SQLException ex ) {
+                if ( ex.getErrorCode() == 90020 ) {
+                    iCoLand.severe("Could not connect to database! Already locked!");
+                } else {
+                    ex.printStackTrace();
+                }
+                return null;
+            }
+            return conn;
+        } else {
+            return null;
         }
-        return conn;
     }
     
     public boolean addIndexTaxActive() {

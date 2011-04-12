@@ -28,61 +28,71 @@ public class TaxTask implements Runnable {
             Account acc = iConomy.getBank().getAccount(land.owner);
             Account bank = iConomy.getBank().getAccount(Config.bankName);
             
-            if ( acc == null ) {
-                iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
-            } else if  ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "admin.notax") ) {
-                if ( acc.hasEnough(tax) ) {
-                    if (!iCoLand.landMgr.updateTaxTime(land.getID(), new Timestamp(land.dateTaxed.getTime()+timeOffset))) {
-                        iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
+            Timestamp newTaxDate = new Timestamp(land.dateTaxed.getTime()+timeOffset);
+            
+            while ( newTaxDate.before(now) ) {
+                if ( acc == null ) {
+                    iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
+                } else if  ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "admin.notax") ) {
+                    if ( acc.hasEnough(tax) ) {
+    
+                        // subtract tax out
+                        acc.subtract(tax);
+                        bank.add(tax);
+                        
+                        int i = playerInList(players, land.owner);
+                        if ( i > -1 ) {
+                            Messaging mess = new Messaging(players[i]);
+                            mess.send("{}Land ID# {PRM}"+land.getID()+" {}taxed for {PRM}"+iCoLand.df.format(tax));
+                        } 
+                        
+                        if ( Config.debugMode ) 
+                            iCoLand.info(land.owner+ " - Land ID# "+land.getID()+" taxed for "+iCoLand.df.format(tax));
+                    } else {
+                        // not enough for taxes, delete zone/mark inactive !
+                        if (!iCoLand.landMgr.updateActive(land.getID(), false)) {
+                            iCoLand.severe("Error setting land ID# "+land.getID()+" inactive, due to unpaid taxes");
+                        }
+    
+                        
+                        if (!iCoLand.landMgr.updateTaxTime(land.getID(), new Timestamp(land.dateTaxed.getTime()+timeOffset))) {
+                            iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
+                        }
+                        
+                        int i = playerInList(players, land.owner);
+                        if ( i >= 0 ) {
+                            Messaging mess = new Messaging(players[i]);
+                            mess.send("{ERR}Not enough money to pay tax of {PRM}"+tax+" on land ID# {PRM}"+land.getID());
+                            mess.send("{}Land ID# {PRM}"+land.getID()+"{} marked inactive");
+                        }
+    
+     //                   if ( Config.debugMode ) {
+                            iCoLand.info(land.owner+" didn't have enough money to pay tax of "+tax+" on land ID# "+land.getID());
+                            iCoLand.info("Land ID# "+land.getID()+" marked inactive");
+     //                   }
                     }
-                    // subtract tax out
-                    acc.subtract(tax);
-                    bank.add(tax);
                     
+                } else {
+                    // notax perm
                     int i = playerInList(players, land.owner);
                     if ( i > -1 ) {
                         Messaging mess = new Messaging(players[i]);
-                        mess.send("{}Land ID# {PRM}"+land.getID()+" {}taxed for {PRM}"+iCoLand.df.format(tax));
-                    } 
-                    
-                    if ( Config.debugMode ) 
-                        iCoLand.info(land.owner+ " - Land ID# "+land.getID()+" taxed for "+iCoLand.df.format(tax));
-                } else {
-                    // not enough for taxes, delete zone/mark inactive !
-                    if (!iCoLand.landMgr.updateActive(land.getID(), false)) {
-                        iCoLand.severe("Error setting land ID# "+land.getID()+" inactive, due to unpaid taxes");
-                    }
-
-                    
-                    if (!iCoLand.landMgr.updateTaxTime(land.getID(), new Timestamp(land.dateTaxed.getTime()+timeOffset))) {
-                        iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
+                        mess.send("{}Land ID# {PRM}"+land.getID()+" {}taxed for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(tax)+"{BKT})");
                     }
                     
-                    int i = playerInList(players, land.owner);
-                    if ( i >= 0 ) {
-                        Messaging mess = new Messaging(players[i]);
-                        mess.send("{ERR}Not enough money to pay tax of {PRM}"+tax+" on land ID# {PRM}"+land.getID());
-                        mess.send("{}Land ID# {PRM}"+land.getID()+"{} marked inactive");
-                    }
-
- //                   if ( Config.debugMode ) {
-                        iCoLand.info(land.owner+" didn't have enough money to pay tax of "+tax+" on land ID# "+land.getID());
-                        iCoLand.info("Land ID# "+land.getID()+" marked inactive");
- //                   }
+    //                if ( Config.debugMode ) 
+                        iCoLand.info(land.owner+ " - Land ID# "+land.getID()+" taxed for 0 ("+iCoLand.df.format(tax)+") - notax perm");
                 }
                 
-            } else {
-                // notax perm
-                int i = playerInList(players, land.owner);
-                if ( i > -1 ) {
-                    Messaging mess = new Messaging(players[i]);
-                    mess.send("{}Land ID# {PRM}"+land.getID()+" {}taxed for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(tax)+"{BKT})");
-                }
-                
-//                if ( Config.debugMode ) 
-                    iCoLand.info(land.owner+ " - Land ID# "+land.getID()+" taxed for 0 ("+iCoLand.df.format(tax)+") - notax perm");
+                newTaxDate.setTime(newTaxDate.getTime()+timeOffset);
+            }
+            
+            if (!iCoLand.landMgr.updateTaxTime(land.getID(), newTaxDate)) {
+                iCoLand.severe("Error updating tax timestamp on land ID# "+land.getID());
             }
         }
+        
+
 
         timeThreshold = new Timestamp(System.currentTimeMillis()-Config.inactiveDeleteTime*60*1000);
         lands = iCoLand.landMgr.listLandPastInactiveTime(timeThreshold);

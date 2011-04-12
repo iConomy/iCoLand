@@ -805,7 +805,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("{CMD}Name: {}"+land.locationName);
 //            mess.send("{CMD}Created: {}"+land.dateCreated);
             mess.send("{CMD}Taxes Due: {PRM}"+
-                    (iCoLand.hasPermission((Player)sender, "admin.notax")?"0 {BKT}({PRM}"+(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate))+"{BKT})":
+                    (iCoLand.hasPermission(land.location.LocMin.getWorld().getName(), land.owner, "admin.notax")?"0 {BKT}({PRM}"+(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate))+"{BKT})":
                     (iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate)))+
                     " {BKT}({}"+
                     (land.active?

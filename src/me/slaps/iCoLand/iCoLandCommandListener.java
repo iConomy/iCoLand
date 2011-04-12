@@ -773,9 +773,9 @@ public class iCoLandCommandListener implements CommandExecutor {
         long minsleft = Long.parseLong(df.format(secsleft/60.0));
         
         if ( minsleft > 1440 )  {
-            long daysleft = Long.parseLong(df.format(secsleft/1000.0/60.0/24.0));
+            long daysleft = Long.parseLong(df.format(secsleft/60.0/60.0/24.0));
             long hoursleft = (minsleft/60)%daysleft;
-            ret = daysleft+" day"+((daysleft>1)?"s":"")+", "+hoursleft+" minute"+((hoursleft>1)?"s":"");
+            ret = daysleft+" day"+((daysleft>1)?"s":"")+((hoursleft>0)?", "+hoursleft+" minute"+((hoursleft>1)?"s":""):"");
         } else if ( minsleft > 60 ) {
             long hoursleft = Long.parseLong(df.format(minsleft/60.0));
             ret = hoursleft+" hour"+((hoursleft>1)?"s":"");

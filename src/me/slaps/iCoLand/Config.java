@@ -81,6 +81,7 @@ public class Config {
         addonsEnabled.put("noboom", true);
         addonsEnabled.put("nofire", true);
         addonsEnabled.put("noflow", true);
+        addonsEnabled.put("nopvp", true);
 
         pricePerBlock = new HashMap<String, Double>();
         pricePerBlock.put("raw", 20.0);
@@ -90,6 +91,7 @@ public class Config {
         pricePerBlock.put("nospawn", 50.0);
         pricePerBlock.put("noboom", 50.0);
         pricePerBlock.put("nofire", 10.0);
+        pricePerBlock.put("noflow", 50.0);
         pricePerBlock.put("noflow", 10.0);
         
         healTime = 30;
@@ -178,6 +180,7 @@ public class Config {
             addonsEnabled.put("noboom", addons.getBoolean("noboom", false));
             addonsEnabled.put("nofire", addons.getBoolean("nofire", false));
             addonsEnabled.put("noflow", addons.getBoolean("noflow", false));
+            addonsEnabled.put("nopvp", addons.getBoolean("nopvp", false));
         }
 
         pricePerBlock.clear();
@@ -191,6 +194,7 @@ public class Config {
             pricePerBlock.put("noboom", addonPrices.getDouble("noboom", 50.0));
             pricePerBlock.put("nofire", addonPrices.getDouble("nofire", 10.0));
             pricePerBlock.put("noflow", addonPrices.getDouble("noflow", 50.0));
+            pricePerBlock.put("nopvp", addonPrices.getDouble("nopvp", 10.0));
         }
         
         ConfigurationNode selectionOptions = config.getNode("Selection-Options");
@@ -235,6 +239,7 @@ public class Config {
         config.setProperty("Addons-Enabled.noboom", addonsEnabled.get("noboom"));
         config.setProperty("Addons-Enabled.nofire", addonsEnabled.get("nofire"));
         config.setProperty("Addons-Enabled.noflow", addonsEnabled.get("noflow"));
+        config.setProperty("Addons-Enabled.nopvp", addonsEnabled.get("nopvp"));
         
         config.setProperty("Price-Per-Block.raw", pricePerBlock.get("raw"));
         config.setProperty("Price-Per-Block.announce", pricePerBlock.get("announce"));
@@ -244,6 +249,7 @@ public class Config {
         config.setProperty("Price-Per-Block.noboom", pricePerBlock.get("noboom"));
         config.setProperty("Price-Per-Block.nofire", pricePerBlock.get("nofire"));
         config.setProperty("Price-Per-Block.noflow", pricePerBlock.get("noflow"));
+        config.setProperty("Price-Per-Block.nopvp", pricePerBlock.get("nopvp"));
         
         config.setProperty("Selection-Options.All-Land-Full-Height", allLandFullHeight);
 

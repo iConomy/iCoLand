@@ -2,9 +2,11 @@ package me.slaps.iCoLand;
 
 import java.util.ArrayList;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -57,6 +59,14 @@ public class iCoLandEntityListener extends EntityListener {
                 event.setCancelled(true);
             }
             
+        } else if (event instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent castEvent = (EntityDamageByEntityEvent)event;
+            if ( (castEvent.getDamager() instanceof Player) && (castEvent.getEntity() instanceof Player) ) {
+                for(Integer id : ids) {                
+                    if ( iCoLand.landMgr.getLandById(id).hasAddon("nopvp") )
+                        event.setCancelled(true);
+                }
+            }
         }
     }
     

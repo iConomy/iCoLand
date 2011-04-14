@@ -174,7 +174,7 @@ public class iCoLand extends JavaPlugin {
             server.getScheduler().scheduleSyncRepeatingTask(this, new HealTask(), 100, Config.healTime*20);
             server.getScheduler().scheduleSyncRepeatingTask(this, new MobKillTask(), 100, Config.mobRemovalTime*20);
             if ( Config.taxTimeMinutes > 0 ) 
-                server.getScheduler().scheduleSyncRepeatingTask(this, new TaxTask(), 100, 300*20);
+                server.getScheduler().scheduleSyncRepeatingTask(this, new TaxTask(), 100, 60*20);
 
             enabled = true;
             

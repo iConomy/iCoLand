@@ -15,13 +15,13 @@ public class Land {
     public HashMap<String, Boolean> canBuildDestroy;    // hash map lookup for perms
     public HashMap<String, Boolean> addons;             // hash map lookup for addons
     public Timestamp dateCreated;                       // date created
-    public Timestamp dateTaxed;                         // date taxed
+    public Timestamp dateTax;                           // date taxed
     public boolean active;                              // land active? ( inactive = didn't pay taxes )
     
     private boolean valid = false;                      // valid
     
     public Land(int id, Cuboid loc, String owner, String locName, HashMap<String, Boolean> perms, 
-            HashMap<String, Boolean> addons, Timestamp dateCreated, Timestamp dateTaxed, Boolean active) {
+            HashMap<String, Boolean> addons, Timestamp dateCreated, Timestamp taxDate, Boolean active) {
         
         this.id = id;
         this.location = loc;
@@ -30,7 +30,7 @@ public class Land {
         this.addons = addons;
         
         this.dateCreated = dateCreated;
-        this.dateTaxed = dateTaxed;
+        this.dateTax = taxDate;
         
         this.locationName = locName;
         
@@ -53,7 +53,7 @@ public class Land {
         if ( !location.isValid() ) ret = false;
         if ( owner.isEmpty() ) ret = false;
         if ( dateCreated == null ) ret = false;
-        if ( dateTaxed == null ) ret = false;
+        if ( dateTax == null ) ret = false;
         
         valid = ret;
         return ret;

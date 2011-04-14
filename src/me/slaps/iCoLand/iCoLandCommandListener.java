@@ -769,8 +769,8 @@ public class iCoLandCommandListener implements CommandExecutor {
         
         DecimalFormat df = new DecimalFormat("#");
         
-        long secsleft = Long.parseLong(df.format(Math.abs(due-now)/1000.0));
-        long minsleft = Long.parseLong(df.format(secsleft/60.0));
+        long secsleft = (long) (Math.abs(due-now)/1000.0);
+        long minsleft = (long) (Math.abs(due-now)/1000.0/60.0);
         if ( due - now < 0 ) {
             ret += "-";
         }
@@ -778,12 +778,19 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( minsleft > 1440 )  {
             long daysleft = Long.parseLong(df.format(secsleft/60.0/60.0/24.0));
             long hoursleft = (minsleft/60)%daysleft;
-            ret += daysleft+" day"+((daysleft>1)?"s":"")+((hoursleft>0)?", "+hoursleft+" minute"+((hoursleft>1)?"s":""):"");
+            ret += daysleft+" day"+((daysleft>1)?"s":"")+
+            ((hoursleft>0)?
+                    ", "+hoursleft+" hour"+((hoursleft>1)?"s":"")
+             :"");
         } else if ( minsleft > 60 ) {
             long hoursleft = Long.parseLong(df.format(minsleft/60.0));
-            ret += hoursleft+" hour"+((hoursleft>1)?"s":"");
+            minsleft = minsleft - ( hoursleft*60 );
+            ret += hoursleft+" hour"+((hoursleft>1)?"s":"")+
+                ((hoursleft == 1 )?", "+minsleft+" minute"+((minsleft > 1)?"s":""):"");
         } else if ( minsleft > 0 ) {
-            ret += minsleft+" minute"+((minsleft>1)?"s":"");
+            secsleft = secsleft - ( minsleft*60 );
+            ret += minsleft+" minute"+((minsleft>1)?"s":"")+
+                ((minsleft < 5)?", "+secsleft+" second"+((secsleft>1)?"s":""):"");
         } else if ( secsleft >= 0 ) {
             ret += secsleft+" second"+((secsleft>1)?"s":"");
         } 
@@ -809,8 +816,8 @@ public class iCoLandCommandListener implements CommandExecutor {
                     (iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate)))+
                     " {BKT}({}"+
                     (land.active?
-                    formatTimeLeft(land.dateTaxed.getTime()+Config.taxTimeMinutes*60*1000):
-                    formatTimeLeft(land.dateTaxed.getTime()+Config.inactiveDeleteTime*60*1000))
+                    formatTimeLeft(land.dateTax.getTime()):
+                    formatTimeLeft(land.dateTax.getTime()+Config.inactiveDeleteTime*60*1000))
                     +" left{BKT})"
                     );
 //            mess.send("{CMD}Taxed: {PRM}"+iCoLand.landMgr.getPrice(land.location)+" {}"+land.dateTaxed);

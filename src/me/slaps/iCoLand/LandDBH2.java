@@ -81,6 +81,14 @@ public class LandDBH2 implements LandDB {
                 iCoLand.warning("Unable to add column Parent to table definition!");
             }
         }
+        if ( columnExists("dateTaxed") ) {
+            if ( renameColumnDateTaxed() ) {
+                iCoLand.info("Column dateTaxed renamed to taxDate");
+            } else {
+                iCoLand.severe("Unable to rename column dateTaxed!");
+                enabled = false;
+            }
+        }
     }
     
     public void close() {
@@ -106,6 +114,22 @@ public class LandDBH2 implements LandDB {
         } else {
             return null;
         }
+    }
+    
+    public boolean renameColumnDateTaxed() {
+        Connection conn = getConnection();
+        PreparedStatement ps = null;
+        try {
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ALTER COLUMN dateTaxed RENAME TO taxDate;";
+            ps = conn.prepareStatement(sql);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return columnExists("taxDate");
     }
     
     public boolean addIndexTaxActive() {
@@ -349,14 +373,14 @@ public class LandDBH2 implements LandDB {
     	try {
     		conn = getConnection();
     		String sql = "INSERT INTO "+Config.sqlTableName+
-                "( owner, dateCreated, dateTaxed, name, perms, addons, "+
+                "( owner, dateCreated, taxDate, name, perms, addons, "+
                 "minX, minY, minZ, maxX, maxY, maxZ, world, active) " +
                 "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"+
                 ";";
     		ps = conn.prepareStatement(sql);
     		ps.setString(1, newLand.owner);
     		ps.setTimestamp(2, newLand.dateCreated);
-    		ps.setTimestamp(3, newLand.dateTaxed);
+    		ps.setTimestamp(3, newLand.dateTax);
     		ps.setString(4, newLand.locationName);
     		ps.setString(5, Land.writePermTags(newLand.canBuildDestroy));
     		ps.setString(6, Land.writeAddonTags(newLand.addons));
@@ -437,7 +461,7 @@ public class LandDBH2 implements LandDB {
         ResultSet rs = null;
         try {
             conn = getConnection();
-            ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
+            ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
                     "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
                     ((playerName != null)?" WHERE owner = ?":"")+
                     " ORDER BY id ASC"+
@@ -487,9 +511,9 @@ public class LandDBH2 implements LandDB {
         ResultSet rs = null;
         try {
             conn = getConnection();
-            ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
+            ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
                     "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
-                    " WHERE dateTaxed < ? AND active = FALSE "+
+                    " WHERE taxDate < ? AND active = FALSE "+
                     " ORDER BY id ASC"
                     );
             ps.setTimestamp(1,time);
@@ -531,9 +555,9 @@ public class LandDBH2 implements LandDB {
         ResultSet rs = null;
         try {
             conn = getConnection();
-            ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
+            ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
                     "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
-                    " WHERE dateTaxed < ? AND active = TRUE "+
+                    " WHERE taxDate < ? AND active = TRUE "+
                     " ORDER BY id ASC"
                     );
             ps.setTimestamp(1,time);
@@ -710,7 +734,7 @@ public class LandDBH2 implements LandDB {
         ResultSet rs = null;
         try {
             conn = getConnection();
-            ps = conn.prepareStatement("SELECT id, owner, dateCreated, dateTaxed, name, perms, addons, "+
+            ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
                     "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
@@ -979,7 +1003,7 @@ public class LandDBH2 implements LandDB {
         PreparedStatement ps = null;
         try {
             conn = getConnection();
-            ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET dateTaxed = ? WHERE id = ?");
+            ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET taxDate = ? WHERE id = ?");
             ps.setTimestamp(1, time);
             ps.setInt(2, id);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
@@ -1057,12 +1081,12 @@ public class LandDBH2 implements LandDB {
             HashMap<String, Boolean> perms = Land.parsePermTags(shopkeys.get("perms"));
             HashMap<String, Boolean> addons = Land.parseAddonTags(shopkeys.get("addons"));
             String dateCreated = shopkeys.get("dateCreated");
-            String dateTaxed = shopkeys.get("dateTaxed");
+            String taxDate = shopkeys.get("taxDate");
             String locationName = shopkeys.get("name");
             
             Boolean active = (shopkeys.containsKey("active")?shopkeys.get("active").equalsIgnoreCase("true"):true);
 
-            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(dateTaxed), active));
+            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(taxDate), active));
 
         }
         
@@ -1092,7 +1116,7 @@ public class LandDBH2 implements LandDB {
             tmpmap.put("perms", Land.writePermTags(land.canBuildDestroy));
             tmpmap.put("addons", Land.writeAddonTags(land.addons));
             tmpmap.put("dateCreated", land.dateCreated.toString() );
-            tmpmap.put("dateTaxed", land.dateTaxed.toString() );
+            tmpmap.put("taxDate", land.dateTax.toString() );
             tmpmap.put("name", land.locationName);
             tmpmap.put("world", land.location.setLoc1.getWorld().getName());
             tmpmap.put("corner1x",land.location.setLoc1.getBlockX());

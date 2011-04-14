@@ -39,9 +39,10 @@ public class LandManager {
 	    if ( !sl.isValid() ) return false;
 		if ( intersectsExistingLand(sl) > 0 ) return false;
 		Timestamp now = new Timestamp(System.currentTimeMillis());
+		Timestamp taxDate = new Timestamp(System.currentTimeMillis()+Config.taxTimeMinutes*60*1000);
 		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
-		        Land.parseAddonTags(addons), now, now, true));
+		        Land.parseAddonTags(addons), now, taxDate, true));
 	}
 	
 	public boolean removeLandById(Integer id) {
@@ -149,7 +150,7 @@ public class LandManager {
             if ( !land.locationName.isEmpty() )
                 mess.send("{CMD}Name: {}"+land.locationName);
             mess.send("{CMD}Created: {}"+land.dateCreated);
-            mess.send("{CMD}Taxed: {}"+land.dateTaxed);
+            mess.send("{CMD}Taxed: {}"+land.dateTax);
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
             mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
             mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
 
-public class HealTask implements Runnable {
+public class TaskLandHeal implements Runnable {
     
     public void run() {
         Player[] players = iCoLand.server.getOnlinePlayers();

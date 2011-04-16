@@ -8,18 +8,18 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public class MobKillTask implements Runnable {
+public class TaskLandMobKill implements Runnable {
 
     iCoLand ic;
     boolean main;
     List<LivingEntity> entities;
     
-    public MobKillTask(boolean main, iCoLand ic) {
+    public TaskLandMobKill(boolean main, iCoLand ic) {
         this.ic = ic;
         this.main = true;
     }
     
-    public MobKillTask(boolean main, iCoLand ic, List<LivingEntity> entities) {
+    public TaskLandMobKill(boolean main, iCoLand ic, List<LivingEntity> entities) {
         this.ic = ic;
         this.main = main;
         this.entities = entities;
@@ -32,7 +32,7 @@ public class MobKillTask implements Runnable {
                 List<LivingEntity> entities = world.getLivingEntities();
                 int jobSize = 20;
                 for(int i=0;i<entities.size()/jobSize+1;i++) {
-                    iCoLand.server.getScheduler().scheduleSyncDelayedTask((Plugin)ic, new MobKillTask(false, ic, entities.subList(0, jobSize*i)), i+1);
+                    iCoLand.server.getScheduler().scheduleSyncDelayedTask((Plugin)ic, new TaskLandMobKill(false, ic, entities.subList(0, jobSize*i)), i+1);
                 }
             }
         } else {

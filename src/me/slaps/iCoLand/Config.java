@@ -1,6 +1,7 @@
 package me.slaps.iCoLand;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.util.config.Configuration;
@@ -51,13 +52,19 @@ public class Config {
     public static boolean unclaimedLandCanBuild;
     public static boolean unclaimedLandCanBoom;
     public static boolean unclaimedLandCanBurn;
+
+    // claimed land settings
+    public static ArrayList<Integer> tempItemsAllowed;
+    public static Integer tempItemDelay;
     
     // selection options
     public static boolean allLandFullHeight;
     
+    
+    
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
-        
+
         // setup defaults
         debugMode = false;
         debugMode1 = false;
@@ -102,6 +109,11 @@ public class Config {
         unclaimedLandCanBuild = true;
         unclaimedLandCanBoom = true;
         unclaimedLandCanBurn = true;
+        
+        tempItemsAllowed = new ArrayList<Integer>();
+        tempItemsAllowed.add(65);
+        tempItemsAllowed.add(50);
+        tempItemDelay = 300;
         
         allLandFullHeight = false;
         
@@ -159,7 +171,21 @@ public class Config {
             unclaimedLandCanBuild = unclaimed.getBoolean("Can-Build", true);
             unclaimedLandCanBoom = unclaimed.getBoolean("Can-Boom", true);
             unclaimedLandCanBurn = unclaimed.getBoolean("Can-Burn", true);
-
+        }
+        
+        ConfigurationNode claimed = config.getNode("Claimed-Land");
+        if ( claimed != null ) {
+             String[] split = claimed.getString("Temp-Items-Allowed","50,65").split(",");
+             tempItemsAllowed.clear();
+             for(String item : split) {
+                 try {
+                     tempItemsAllowed.add(Integer.parseInt(item.trim()));
+                 } catch (NumberFormatException ex ) {
+                     iCoLand.warning("Could not parse Temp-Items-Allowed on token: "+item);
+                 }
+             }
+             
+             tempItemDelay = claimed.getInt("Temp-Items-Delay", 300);
         }
 
         ConfigurationNode landLimits = config.getNode("Land-Limits");
@@ -226,6 +252,15 @@ public class Config {
         config.setProperty("Unclaimed-Land.Can-Build", unclaimedLandCanBuild);
         config.setProperty("Unclaimed-Land.Can-Boom", unclaimedLandCanBoom);
         config.setProperty("Unclaimed-Land.Can-Burn", unclaimedLandCanBurn);
+        
+        String tempItems = "";
+        for(int i = 0; i<tempItemsAllowed.size(); i++) { 
+            tempItems += tempItemsAllowed.get(i).toString(); 
+            if ( !(i == tempItemsAllowed.size()-1) ) 
+                tempItems += ",";
+        }
+        config.setProperty("Claimed-Land.Temp-Items-Allowed.", tempItems);
+        config.setProperty("Claimed-Land.Temp-Items-Delay", tempItemDelay);
         
         config.setProperty("Land-Limits.Max-Total-Blocks-Claimable", maxBlocksClaimable);
         config.setProperty("Land-Limits.Max-Lands-Claimable", maxLandsClaimable);

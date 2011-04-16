@@ -13,15 +13,19 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.plugin.Plugin;
 
 public class iCoLandBlockListener extends BlockListener {
 	
+    iCoLand ic; 
+    
 	public iCoLandBlockListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_BREAK, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_PLACE, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_BURN, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.BLOCK_FROMTO, this, Priority.Low, plug);
+        ic = plug;
 	}
 	
 	public void onBlockBreak( BlockBreakEvent event ) {
@@ -38,9 +42,13 @@ public class iCoLandBlockListener extends BlockListener {
         Location loc = event.getBlock().getLocation();
         Player player = event.getPlayer();
         if ( !iCoLand.landMgr.canBuildDestroy(player, loc) && !iCoLand.hasPermission(player, "admin.bypass") ) {
-            event.setCancelled(true);
-            Messaging mess = new Messaging((CommandSender)player);
-            mess.send("{ERR}You can't do that here.");
+            if ( Config.tempItemsAllowed.indexOf(event.getBlock().getTypeId()) > -1 ) {
+                iCoLand.server.getScheduler().scheduleSyncDelayedTask((Plugin)ic, new TaskTempBlockRemoval(event.getBlock(), player), Config.tempItemDelay*20);
+            } else {
+                event.setCancelled(true);
+                Messaging mess = new Messaging((CommandSender)player);
+                mess.send("{ERR}You can't do that here.");
+            }
         }
 	}
 	

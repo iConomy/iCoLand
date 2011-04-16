@@ -9,7 +9,7 @@ import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.Account;
 
 
-public class TaxTask implements Runnable {
+public class TaskLandTaxes implements Runnable {
     
     public void run() {
         Player[] players = iCoLand.server.getOnlinePlayers();

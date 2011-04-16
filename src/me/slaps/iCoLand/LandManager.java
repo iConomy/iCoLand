@@ -4,12 +4,14 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.nijiko.coelho.iConomy.iConomy;
@@ -42,7 +44,7 @@ public class LandManager {
 		Timestamp taxDate = new Timestamp(System.currentTimeMillis()+Config.taxTimeMinutes*60*1000);
 		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
-		        Land.parseAddonTags(addons), now, taxDate, true));
+		        Land.parseAddonTags(addons), now, taxDate, true, Config.defaultNoSpawnMobs));
 	}
 	
 	public boolean removeLandById(Integer id) {
@@ -153,7 +155,7 @@ public class LandManager {
             mess.send("{CMD}Taxed: {}"+land.dateTax);
             mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
             mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
-            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));
+            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(land));
         }
 	}
 
@@ -211,7 +213,7 @@ public class LandManager {
     }
     
     public boolean updateTaxTime(int id, Timestamp time) {
-        return landDB.updateTaxTime(id, time);
+        return landDB.updateLandTaxTime(id, time);
     }
     
     public boolean updateActive(int id, Boolean active) {
@@ -260,6 +262,10 @@ public class LandManager {
         return landDB.updateLandPerms(id, permString);        
     }
     
+    public boolean updateNoSpawn(int id, String noSpawn) {
+        return landDB.updateLandNoSpawn(id, noSpawn);
+    }
+    
     public boolean modifyPermTags(int id, String args) {
         HashMap<String, Boolean> perms = Land.parsePermTags(iCoLand.landMgr.getPerms(id));
         
@@ -300,6 +306,10 @@ public class LandManager {
         return landDB.getLandOwner(id);
     }
     
+    public String getNoSpawn(int id) {
+        return landDB.getLandNoSpawn(id);
+    }
+    
 	public void test() {
         long start = System.currentTimeMillis();
         int numLands = 10000;
@@ -321,6 +331,24 @@ public class LandManager {
         if ( i < 0 ) 
             i = -i;
         return lo+i;
+    }
+    
+    public boolean preventSpawn(int id, Entity ent) {
+        HashSet<String> noSpawn = Land.parseNoSpawnTags(landDB.getLandNoSpawn(id));
+        return noSpawn.contains(ent.getClass().toString().toLowerCase());
+    }
+    
+    public boolean modifyNoSpawnTags(int id, String tags) {
+        HashSet<String> nospawn = Land.parseNoSpawnTags(getNoSpawn(id));
+        String split[] = tags.split(" ");
+        for(String tag : split) {
+            if (nospawn.contains(tag))
+                nospawn.remove(tag);
+            else
+                nospawn.add(tag);
+        }
+        
+        return updateNoSpawn(id, Land.writeNoSpawnTags(nospawn));
     }
 	
 }

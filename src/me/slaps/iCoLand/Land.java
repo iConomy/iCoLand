@@ -2,10 +2,11 @@ package me.slaps.iCoLand;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 
 public class Land {
     private int id;                                     // unique # ( sql primary key )
@@ -17,11 +18,12 @@ public class Land {
     public Timestamp dateCreated;                       // date created
     public Timestamp dateTax;                           // date taxed
     public boolean active;                              // land active? ( inactive = didn't pay taxes )
+    public String noSpawn;
     
     private boolean valid = false;                      // valid
     
     public Land(int id, Cuboid loc, String owner, String locName, HashMap<String, Boolean> perms, 
-            HashMap<String, Boolean> addons, Timestamp dateCreated, Timestamp taxDate, Boolean active) {
+            HashMap<String, Boolean> addons, Timestamp dateCreated, Timestamp taxDate, Boolean active, String noSpawn) {
         
         this.id = id;
         this.location = loc;
@@ -35,6 +37,8 @@ public class Land {
         this.locationName = locName;
         
         this.active = active;
+        
+        this.noSpawn = noSpawn;
         
         validate();
     }
@@ -175,7 +179,7 @@ public class Land {
         return ret;
     }
     
-    public static String writeAddonPrices(CommandSender sender, Land land) {
+    public static String writeAddonPrices(Land land) {
         String ret = "";
         if ( !land.addons.containsKey("announce") )
             ret += "Announce: "+iCoLand.df.format(land.getAddonPrice("announce"))+" ";
@@ -194,6 +198,28 @@ public class Land {
         
         return ret;
     }
+    
+    public static String writeNoSpawnTags(HashSet<String> noSpawn) {
+        String ret = "";
+        Iterator<String> itr = noSpawn.iterator();
+        while(itr.hasNext()) {
+            ret += itr.next();
+            if ( itr.hasNext() )
+                ret += ",";
+        }
+        return ret;
+    }
+    
+    public static HashSet<String> parseNoSpawnTags(String tags) {
+        HashSet<String> ret = new HashSet<String>();
+        String[] split = tags.split(",");
+        for(String tag : split) {
+            if ( !ret.contains(tag) ) 
+                ret.add(tag.trim().toLowerCase());
+        }
+        return ret;
+    }
+    
     
     
     

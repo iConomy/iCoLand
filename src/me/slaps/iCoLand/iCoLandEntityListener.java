@@ -26,7 +26,8 @@ public class iCoLandEntityListener extends EntityListener {
         ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
         for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nospawn") ) {
-                event.setCancelled(true);
+                if ( !iCoLand.landMgr.preventSpawn(id, event.getEntity()) )
+                    event.setCancelled(true);
             }
         }
     }

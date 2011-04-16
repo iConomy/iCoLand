@@ -56,6 +56,7 @@ public class Config {
     // claimed land settings
     public static ArrayList<Integer> tempItemsAllowed;
     public static Integer tempItemDelay;
+    public static String defaultNoSpawnMobs;
     
     // selection options
     public static boolean allLandFullHeight;
@@ -114,6 +115,7 @@ public class Config {
         tempItemsAllowed.add(65);
         tempItemsAllowed.add(50);
         tempItemDelay = 300;
+        defaultNoSpawnMobs = "Spider,Zombie,Skeleton,Creeper,Slime,Ghast";
         
         allLandFullHeight = false;
         
@@ -186,6 +188,7 @@ public class Config {
              }
              
              tempItemDelay = claimed.getInt("Temp-Items-Delay", 300);
+             defaultNoSpawnMobs = claimed.getString("Default-No-Spawn-Mobs", "Spider,Zombie,Skeleton,Creeper,Slime,Ghast");
         }
 
         ConfigurationNode landLimits = config.getNode("Land-Limits");
@@ -261,6 +264,7 @@ public class Config {
         }
         config.setProperty("Claimed-Land.Temp-Items-Allowed.", tempItems);
         config.setProperty("Claimed-Land.Temp-Items-Delay", tempItemDelay);
+        config.setProperty("Claimed-Land.Default-No-Spawn-Mobs", defaultNoSpawnMobs);
         
         config.setProperty("Land-Limits.Max-Total-Blocks-Claimable", maxBlocksClaimable);
         config.setProperty("Land-Limits.Max-Lands-Claimable", maxLandsClaimable);

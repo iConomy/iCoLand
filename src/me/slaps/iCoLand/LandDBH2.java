@@ -63,22 +63,24 @@ public class LandDBH2 implements LandDB {
             if ( addColumnActive() ) {
                 iCoLand.info("Column Active added to table.");
             } else {
-                iCoLand.warning("Unable to add column Active to table definition!");
+                iCoLand.severe("Unable to add column Active to table definition!");
+                enabled = false;
             }
-            
         }
         if ( !indexExists("TaxActive") ) {
             if ( addIndexTaxActive() ) {
                 iCoLand.info("Index TaxActive added to table.");
             } else {
-                iCoLand.warning("Unable to add index TaxActive to table definition!");
+                iCoLand.severe("Unable to add index TaxActive to table definition!");
+                enabled = false;
             }
         }
         if ( !columnExists("parent") ) {
             if ( addColumnParent() ) {
                 iCoLand.info("Column Parent added to table.");
             } else {
-                iCoLand.warning("Unable to add column Parent to table definition!");
+                iCoLand.severe("Unable to add column Parent to table definition!");
+                enabled = false;
             }
         }
         if ( columnExists("dateTaxed") ) {
@@ -86,6 +88,14 @@ public class LandDBH2 implements LandDB {
                 iCoLand.info("Column dateTaxed renamed to taxDate");
             } else {
                 iCoLand.severe("Unable to rename column dateTaxed!");
+                enabled = false;
+            }
+        }
+        if ( !columnExists("noSpawn") ) {
+            if ( addColumnNoSpawn() ) {
+                iCoLand.info("Column noSpawn added to table");
+            } else {
+                iCoLand.severe("Unabled to add column noSpawn to table!");
                 enabled = false;
             }
         }
@@ -115,7 +125,23 @@ public class LandDBH2 implements LandDB {
             return null;
         }
     }
-    
+
+    public boolean addColumnNoSpawn() {
+        Connection conn = getConnection();
+        PreparedStatement ps = null;
+        try {
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD IF NOT EXISTS noSpawn VARCHAR(512) DEFAULT '' NOT NULL;";
+            ps = conn.prepareStatement(sql);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return columnExists("noSpawn");
+    }
+
     public boolean renameColumnDateTaxed() {
         Connection conn = getConnection();
         PreparedStatement ps = null;
@@ -374,8 +400,8 @@ public class LandDBH2 implements LandDB {
     		conn = getConnection();
     		String sql = "INSERT INTO "+Config.sqlTableName+
                 "( owner, dateCreated, taxDate, name, perms, addons, "+
-                "minX, minY, minZ, maxX, maxY, maxZ, world, active) " +
-                "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"+
+                "minX, minY, minZ, maxX, maxY, maxZ, world, active, nospawn) " +
+                "VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"+
                 ";";
     		ps = conn.prepareStatement(sql);
     		ps.setString(1, newLand.owner);
@@ -392,6 +418,7 @@ public class LandDBH2 implements LandDB {
     		ps.setInt(12, newLand.location.LocMax.getBlockZ());
             ps.setString(13, newLand.location.LocMax.getWorld().getName());
             ps.setBoolean(14, newLand.active);
+            ps.setString(15, newLand.noSpawn);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
     		ret = ps.executeUpdate();
     		
@@ -462,7 +489,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active, noSpawn FROM "+Config.sqlTableName+
                     ((playerName != null)?" WHERE owner = ?":"")+
                     " ORDER BY id ASC"+
                     ((limit > 0)?" LIMIT ? OFFSET ?;":";")
@@ -491,7 +518,8 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                 
                 ret.add(new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
+                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15),
+                                 rs.getString(16)
                                 ));
             }
             
@@ -512,7 +540,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active, noSpawn FROM "+Config.sqlTableName+
                     " WHERE taxDate < ? AND active = FALSE "+
                     " ORDER BY id ASC"
                     );
@@ -535,7 +563,8 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                 
                 ret.add(new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
+                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15),
+                                 rs.getString(16)
                                 ));
             }
             
@@ -556,7 +585,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active, noSpawn FROM "+Config.sqlTableName+
                     " WHERE taxDate < ? AND active = TRUE "+
                     " ORDER BY id ASC"
                     );
@@ -579,7 +608,8 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                 
                 ret.add(new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
+                                 Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15),
+                                 rs.getString(16)
                                 ));
             }
             
@@ -735,7 +765,7 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT id, owner, dateCreated, taxDate, name, perms, addons, "+
-                    "minX, minY, minZ, maxX, maxY, maxZ, world, active FROM "+Config.sqlTableName+
+                    "minX, minY, minZ, maxX, maxY, maxZ, world, active, noSpawn FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
@@ -756,7 +786,8 @@ public class LandDBH2 implements LandDB {
                 Cuboid newCub = new Cuboid(locMin, locMax);
                     
                 ret = new Land(rs.getInt(1), newCub, rs.getString(2), rs.getString(5), Land.parsePermTags(rs.getString(6)), 
-                               Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15)
+                               Land.parseAddonTags(rs.getString(7)), rs.getTimestamp(3), rs.getTimestamp(4), rs.getBoolean(15),
+                               rs.getString(16)
                               );
             }
                 
@@ -845,6 +876,36 @@ public class LandDBH2 implements LandDB {
         try {
             conn = getConnection();
             ps = conn.prepareStatement("SELECT owner FROM "+Config.sqlTableName+
+                    " WHERE id = ?");
+            ps.setInt(1, id);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            rs = ps.executeQuery();
+            
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        try {
+            while( rs.next() ) {
+                ret = rs.getString(1);
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return ret;
+    }
+    
+    public String getLandNoSpawn(int id) {
+        String ret = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("SELECT noSpawn FROM "+Config.sqlTableName+
                     " WHERE id = ?");
             ps.setInt(1, id);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
@@ -996,8 +1057,31 @@ public class LandDBH2 implements LandDB {
         
         return (ret>0);
     }
+    
 
-    public boolean updateTaxTime(int id, Timestamp time) {
+
+    public boolean updateLandNoSpawn(int id, String noSpawn) {
+        int ret = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement("UPDATE "+Config.sqlTableName+" SET noSpawn = ? WHERE id = ?");
+            ps.setString(1, noSpawn);
+            ps.setInt(2, id);
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ret = ps.executeUpdate();
+            ps.close();
+            conn.close();
+        } catch ( SQLException ex ) {
+            ex.printStackTrace();
+        }
+        
+        return (ret>0);
+    }
+
+
+    public boolean updateLandTaxTime(int id, Timestamp time) {
         int ret = 0;
         Connection conn = null;
         PreparedStatement ps = null;
@@ -1085,8 +1169,10 @@ public class LandDBH2 implements LandDB {
             String locationName = shopkeys.get("name");
             
             Boolean active = (shopkeys.containsKey("active")?shopkeys.get("active").equalsIgnoreCase("true"):true);
+            
+            String noSpawn = (shopkeys.containsKey("noSpawn")?shopkeys.get("noSpawn"):"");
 
-            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(taxDate), active));
+            lands.put(id, new Land(id, loc, owner, locationName, perms, addons, Timestamp.valueOf(dateCreated), Timestamp.valueOf(taxDate), active, noSpawn));
 
         }
         
@@ -1126,12 +1212,14 @@ public class LandDBH2 implements LandDB {
             tmpmap.put("corner2y",land.location.setLoc2.getBlockY());
             tmpmap.put("corner2z",land.location.setLoc2.getBlockZ());
             tmpmap.put("active", land.active?"true":"false");
+            tmpmap.put("noSpawn", land.noSpawn);
 
             tmpshops.add(tmpmap);           
         }
         LandConfig.setProperty("lands", tmpshops);
         LandConfig.save();
     }
+
 
 
 

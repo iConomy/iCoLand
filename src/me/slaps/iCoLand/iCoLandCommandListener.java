@@ -85,7 +85,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                         }
                         if ( iCoLand.landMgr.landIdExists(id) ) {
                             if ( iCoLand.landMgr.isOwner(player.getName(), id) ) {                            
-                                if ( Misc.isEither(args[2], "name", "perms") ) {
+                                if ( Misc.isAny(args[2], "name", "perms", "nospawn") ) {
                                     String tags = "";
                                     for(int i=3;i<args.length;i++) tags += args[i] + " ";
                                     editLand(player, id, args[2], tags);
@@ -391,6 +391,11 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("{}Location name changed");
             else
                 mess.send("{ERR}Error changing location name");
+        } else if ( category.equalsIgnoreCase("nospawn") ) {
+            if ( iCoLand.landMgr.modifyNoSpawnTags(id, args) ) 
+                mess.send("{}NoSpawn list modified");
+            else
+                mess.send("{ERR}Problem modifying NoSpawn list");
         }
     }
     
@@ -416,7 +421,11 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("{}Location name changed");
             else
                 mess.send("{ERR}Error changing location name");
-
+        } else if ( category.equalsIgnoreCase("nospawn") ) {
+            if ( iCoLand.landMgr.modifyNoSpawnTags(id, tags) ) 
+                mess.send("{}NoSpawn list modified");
+            else
+                mess.send("{ERR}Problem modifying NoSpawn list");            
         } else {
             mess.send("{ERR}Bad category");
         }
@@ -720,7 +729,7 @@ public class iCoLandCommandListener implements CommandExecutor {
 
         } else if ( topic.equalsIgnoreCase("edit") ) {
             if ( iCoLand.hasPermission(sender, "land.edit") ) {
-                mess.send(" {CMD}/icl {PRM}edit {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}name{BKT}> <{PRM}tags{BKT}>");
+                mess.send(" {CMD}/icl {PRM}edit {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}name{BKT}|{PRM}nospawn{BKT}> <{PRM}tags{BKT}>");
                 mess.send("    {}modifies config for land ( permissions, names )");
                 mess.send("    {}change location name example: {CMD}/icl edit 4 name This Land");
                 mess.send("    {}Tags for perms: {BKT}<{PRM}playerName{BKT}>{PRM}:{BKT}<{PRM}t{BKT}|{PRM}f{BKT}|{PRM}-{BKT}>");
@@ -732,7 +741,7 @@ public class iCoLandCommandListener implements CommandExecutor {
 
         } else if ( topic.equalsIgnoreCase("modify") ) {
             if ( iCoLand.hasPermission(sender, "admin.modify") ) { 
-                mess.send(" {CMD}/icl {PRM}modify {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}addons{BKT}|{PRM}owner{BKT}|{PRM}name{BKT}> <{PRM}tags{BKT}> {}- modify land settings");
+                mess.send(" {CMD}/icl {PRM}modify {BKT}<{PRM}LANDID{BKT}> <{PRM}perms{BKT}|{PRM}addons{BKT}|{PRM}owner{BKT}|{PRM}name{BKT}|{PRM}nospawn{BKT}> <{PRM}tags{BKT}> {}- modify land settings");
             }
             
         }
@@ -810,7 +819,7 @@ public class iCoLandCommandListener implements CommandExecutor {
         if ( !(sender instanceof Player) || land.owner.equals(((Player)sender).getName()) || iCoLand.hasPermission(sender,"admin.bypass") ) {
             if ( !land.locationName.isEmpty() )
                 mess.send("{CMD}Name: {}"+land.locationName);
-//            mess.send("{CMD}Created: {}"+land.dateCreated);
+            
             mess.send("{CMD}Taxes Due: {PRM}"+
                     (iCoLand.hasPermission(land.location.LocMin.getWorld().getName(), land.owner, "admin.notax")?"0 {BKT}({PRM}"+(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate))+"{BKT})":
                     (iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate)))+
@@ -820,10 +829,11 @@ public class iCoLandCommandListener implements CommandExecutor {
                     formatTimeLeft(land.dateTax.getTime()+Config.inactiveDeleteTime*60*1000))
                     +" left{BKT})"
                     );
-//            mess.send("{CMD}Taxed: {PRM}"+iCoLand.landMgr.getPrice(land.location)+" {}"+land.dateTaxed);
-            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy));            
+            mess.send("{CMD}Perms: {}"+Land.writePermTags(land.canBuildDestroy)); 
+            if ( land.hasAddon("nospawn") ) 
+                mess.send("{CMD}NoSpawn: {}"+land.noSpawn);
             mess.send("{CMD}Addons: {}"+Land.writeAddonTags(land.addons));
-            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(sender, land));
+            mess.send("{CMD}Addon Prices: {}"+Land.writeAddonPrices(land));
         }
     }
     

@@ -29,13 +29,15 @@ public interface LandDB {
     abstract public String getLandPerms(int id);
     abstract public String getLandAddons(int id);
     abstract public String getLandOwner(int id);
+    abstract public String getLandNoSpawn(int id);
     abstract public boolean isActive(int id);
     
     abstract public boolean updateLandOwner(int id, String newOwner);
     abstract public boolean updateLandName(int id, String newName);
     abstract public boolean updateLandPerms(int id, String perms);
     abstract public boolean updateLandAddons(int id, String addons);
-    abstract public boolean updateTaxTime(int id, Timestamp time);
+    abstract public boolean updateLandTaxTime(int id, Timestamp time);
+    abstract public boolean updateLandNoSpawn(int id, String noSpawn);
     abstract public boolean updateActive(int id, Boolean active);
     
     abstract public boolean hasPermission(String playerName, Location loc);

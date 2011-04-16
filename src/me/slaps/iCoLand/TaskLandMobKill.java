@@ -41,7 +41,8 @@ public class TaskLandMobKill implements Runnable {
                     ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(entity.getLocation());
                     for(Integer id : ids) {
                         if ( iCoLand.landMgr.getLandById(id).hasAddon("nospawn") ) {
-                            entity.remove();
+                            if ( !iCoLand.landMgr.preventSpawn(id, entity) )
+                                entity.remove();
                         }
                     }
                 }

@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -61,6 +62,10 @@ public class iCoLand extends JavaPlugin {
     
     public static DecimalFormat df;
     
+    private int taskIdHeal = -1;
+    private int taskIdMob = -1;
+    private int taskIdTax = -1;
+    
     public iCoLand() {
         // setup command map
         cmdMap = new HashMap<String, String>();
@@ -94,7 +99,15 @@ public class iCoLand extends JavaPlugin {
         iCoLand.enabled = false;
         Config.loaded = false;
         
-        server.getScheduler().cancelTasks(this);
+        BukkitScheduler bs= server.getScheduler();
+        bs.cancelTasks(this);
+        if ( bs.isCurrentlyRunning(taskIdHeal) || bs.isQueued(taskIdHeal) )
+            bs.cancelTask(taskIdHeal);
+        if ( bs.isCurrentlyRunning(taskIdMob) || bs.isQueued(taskIdMob) )
+            bs.cancelTask(taskIdMob);
+        if ( bs.isCurrentlyRunning(taskIdTax) || bs.isQueued(taskIdTax) )
+            bs.cancelTask(taskIdTax);
+        
         
 		info("Version ["+version+"] ("+codename+") disabled");
 	}
@@ -171,10 +184,10 @@ public class iCoLand extends JavaPlugin {
             getCommand("icl").setExecutor(commandListener);
             
             // setup events
-            server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandHeal(), 100, Config.healTime*20);
-            server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandMobKill(true, this), 100, Config.mobRemovalTime*20);
+            taskIdHeal = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandHeal(), 100, Config.healTime*20);
+            taskIdMob = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandMobKill(true, this), 100, Config.mobRemovalTime*20);
             if ( Config.taxTimeMinutes > 0 ) 
-                server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandTaxes(), 100, 60*20);
+                taskIdTax = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandTaxes(), 100, 60*20);
 
             enabled = true;
             

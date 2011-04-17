@@ -20,16 +20,19 @@ public class TaskTempBlockRemoval implements Runnable {
     }
     
     public void run() {
-        if (Config.debugMode1)
-            iCoLand.info("Removing item ID#"+target.getTypeId()+" placed by Player "+player.getName());
-        
         PlayerInventory playerInv = player.getInventory();
-        playerInv.addItem(new ItemStack(target.getTypeId(), 1));
+        if ( playerInv != null && target.getTypeId() > 0 ) {
+            if (Config.debugMode1)
+                iCoLand.info("Removing item ID#"+target.getTypeId()+" placed by Player "+player.getName());
         
+            playerInv.addItem(new ItemStack(target.getTypeId(), 1));
+            
+            mess.send("{}Returning item ID# "+target.getTypeId());
+        }
         
-        mess.send("{}Returning item ID# "+target.getTypeId());
+        if ( target.getTypeId() > 0 ) 
+            target.setType(Material.AIR);
         
-        target.setType(Material.AIR);
     }
 
 }

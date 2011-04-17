@@ -328,6 +328,18 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{ERR}No access for that...");
                 }
                 return true;
+                
+            } else if ( args[0].equalsIgnoreCase("fixperms") ) {
+                if ( iCoLand.hasPermission(sender, "admin.fixperms") ) {
+                    ArrayList<Land> lands = iCoLand.landMgr.getAllLands();
+                    for(Land land: lands) {
+                        iCoLand.landMgr.updatePerms(land.getID(), Land.writePermTags(land.canBuildDestroy));
+                    }
+                    mess.send("{}Done...");
+                } else {
+                    mess.send("{ERR}No access for that...");
+                }
+                return true;
             // unrecognized /icl command
             } else {
                 mess.send("{}Unrecognized/invalid/malformed command!");

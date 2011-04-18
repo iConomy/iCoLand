@@ -55,17 +55,34 @@ public class iCoLandCommandListener implements CommandExecutor {
                         try { 
                             page = Integer.parseInt(args[1]);
                             if ( page > 1 ) 
-                                showList(sender, page-1);
+                                showList(sender, page-1, false);
                             else
                                 mess.send("{ERR}Bad page #");
                         } catch(NumberFormatException ex) {
                             mess.send("{ERR}Error parsing page #!");                        
                         }
                     } else {
-                        showList(sender, 0);
+                        showList(sender, 0, false);
                     }
                 } else {
                     mess.send("{ERR}No access for list");
+                }
+                return true;
+                
+            } else if (args[0].equalsIgnoreCase("adminlist") ) {
+                if ( args.length > 1 ) {
+                    Integer page;
+                    try { 
+                        page = Integer.parseInt(args[1]);
+                        if ( page > 1 ) 
+                            showList(sender, page-1, true);
+                        else
+                            mess.send("{ERR}Bad page #");
+                    } catch(NumberFormatException ex) {
+                        mess.send("{ERR}Error parsing page #!");                        
+                    }
+                } else {
+                    showList(sender, 0, true);
                 }
                 return true;
                 
@@ -451,12 +468,12 @@ public class iCoLandCommandListener implements CommandExecutor {
         
     }
     
-    public void showList(CommandSender sender, Integer page) {
+    public void showList(CommandSender sender, Integer page, boolean showAll) {
         Integer pageSize = 7;
         ArrayList<Land> list;
 
         int numLands = 0;
-        if( sender instanceof Player )
+        if( !showAll && (sender instanceof Player) )
             numLands = iCoLand.landMgr.countLandsOwnedBy(((Player)sender).getName());
         else
             numLands = iCoLand.landMgr.countLandsOwnedBy(null);
@@ -468,7 +485,7 @@ public class iCoLandCommandListener implements CommandExecutor {
             if ( page*pageSize > numLands ) {
                 mess.send("{ERR}No lands on this page");
             } else {
-                String playerName = (sender instanceof Player)?((Player)sender).getName():null;
+                String playerName = (!showAll && (sender instanceof Player))?((Player)sender).getName():null;
                 list = iCoLand.landMgr.getLandsOwnedBy(playerName, pageSize, page*pageSize);
                 int pages = numLands / pageSize + (( numLands % pageSize > 0)?1:0);
                 mess.send("{}"+Misc.headerify("{CMD}Your Lands {BKT}({CMD}Page " + (page+1) + "{BKT}/{CMD}"+pages+"{BKT}){}"));                

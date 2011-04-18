@@ -155,6 +155,13 @@ public class iCoLandCommandListener implements CommandExecutor {
                             if ( iCoLand.tmpCuboidMap.containsKey(player.getName()) ) {
                                 mess.send("{}Changing selection height to full height.");
                                 iCoLand.tmpCuboidMap.get(player.getName()).setFullHeight();
+                                int id = iCoLand.landMgr.intersectsExistingLand(iCoLand.tmpCuboidMap.get(player.getName()));
+                                if ( id > 0 ) {
+                                    mess.send("{ERR}Intersects existing land!");
+                                    iCoLand.tmpCuboidMap.put(player.getName(), iCoLand.landMgr.getLandById(id).location);
+                                } else {
+                                    mess.send("{}Selecting full height");
+                                }
                             } else {
                                 mess.send("{ERR}No currently selected land.");
                             }

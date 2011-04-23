@@ -131,7 +131,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         PreparedStatement ps = null;
         try {
-            String sql = "CREATE INDEX TaxActive ON "+Config.sqlTableName+" ( dateTaxed, Active );";
+            String sql = "CREATE INDEX TaxActive ON "+Config.sqlTableName+" ( " + (columnExists("dateTaxed") ? "dateTaxed" : "taxDate") + ", Active );";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ps.executeUpdate();

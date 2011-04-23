@@ -8,17 +8,17 @@ import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 
 public class Config {
-    
+    private static final String DEFAULT_TABLE_NAME = "iCoLand";
+
     public static boolean loaded = false;
-    
+
     // debug settings
     public static boolean debugMode;
     public static boolean debugMode1;
     public static boolean debugModeSQL;
     
     // database settings
-    public static String h2DBFile = "lands.db";
-    public static String sqlTableName = "lands";
+    public static String sqlTableName;
     
     // import/export files
     public static String exportFile = "export.yml";
@@ -60,9 +60,7 @@ public class Config {
     
     // selection options
     public static boolean allLandFullHeight;
-    
-    
-    
+
     public static void getConfig(File dataFolder) {
         File configFile = new File(dataFolder + File.separator + "config.yml");
 
@@ -121,6 +119,7 @@ public class Config {
         
         bankName = "iCoLand";
 
+        sqlTableName = DEFAULT_TABLE_NAME;
         
         // write default config file if it doesn't exist
         if ( !configFile.exists() ) {
@@ -231,7 +230,10 @@ public class Config {
             allLandFullHeight = selectionOptions.getBoolean("All-Land-Full-Height", false);
         }
         
-
+        ConfigurationNode sql = config.getNode("SQL");
+        if (sql != null) {
+            sqlTableName = sql.getString("Table-Name", DEFAULT_TABLE_NAME);
+        }
         
     }
     
@@ -291,6 +293,8 @@ public class Config {
         config.setProperty("Price-Per-Block.nopvp", pricePerBlock.get("nopvp"));
         
         config.setProperty("Selection-Options.All-Land-Full-Height", allLandFullHeight);
+
+        config.setProperty("SQL.Table-Name", sqlTableName);
 
         config.save();
     }

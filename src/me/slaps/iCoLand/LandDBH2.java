@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.nijiko.coelho.iConomy.net.Database;
 import me.slaps.iCoLand.Land;
 import me.slaps.iCoLand.LandDB;
 
@@ -23,38 +24,19 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 public class LandDBH2 implements LandDB {
     
-    private String dbPath;
-    private static JdbcConnectionPool cp;
+    private Database database;
+
+    public boolean enabled = true;
     
-    public boolean enabled;
-    
-    public LandDBH2(String pathToDB) {
-        enabled = false;
-        dbPath = pathToDB;
+    public LandDBH2(Database database) {
+        if (database == null) {
+            throw new NullPointerException("Database may not be null");
+        }
+        this.database = database;
         initDB();
     }
-    
+
     public void initDB() {
-        boolean err = false;
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            err = true;
-        }
-        
-        if ( !err ) {
-            cp = JdbcConnectionPool.create("jdbc:h2:"+dbPath+";AUTO_RECONNECT=TRUE;CACHE_SIZE=32768;MODE=MYSQL", "sa", "sa");
-            enabled = true;
-            Connection test = getConnection();
-            if ( test != null ) {
-               enabled = true;
-            } else {
-                enabled = false;
-                return;
-            }
-        }
-        
         if ( !tableExists(Config.sqlTableName) ) {
             createTable();
         }
@@ -102,25 +84,12 @@ public class LandDBH2 implements LandDB {
     }
     
     public void close() {
-        cp.dispose();
-        cp = null;
+        database = null;
     }
-    
-    public Connection getConnection() {
+
+    private Connection getConnection() {
         if ( enabled ) {
-            if (Config.debugModeSQL) iCoLand.info(cp.getActiveConnections()+" active connections"); 
-            Connection conn = null;
-            try {
-                conn = cp.getConnection();
-            } catch( SQLException ex ) {
-                if ( ex.getErrorCode() == 90020 ) {
-                    iCoLand.severe("Could not connect to database! Already locked!");
-                } else {
-                    ex.printStackTrace();
-                }
-                return null;
-            }
-            return conn;
+            return database.getConnection();
         } else {
             return null;
         }
@@ -130,7 +99,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         PreparedStatement ps = null;
         try {
-            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD IF NOT EXISTS noSpawn VARCHAR(512) DEFAULT '' NOT NULL;";
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD noSpawn VARCHAR(512) DEFAULT '' NOT NULL;";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ps.executeUpdate();
@@ -146,7 +115,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         PreparedStatement ps = null;
         try {
-            String sql = "ALTER TABLE "+Config.sqlTableName+" ALTER COLUMN dateTaxed RENAME TO taxDate;";
+            String sql = "ALTER TABLE "+Config.sqlTableName+" CHANGE dateTaxed taxDate TIMESTAMP;";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ps.executeUpdate();
@@ -162,7 +131,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         PreparedStatement ps = null;
         try {
-            String sql = "CREATE INDEX IF NOT EXISTS TaxActive ON "+Config.sqlTableName+" ( dateTaxed, Active );";
+            String sql = "CREATE INDEX TaxActive ON "+Config.sqlTableName+" ( dateTaxed, Active );";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ps.executeUpdate();
@@ -178,7 +147,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         PreparedStatement ps = null;
         try {
-            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD IF NOT EXISTS parent INT DEFAULT NULL;";
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD parent INT DEFAULT NULL;";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ps.executeUpdate();
@@ -194,7 +163,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         PreparedStatement ps = null;
         try {
-            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD IF NOT EXISTS active BOOLEAN DEFAULT TRUE NOT NULL;";
+            String sql = "ALTER TABLE "+Config.sqlTableName+" ADD active BIT DEFAULT TRUE NOT NULL;";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             ps.executeUpdate();
@@ -212,7 +181,7 @@ public class LandDBH2 implements LandDB {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.INDEXES WHERE ORDINAL_POSITION=1 AND INDEX_NAME='"+index+"';";
+            String sql = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE SEQ_IN_INDEX=1 AND INDEX_NAME='"+index+"';";
             ps = conn.prepareStatement(sql);
             if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
@@ -304,7 +273,7 @@ public class LandDBH2 implements LandDB {
         Connection conn = getConnection();
         Statement st = null;
         try {
-            String sql = "CREATE TABLE IF NOT EXISTS " + Config.sqlTableName + "("+
+            String sql = "CREATE TABLE " + Config.sqlTableName + "("+
                 "id INT auto_increment PRIMARY KEY,"+
                 "owner VARCHAR(256),"+
                 "world VARCHAR(256),"+

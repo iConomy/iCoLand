@@ -168,7 +168,7 @@ public class iCoLand extends JavaPlugin {
         if ( !enabled ) {
             // setup location manager
             iCoLand.info("Initializing land manager...");
-            LandDBH2 landDB = new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile);
+            LandDBH2 landDB = new LandDBH2(iConomy.getLocalDatabase());
             if ( !landDB.enabled ) {
                 iCoLand.severe("Could not initialize land manager, not enabling plugin");
                 return;

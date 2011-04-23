@@ -6,9 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Egg;
@@ -27,7 +25,7 @@ public class OfflinePlayer implements Player {
     private int entId = -1;
     String name;
     private String displayName;
-    
+
     public OfflinePlayer(Server server, World world, String name) {
         displayName = this.name = name;
         this.world = world; // TEMP!
@@ -68,7 +66,7 @@ public class OfflinePlayer implements Player {
     }
 
     public double getEyeHeight(boolean ignoreSneaking) {
-        if(ignoreSneaking) {
+        if (ignoreSneaking) {
             return 1.62D;
         } else {
             if (isSneaking()) {
@@ -101,7 +99,7 @@ public class OfflinePlayer implements Player {
                     break;
                 }
             } else {
-                if (!transparent.contains((byte)id)) {
+                if (!transparent.contains((byte) id)) {
                     break;
                 }
             }
@@ -175,7 +173,7 @@ public class OfflinePlayer implements Player {
     }
 
     public int getEntityId() {
-        return entId ;
+        return entId;
     }
 
     public int getFireTicks() {
@@ -247,6 +245,26 @@ public class OfflinePlayer implements Player {
     }
 
     public void updateInventory() {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void awardAchievement(Achievement achievement) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic, int amount) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic, Material material) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic, Material material, int amount) {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
 
@@ -355,6 +373,14 @@ public class OfflinePlayer implements Player {
     }
 
     public void loadData() {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void setSleepingIgnored(boolean isSleeping) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public boolean isSleepingIgnored() {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
 }

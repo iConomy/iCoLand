@@ -1,7 +1,9 @@
 package me.slaps.iCoLand;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -76,12 +78,32 @@ public class iCoLandEntityListener extends EntityListener {
         for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
                 event.setCancelled(true);
+                return;
             }
-        } 
+        }
 
         if ( ids.size() == 0 && !Config.unclaimedLandCanBoom ) {
             event.setCancelled(true);
+            return;
         }
+        
+        List<Block> bl = event.blockList();
+        int total = bl.size();
+        int cancelled = 0;
+        for(Block block : bl ) {
+            ids = iCoLand.landMgr.getLandIds(block.getLocation());
+            for(Integer id : ids) {
+                if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
+                    // TODO - cancel block explosion here
+                    
+                    
+                    cancelled++;
+                }
+            }
+        }
+        float ratio = 1 - cancelled/total;
+        
+        event.setYield(ratio*event.getYield());
     }
     
     public void onExplosionPrime ( ExplosionPrimeEvent event ) {

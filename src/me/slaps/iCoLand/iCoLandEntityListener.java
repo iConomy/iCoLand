@@ -3,6 +3,8 @@ package me.slaps.iCoLand;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -17,13 +19,16 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 public class iCoLandEntityListener extends EntityListener {
     
+    iCoLand ic;
+
     public iCoLandEntityListener(iCoLand plug) {
         plug.getServer().getPluginManager().registerEvent(Event.Type.CREATURE_SPAWN, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.ENTITY_EXPLODE, this, Priority.Low, plug);
-//        plug.getServer().getPluginManager().registerEvent(Event.Type.EXPLOSION_PRIME, this, Priority.Low, plug);
+        //        plug.getServer().getPluginManager().registerEvent(Event.Type.EXPLOSION_PRIME, this, Priority.Low, plug);
         plug.getServer().getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGE, this, Priority.Low, plug);
+        ic = plug;
     }
-    
+
     public void onCreatureSpawn (CreatureSpawnEvent event) {
         ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
         for(Integer id : ids) {
@@ -33,7 +38,7 @@ public class iCoLandEntityListener extends EntityListener {
             }
         }
     }
-    
+
     public void onEntityDamage ( EntityDamageEvent event ) {
         DamageCause cause = event.getCause();
 
@@ -46,7 +51,7 @@ public class iCoLandEntityListener extends EntityListener {
                     event.setCancelled(true);
                 }
             }
-            
+
             if ( ids.size() == 0 && !Config.unclaimedLandCanBurn ) {
                 event.setCancelled(true);
             }
@@ -57,11 +62,11 @@ public class iCoLandEntityListener extends EntityListener {
                     event.setCancelled(true);
                 }
             } 
-            
+
             if ( ids.size() == 0 && !Config.unclaimedLandCanBoom ) {
                 event.setCancelled(true);
             }
-            
+
         } else if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent castEvent = (EntityDamageByEntityEvent)event;
             if ( (castEvent.getDamager() instanceof Player) && (castEvent.getEntity() instanceof Player) ) {
@@ -72,7 +77,7 @@ public class iCoLandEntityListener extends EntityListener {
             }
         }
     }
-    
+
     public void onEntityExplode ( EntityExplodeEvent event ) {
         ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
         for(Integer id : ids) {
@@ -86,26 +91,26 @@ public class iCoLandEntityListener extends EntityListener {
             event.setCancelled(true);
             return;
         }
-        
+
         List<Block> bl = event.blockList();
         int total = bl.size();
         int cancelled = 0;
         for(Block block : bl ) {
+            //iCoLand.info("Block:"+block+ " Location:"+block.getLocation()+" Material:"+block.getType());
             ids = iCoLand.landMgr.getLandIds(block.getLocation());
             for(Integer id : ids) {
                 if ( iCoLand.landMgr.getLandById(id).hasAddon("noboom") ) {
-                    // TODO - cancel block explosion here
-                    
-                    
                     cancelled++;
+                    iCoLand.server.getScheduler().scheduleSyncDelayedTask(ic, new TaskSetBlock(block.getLocation(), block.getTypeId()), cancelled/20);
+                    break;
                 }
             }
         }
-        float ratio = 1 - cancelled/total;
-        
+        float ratio = (total>0) ? (1 - cancelled/((float)total)) : 1;
+        //iCoLand.info("total "+total+" cancelled "+cancelled+" ratio "+ratio+" getYield: "+event.getYield());
         event.setYield(ratio*event.getYield());
     }
-    
+
     public void onExplosionPrime ( ExplosionPrimeEvent event ) {
         ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
         for(Integer id : ids) {
@@ -118,5 +123,5 @@ public class iCoLandEntityListener extends EntityListener {
             event.setCancelled(true);
         }
     }
-    
+
 }

@@ -26,6 +26,7 @@ public class TaskLandMobKill implements Runnable {
     }
     
     public void run() {
+        if ( iCoLand.landMgr == null ) return;
         if ( main ) {
             List<World> worlds = iCoLand.server.getWorlds();
             for(World world : worlds) {

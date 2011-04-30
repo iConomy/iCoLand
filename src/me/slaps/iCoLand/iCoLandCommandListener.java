@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -733,34 +734,44 @@ public class iCoLandCommandListener implements CommandExecutor {
         } else if ( topic.equalsIgnoreCase("select") ) {
             if ( iCoLand.hasPermission(sender, "basic.select") ) { 
                 mess.send(" {CMD}/icl {PRM}select {}- start cuboid selection process");
-                mess.send("    {}After typing this command, left click a block to set the first corner,");
-                mess.send("    {}then left click a 2nd block to set the second corner.  This selects");
-                mess.send("    {}the {PRM}CUBE {} set by the 2 corner blocks.");
+                mess.send("    {}Left click a block to set the 1st corner, then left");
+                mess.send("    {}click a 2nd block to set the 2nd corner.  This selects");
+                mess.send("    {}the {BKT}CUBE{} set by the 2 corner blocks.");
                 mess.send(" {CMD}/icl {PRM}select {BKT}[{PRM}cancel{BKT}|{PRM}fullheight{BKT}] {}");
-                mess.send("    {}pass an optional argument cancel to cancel the current selection");
-                mess.send("    {}or pass fullheight to modify your selection to be the full height.");
+                mess.send("    {}cancel - cancels current selection");
+                mess.send("    {}fullheight - changes current selection to full height");
             }
         } else if ( topic.equalsIgnoreCase("info") ) {
             if ( iCoLand.hasPermission(sender, "basic.info") ) { 
-                mess.send(" {CMD}/icl {PRM}info {BKT}[{PRM}here{BKT}|{PRM}LANDID{BKT] {}- gets land info");
-                mess.send("    {}Optional arguments 'here' or <LANDID>");
-                mess.send("    {}Will give info on the selected land, or current location, or specific land ID#");
+                mess.send(" {CMD}/icl {PRM}info {BKT}[{PRM}here{BKT}|{PRM}LANDID{BKT}]");
+                mess.send("    {}Gives land information.");
+                mess.send("    {PRM}here {}- info on land where you are standing");
+                mess.send("    {PRM}<LANDID> {}- info on specific land ID");
             }
             
         } else if ( topic.equalsIgnoreCase("buy") ) {
             if ( iCoLand.hasPermission(sender, "land.buy") ) { 
-                mess.send(" {CMD}/icl {PRM}buy {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}- purchase land or addons");
-                mess.send("    {}this command can be used to purchase land: {CMD}/icl buy land");
-                mess.send("    {}it can also be used to buy addons for a specific land ID# with:");
-                mess.send("    {}{CMD}/icl buy addon <ADDON> <LANDID>");
+                mess.send(" {CMD}/icl {PRM}buy {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}");
+                mess.send("    {}Purchase land or addons for lands.");
+                mess.send("    {}this command can be used to purchase land: {CMD}/icl {PRM}buy land");
+                mess.send("    {}it can also be used to buy addons for a land ID# with:");
+                mess.send("    {}{CMD}/icl {PRM}buy addon <ADDON> <LANDID>");
+                String out = "    {}Addons avail: {PRM}";
+                Set<String> addons = Config.addonsEnabled.keySet();
+                for(String addon : addons) {
+                    if ( Config.addonsEnabled.get(addon) )
+                        out += addon + "{}, {PRM}"; 
+                }
+                if ( out.substring(out.length()-9, out.length()).equals("{}, {PRM}") ) out = out.substring(0,out.length()-9);
+                mess.send(out);
             }
             
         } else if ( topic.equalsIgnoreCase("sell") ) {
             if ( iCoLand.hasPermission(sender, "land.sell") ) { 
-                mess.send(" {CMD}/icl {PRM}sell {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}] {}- purchase land or addons");
-                mess.send("    {}this command can be used to sell land: {CMD}/icl sell land");
-                mess.send("    {}it can also be used to sell addons for a specific land ID# with:");
-                mess.send("    {}{CMD}/icl sell addon <ADDON> <LANDID>");
+                mess.send(" {CMD}/icl {PRM}sell {BKT}[{PRM}land{BKT}|{PRM}addon{BKT}] [{PRM}ADDON{BKT}] [{PRM}LANDID{BKT}]");
+                mess.send("    {}this command can be used to sell land: {CMD}/icl {PRM}sell land");
+                mess.send("    {}it can also be used to sell addons for a land ID# with:");
+                mess.send("    {}{CMD}/icl {PRM}sell addon <ADDON> <LANDID>");
             }
 
         } else if ( topic.equalsIgnoreCase("edit") ) {
@@ -769,7 +780,7 @@ public class iCoLandCommandListener implements CommandExecutor {
                 mess.send("    {}modifies config for land ( permissions, names )");
                 mess.send("    {}change location name example: {CMD}/icl edit 4 name This Land");
                 mess.send("    {}Tags for perms: {BKT}<{PRM}playerName{BKT}>{PRM}:{BKT}<{PRM}t{BKT}|{PRM}f{BKT}|{PRM}-{BKT}>");
-                mess.send("    {}{BKT}<{PRM}playerName{BKT}> {}- player to be affected ( or '{PRM}default{}' )");
+                mess.send("    {}{BKT}<{PRM}playerName{BKT}> {}- player to be affected");
                 mess.send("    {}{BKT}<{PRM}t{BKT}|{PRM}f{BKT}|{PRM}-{BKT}> {}- {PRM}t{}/{PRM}f{} for true/false (build/destroy)");
                 mess.send("    {}{PRM}- {}removes perm for playerName");
                 mess.send("    {}perm example: {CMD}/icl edit 4 perms default:f kigam:t jesus:t");

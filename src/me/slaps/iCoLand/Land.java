@@ -79,9 +79,9 @@ public class Land {
             if ( canBuildDestroy.containsKey(playerName) ) {
                 ret = canBuildDestroy.get(playerName);
             }
-            if ( canBuildDestroy.containsKey("default") ) {
-                ret = canBuildDestroy.get("default");
-            }
+//            if ( canBuildDestroy.containsKey("default") ) {
+//                ret = canBuildDestroy.get("default");
+//            }
         }
         if (Config.debugMode) iCoLand.info("Player "+playerName+(ret?" has perms ":" doesn't have perms ")+"in land ID# "+id);
         return ret;

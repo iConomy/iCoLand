@@ -3,8 +3,6 @@ package me.slaps.iCoLand;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -33,8 +31,9 @@ public class iCoLandEntityListener extends EntityListener {
         ArrayList<Integer> ids = iCoLand.landMgr.getLandIds(event.getEntity().getLocation());
         for(Integer id : ids) {
             if ( iCoLand.landMgr.getLandById(id).hasAddon("nospawn") ) {
-                if ( !iCoLand.landMgr.preventSpawn(id, event.getEntity()) )
+                if ( iCoLand.landMgr.preventSpawn(id, event.getEntity()) ) {
                     event.setCancelled(true);
+                }
             }
         }
     }

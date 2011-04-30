@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Built-By: magik
-Class-Path: .\iCoLand\h2.jar .\h2.jar ..\h2.jar ..\lib\h2.jar
+Class-Path: ./iCoLand/h2.jar ./h2.jar ../h2.jar ../lib/h2.jar
 

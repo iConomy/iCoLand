@@ -169,7 +169,8 @@ public class iCoLand extends JavaPlugin {
         if ( !enabled ) {
             // setup location manager
             iCoLand.info("Initializing land manager...");
-            LandDBH2 landDB = new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile);
+            //LandDBH2 landDB = new LandDBH2(iCoLand.pluginDirectory + File.separator + Config.h2DBFile);
+            LandDBMySQL landDB = new LandDBMySQL("jdbc:mysql://localhost:3306/", "iCoLand", "root", "");
             if ( !landDB.enabled ) {
                 iCoLand.severe("Could not initialize land manager, not enabling plugin");
                 return;
@@ -185,10 +186,10 @@ public class iCoLand extends JavaPlugin {
             getCommand("icl").setExecutor(commandListener);
             
             // setup events
-            taskIdHeal = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandHeal(), 100, Config.healTime*20);
-            taskIdMob = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandMobKill(true, this), 100, Config.mobRemovalTime*20);
+            taskIdHeal = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandHeal(), 20, Config.healTime*20);
+            taskIdMob = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandMobKill(this), 20, Config.mobRemovalTime*20/3);
             if ( Config.taxTimeMinutes > 0 ) 
-                taskIdTax = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandTaxes(), 100, 60*20);
+                taskIdTax = server.getScheduler().scheduleSyncRepeatingTask(this, new TaskLandTaxes(this), 20, 10*20);
 
             enabled = true;
             

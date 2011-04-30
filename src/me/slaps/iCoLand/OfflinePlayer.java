@@ -6,8 +6,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Achievement;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
@@ -355,6 +358,34 @@ public class OfflinePlayer implements Player {
     }
 
     public void loadData() {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void setSleepingIgnored(boolean isSleeping) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public boolean isSleepingIgnored() {
+        return false;
+    }
+
+    public void awardAchievement(Achievement achievement) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic, int amount) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic, Material material) {
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    public void incrementStatistic(Statistic statistic, Material material, int amount) {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
 }

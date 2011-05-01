@@ -630,13 +630,26 @@ public class LandDBH2 implements LandDB {
         ResultSet rs = null;
         try {
             conn = getConnection();
-            ps = conn.prepareStatement("SELECT id FROM "+Config.sqlTableName+
+            // nested search?
+            /*
+            ps = conn.prepareStatement("SELECT id FROM" +
+                        " (SELECT id,minX,maxX,minY,maxY,minZ,maxZ FROM" +
+                            " (SELECT id,minX,maxX,minY,maxY,minZ,maxZ FROM" +
+                                " (SELECT id,minX,maxX,minY,maxY,minZ,maxZ FROM" +
+                                    " (SELECT id,minX,maxX,minY,maxY,minZ,maxZ FROM "+Config.sqlTableName+" WHERE world = ?)"+
+                                " WHERE ? BETWEEN minY AND maxY )"+
+                            " WHERE ? BETWEEN minX AND maxX )"+
+                        " WHERE ? BETWEEN minZ AND maxZ )"+
+                    " ORDER BY id ASC;");
+            */
+            ps = conn.prepareStatement("SELECT id FROM (SELECT id,minX,maxX,minY,maxY,minZ,maxZ FROM "+Config.sqlTableName+" WHERE world = ?)"+
                     " WHERE ? BETWEEN minX AND maxX AND ? BETWEEN minY AND maxY AND ? BETWEEN minZ AND maxZ"+
                     " ORDER BY id ASC;");
-            ps.setInt(1, loc.getBlockX());
-            ps.setInt(2, loc.getBlockY());
-            ps.setInt(3, loc.getBlockZ());
-//            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
+            ps.setString(1, loc.getWorld().getName());
+            ps.setInt(2, loc.getBlockX());
+            ps.setInt(3, loc.getBlockY());
+            ps.setInt(4, loc.getBlockZ());
+            if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
             rs = ps.executeQuery();
         } catch ( SQLException ex ) {
             ex.printStackTrace();

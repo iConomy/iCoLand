@@ -95,8 +95,19 @@ public class LandDBH2 implements LandDB {
             if ( addColumnNoSpawn() ) {
                 iCoLand.info("Column noSpawn added to table");
             } else {
-                iCoLand.severe("Unabled to add column noSpawn to table!");
+                iCoLand.severe("Unable to add column noSpawn to table!");
                 enabled = false;
+            }
+        }
+        
+        if ( indexExists("MinMinMin") || indexExists("MinMinMax") || indexExists("MinMaxMin") || indexExists("MinMaxMax") ||
+             indexExists("MaxMinMin") || indexExists("MaxMinMax") || indexExists("MaxMaxMin") || indexExists("MaxMaxMax") ||
+             indexExists("MinMaxMinMaxMinMax")) {
+            if ( redoIndecies() ) {
+                iCoLand.info("Reindexed coords + worlds");            
+            } else {
+                iCoLand.severe("Unable to redo indecies!");
+                enabled = false;                
             }
         }
     }
@@ -124,6 +135,120 @@ public class LandDBH2 implements LandDB {
         } else {
             return null;
         }
+    }
+    public boolean dropIndex(String index) {
+        Connection conn = getConnection();
+        try {
+            String sql = "DROP INDEX "+index;
+            Statement st = conn.createStatement();
+            st.executeUpdate(sql);
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.close();
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return !indexExists(index);        
+    }
+    
+    public boolean redoIndecies() {
+        if ( indexExists("MinMinMin" ) ) 
+            if ( !dropIndex("MinMinMin") )
+                return false;
+        if ( indexExists("MinMinMax" ) ) 
+            if ( !dropIndex("MinMinMax") )
+                return false;
+        if ( indexExists("MinMaxMin" ) ) 
+            if ( !dropIndex("MinMaxMin") ) 
+                return false;
+        if ( indexExists("MinMaxMax" ) ) 
+            if ( !dropIndex("MinMaxMax") ) 
+                return false;
+        if ( indexExists("MaxMinMin" ) ) 
+            if ( !dropIndex("MaxMinMin") )
+                return false;        
+        if ( indexExists("MaxMinMax" ) ) 
+            if ( !dropIndex("MaxMinMax") )
+                return false;
+        if ( indexExists("MaxMaxMin" ) ) 
+            if ( !dropIndex("MaxMaxMin") )
+                return false;
+        if ( indexExists("MaxMaxMax" ) ) 
+            if ( !dropIndex("MaxMaxMax") )
+                return false;
+        if ( indexExists("MinMaxMinMaxMinMax" ) ) 
+            if ( !dropIndex("MinMaxMinMaxMinMax") )
+                return false;
+        
+        
+        try {
+            Connection conn = getConnection();
+            String sql;
+            Statement st;
+
+            sql = "CREATE INDEX MinMinMinW ON " + Config.sqlTableName + " (world, minX, minY, minZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMinMaxW ON " + Config.sqlTableName + " (world, minX, minY, maxZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMaxMinW ON " + Config.sqlTableName + " (world, minX, maxY, minZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMaxMaxW ON " + Config.sqlTableName + " (world, minX, maxY, maxZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMinMinW ON " + Config.sqlTableName + " (world, maxX, minY, minZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMinMaxW ON " + Config.sqlTableName + " (world, maxX, minY, maxZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMaxMinW ON " + Config.sqlTableName + " (world, maxX, maxY, minZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MaxMaxMaxW ON " + Config.sqlTableName + " (world, maxX, maxY, maxZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            sql = "CREATE INDEX MinMaxMinMaxMinMaxW ON " + Config.sqlTableName + " (world, minX, maxX, minY, maxY, minZ, maxZ);";
+            st = conn.createStatement();
+            if ( Config.debugModeSQL ) iCoLand.info(st.toString());
+            st.executeUpdate(sql);
+            st.close();
+            
+            conn.close();
+        } catch(SQLException ex) { 
+            ex.printStackTrace();
+        }
+        
+        return ( indexExists("MinMinMinW") && indexExists("MinMinMaxW") && indexExists("MinMaxMinW") && indexExists("MinMaxMaxW") && 
+                 indexExists("MaxMinMinW") && indexExists("MaxMinMaxW") && indexExists("MaxMaxMinW") && indexExists("MaxMaxMaxW") && 
+                 indexExists("MinMaxMinMaxMinMaxW") );
+        
     }
 
     public boolean addColumnNoSpawn() {
@@ -642,8 +767,8 @@ public class LandDBH2 implements LandDB {
                         " WHERE ? BETWEEN minZ AND maxZ )"+
                     " ORDER BY id ASC;");
             */
-            ps = conn.prepareStatement("SELECT id FROM (SELECT id,minX,maxX,minY,maxY,minZ,maxZ FROM "+Config.sqlTableName+" WHERE world = ?)"+
-                    " WHERE ? BETWEEN minX AND maxX AND ? BETWEEN minY AND maxY AND ? BETWEEN minZ AND maxZ"+
+            ps = conn.prepareStatement("SELECT id FROM "+Config.sqlTableName+" WHERE world = ? AND "+
+                    " ? BETWEEN minX AND maxX AND ? BETWEEN minY AND maxY AND ? BETWEEN minZ AND maxZ"+
                     " ORDER BY id ASC;");
             ps.setString(1, loc.getWorld().getName());
             ps.setInt(2, loc.getBlockX());
@@ -676,39 +801,40 @@ public class LandDBH2 implements LandDB {
         ResultSet rs = null;
         ArrayList<String> sqls = new ArrayList<String>();
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE minX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND minX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE minX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND minX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE minX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND minX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE minX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND minX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE maxX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND maxX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE maxX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND maxX BETWEEN ? AND ? AND minY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                 " WHERE maxX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
+                 " WHERE world = ? AND maxX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND minZ BETWEEN ? AND ?"+
                  " ORDER BY id ASC;");
         sqls.add("SELECT id FROM "+Config.sqlTableName+
-                " WHERE maxX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
+                " WHERE world = ? AND maxX BETWEEN ? AND ? AND maxY BETWEEN ? AND ? AND maxZ BETWEEN ? AND ?"+
                   " ORDER BY id ASC;");
         try {
             conn = getConnection();
             for(String sql : sqls) {
                 ps = conn.prepareStatement(sql);
-                ps.setInt(1,cub.LocMin.getBlockX());
-                ps.setInt(2,cub.LocMax.getBlockX());
-                ps.setInt(3,cub.LocMin.getBlockY());
-                ps.setInt(4,cub.LocMax.getBlockY());
-                ps.setInt(5,cub.LocMin.getBlockZ());
-                ps.setInt(6,cub.LocMax.getBlockZ());
+                ps.setString(1, cub.LocMin.getWorld().getName());
+                ps.setInt(2,cub.LocMin.getBlockX());
+                ps.setInt(3,cub.LocMax.getBlockX());
+                ps.setInt(4,cub.LocMin.getBlockY());
+                ps.setInt(5,cub.LocMax.getBlockY());
+                ps.setInt(6,cub.LocMin.getBlockZ());
+                ps.setInt(7,cub.LocMax.getBlockZ());
 //                if ( Config.debugModeSQL ) iCoLand.info(ps.toString());
                 rs = ps.executeQuery();
                 

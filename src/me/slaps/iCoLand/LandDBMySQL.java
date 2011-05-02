@@ -669,6 +669,7 @@ public class LandDBMySQL implements LandDB {
     }
 
     public ArrayList<Integer> getLandIds(Location loc) {
+        long start = System.currentTimeMillis();
         ArrayList<Integer> ret = new ArrayList<Integer>();
         Connection conn = null;
         PreparedStatement ps = null;
@@ -697,6 +698,8 @@ public class LandDBMySQL implements LandDB {
         } catch ( SQLException ex ) {
             ex.printStackTrace();
         }
+        
+        if ( Config.debugMode ) iCoLand.info("getLandIds() took "+(System.currentTimeMillis()-start)+" ms");
         
         return ret;
     }

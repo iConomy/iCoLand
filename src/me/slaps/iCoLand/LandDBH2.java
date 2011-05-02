@@ -792,7 +792,7 @@ public class LandDBH2 implements LandDB {
             ex.printStackTrace();
         }
 
-        if ( Config.debugMode1 ) iCoLand.info("getLandById query took "+(System.currentTimeMillis()-start)+" ms"+" land ID"+((ret.size()>0)?ret.get(0):-1)+" "+loc );
+        //if ( Config.debugMode1 ) iCoLand.info("getLandById query took "+(System.currentTimeMillis()-start)+" ms"+" land ID"+((ret.size()>0)?ret.get(0):-1)+" "+loc );
         
         return ret;
     }
@@ -940,7 +940,7 @@ public class LandDBH2 implements LandDB {
             rs.close();
             ps.close();
             conn.close();
-            if ( Config.debugMode1 ) iCoLand.info("getLandById query took "+(System.currentTimeMillis()-start)+" ms");
+            //if ( Config.debugMode1 ) iCoLand.info("getLandById query took "+(System.currentTimeMillis()-start)+" ms");
         } catch ( SQLException ex ) {
             ex.printStackTrace();
         }

@@ -49,11 +49,15 @@ public class LandManager {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Timestamp taxDate = new Timestamp(System.currentTimeMillis()+Config.taxTimeMinutes*60*1000);
 		
+		posCache.clear();
+		
 		return landDB.createNewLand(new Land(0, sl, owner, "", Land.parsePermTags(perms), 
 		        Land.parseAddonTags(addons), now, taxDate, true, Config.defaultNoSpawnMobs));
 	}
 	
 	public boolean removeLandById(Integer id) {
+        posCache.clear();
+        landCache.remove(id);
 	    return landDB.removeLandById(id);
 	}
 	
@@ -77,11 +81,16 @@ public class LandManager {
 	}
 	
 	public Location getCenterOfLand(Integer id) {
+	    if ( landCache.containsKey(id) ) 
+	        return landCache.get(id).getCenter();
 	    Land land = landDB.getLandById(id);
+	    landCache.put(id, land);
 	    return land.getCenter();
 	}
 		
 	public boolean isOwner(String playerName, Integer id) {
+	    if ( landCache.containsKey(id) )
+	        return landCache.get(id).owner.equals(playerName);
 	    return getOwner(id).equals(playerName);
 	}
 	
@@ -144,14 +153,21 @@ public class LandManager {
 	public void showSelectLandInfo(CommandSender sender, Cuboid select) {
 	    Messaging mess = new Messaging(sender);
 	    Integer id = intersectsExistingLand(select);
+	    Land land;
 	    
-	    if ( id > 0 && iCoLand.landMgr.getLandById(id).location.equals(select) ) {
-	        showExistingLandInfo(sender, landDB.getLandById(id));
+	    if ( landCache.containsKey(id) ) land = landCache.get(id);
+	    else {
+	        land = iCoLand.landMgr.getLandById(id);
+	        landCache.put(id,land);
+	    }
+	    
+	    if ( id > 0 && land.location.equals(select) ) {
+	        showExistingLandInfo(sender, land);
 	    } else if ( id > 0 ) {
             mess.send("{ERR}Intersects existing land ID# "+id);
             mess.send("{ERR}Selecting/showing land ID# "+id+" instead");
-            iCoLand.tmpCuboidMap.put(((Player)sender).getName(), iCoLand.landMgr.getLandById(id).location );
-            showExistingLandInfo(sender, landDB.getLandById(id));
+            iCoLand.tmpCuboidMap.put(((Player)sender).getName(), land.location );
+            showExistingLandInfo(sender, land);
 	    } else {
             mess.send("{}"+Misc.headerify("{PRM}Unclaimed Land{}"));
             mess.send("Dimensoins: " + select.toDimString() );
@@ -162,7 +178,14 @@ public class LandManager {
 	}
 	
 	public void showSelectLandInfo(CommandSender sender, Integer id) {
-	    showExistingLandInfo(sender, landDB.getLandById(id));
+	    Land land;
+	    if ( landCache.containsKey(id) ) {
+	        land = landCache.get(id);
+	    } else {
+	        land = landDB.getLandById(id);
+	        landCache.put(id, land);
+	    }
+	    showExistingLandInfo(sender, land);
 	}
 	
 	public void showExistingLandInfo(CommandSender sender, Land land) {
@@ -225,22 +248,27 @@ public class LandManager {
     }
     
     public boolean updateName(int id, String name) {
+        landCache.remove(id);
         return landDB.updateLandName(id, name);
     }
     
     public boolean updateOwner(int id, String playerName) {
+        landCache.remove(id);
         return landDB.updateLandOwner(id, playerName);
     }
     
     public boolean updateAddons(int id, String addonString) {
+        landCache.remove(id);
         return landDB.updateLandAddons(id, addonString);
     }
     
     public boolean updateTaxTime(int id, Timestamp time) {
+        landCache.remove(id);
         return landDB.updateLandTaxTime(id, time);
     }
     
     public boolean updateActive(int id, Boolean active) {
+        landCache.remove(id);
         return landDB.updateActive(id, active);
     }
     
@@ -283,10 +311,12 @@ public class LandManager {
     }
 
     public boolean updatePerms(int id, String permString) {
+        landCache.remove(id);
         return landDB.updateLandPerms(id, permString);        
     }
     
     public boolean updateNoSpawn(int id, String noSpawn) {
+        landCache.remove(id);
         return landDB.updateLandNoSpawn(id, noSpawn);
     }
     
@@ -314,23 +344,28 @@ public class LandManager {
         return updatePerms(id, Land.writePermTags(perms));
     }
     
-    public void modifyBuildDestroyWithTags(String tagString) {
-
-    }
     
     public String getAddons(int id) {
+        if ( landCache.containsKey(id) ) 
+            return Land.writeAddonTags(landCache.get(id).addons);
         return landDB.getLandAddons(id);
     }
     
     public String getPerms(int id) {
+        if ( landCache.containsKey(id) ) 
+            return Land.writePermTags(landCache.get(id).canBuildDestroy);
         return landDB.getLandPerms(id);
     }
     
     public String getOwner(int id) {
+        if ( landCache.containsKey(id) ) 
+            return landCache.get(id).owner;
         return landDB.getLandOwner(id);
     }
     
     public String getNoSpawn(int id) {
+        if ( landCache.containsKey(id) ) 
+            return landCache.get(id).noSpawn;
         return landDB.getLandNoSpawn(id);
     }
     
@@ -361,7 +396,7 @@ public class LandManager {
         String[] split = ent.getClass().getName().split("\\.");
         String classname = split[split.length-1].replaceAll("Craft", "").toLowerCase();
         
-        HashSet<String> noSpawn = Land.parseNoSpawnTags(landDB.getLandNoSpawn(id));
+        HashSet<String> noSpawn = Land.parseNoSpawnTags(getNoSpawn(id));
         if (noSpawn.contains(classname)) 
             iCoLand.info(classname + " removed");        
         return noSpawn.contains(classname);

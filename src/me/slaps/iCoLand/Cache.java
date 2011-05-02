@@ -30,7 +30,7 @@ public class Cache<K,V> extends LinkedHashMap<K,V> {
     
     public V put( K key, V value ) {
         miss++;
-        iCoLand.info("Cache miss - size: "+this.size()+" "+(hit/1.0/((hit+miss))));
+        //iCoLand.info("Cache miss - size: "+this.size()+" "+(hit/1.0/((hit+miss))));
         return super.put( key, value );
     }
     

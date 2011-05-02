@@ -749,6 +749,7 @@ public class LandDBH2 implements LandDB {
     }
 
     public ArrayList<Integer> getLandIds(Location loc) {
+        long start = System.currentTimeMillis();
         ArrayList<Integer> ret = new ArrayList<Integer>();
         Connection conn = null;
         PreparedStatement ps = null;
@@ -790,6 +791,8 @@ public class LandDBH2 implements LandDB {
         } catch ( SQLException ex ) {
             ex.printStackTrace();
         }
+
+        //if ( Config.debugMode1 ) iCoLand.info("getLandById query took "+(System.currentTimeMillis()-start)+" ms"+" land ID"+((ret.size()>0)?ret.get(0):-1)+" "+loc );
         
         return ret;
     }
@@ -897,6 +900,8 @@ public class LandDBH2 implements LandDB {
     }
 
     public Land getLandById(int id) {
+        long start = System.currentTimeMillis();
+        
         Land ret = null;
         Connection conn = null;
         PreparedStatement ps = null;
@@ -935,6 +940,7 @@ public class LandDBH2 implements LandDB {
             rs.close();
             ps.close();
             conn.close();
+            if ( Config.debugMode1 ) iCoLand.info("getLandById query took "+(System.currentTimeMillis()-start)+" ms");
         } catch ( SQLException ex ) {
             ex.printStackTrace();
         }

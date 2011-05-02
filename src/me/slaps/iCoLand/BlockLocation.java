@@ -12,6 +12,16 @@ public class BlockLocation {
         this.y = loc.getBlockY();
         this.z = loc.getBlockZ();
     }
-    
+    public boolean equals(Object obj) {
+        if ( obj instanceof BlockLocation ) {
+            BlockLocation other = (BlockLocation)obj;
+            
+            return ( other.world.equals(world) && x == other.x && y == other.y && z == other.z );
+        } else 
+            return false;
+    }
+    public String toString() {
+        return "x:"+x+",y:"+y+",z:"+z;
+    }
     
 }

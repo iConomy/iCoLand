@@ -12,6 +12,7 @@ public class BlockLocation {
         this.y = loc.getBlockY();
         this.z = loc.getBlockZ();
     }
+
     public boolean equals(Object obj) {
         if ( obj instanceof BlockLocation ) {
             BlockLocation other = (BlockLocation)obj;
@@ -20,8 +21,13 @@ public class BlockLocation {
         } else 
             return false;
     }
+    
     public String toString() {
         return "x:"+x+",y:"+y+",z:"+z;
+    }
+    
+    public int hashCode() {
+        return x + y << 8 + z << 16 + world.hashCode() << 24; 
     }
     
 }

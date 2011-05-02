@@ -35,7 +35,7 @@ public class LandManager {
 	        iCoLand.info("Found iConomy Tax/Bank account: "+Config.bankName);
 	    }
 	    
-	    posCache = new Cache<BlockLocation, ArrayList<Integer>>(32768*8);
+	    posCache = new Cache<BlockLocation, ArrayList<Integer>>(32768);
 	    landCache = new Cache<Integer, Land>(128);
 	}
 	
@@ -108,7 +108,6 @@ public class LandManager {
 
         ArrayList<Integer> id = landDB.getLandIds(loc);
         posCache.put(bl, id);
-        iCoLand.info("cache miss - "+bl);
         return id;
 	}
 	
@@ -134,6 +133,7 @@ public class LandManager {
 	}
 	
 	public boolean landIdExists(Integer id) {
+	    if ( landCache.containsKey(id) ) return true;
 	    return landDB.landIdExists(id);
 	}
 	

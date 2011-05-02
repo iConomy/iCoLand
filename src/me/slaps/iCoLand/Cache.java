@@ -36,12 +36,18 @@ public class Cache<K,V> extends LinkedHashMap<K,V> {
     
     public V get( Object key ) {
         hit++;
-        iCoLand.info("Cache hit - size: "+this.size()+" "+(hit/1.0/((hit+miss))));
+        //iCoLand.info("Cache hit - size: "+this.size()+" "+(hit/1.0/((hit+miss))));
         return super.get( key );
     }
     
     public boolean containsKey( Object key ) {
-        //iCoLand.info("Cache contains - size: "+this.size());        
+        //iCoLand.info("Cache contains - size: "+this.size());
+        /*
+        iCoLand.info("containsKey: "+key.toString());
+        for(K each : super.keySet()) {
+            iCoLand.info("key: "+each.toString());
+        }
+        */
         return super.containsKey( key );
     }
     

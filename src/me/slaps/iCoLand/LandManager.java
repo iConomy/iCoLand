@@ -338,7 +338,7 @@ public class LandManager {
         String classname = split[split.length-1].replaceAll("Craft", "").toLowerCase();
         
         HashSet<String> noSpawn = Land.parseNoSpawnTags(landDB.getLandNoSpawn(id));
-        if (noSpawn.contains(classname)) 
+        if (Config.debugMode1 && noSpawn.contains(classname)) 
             iCoLand.info(classname + " removed");        
         return noSpawn.contains(classname);
     }

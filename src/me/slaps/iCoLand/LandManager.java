@@ -21,6 +21,9 @@ public class LandManager {
     Random rn = new Random();
 
     private LandDB landDB;
+    
+    private Cache<BlockLocation, ArrayList<Integer>> posCache;
+    private Cache<Integer, Land> landCache;
 	
 	public LandManager(LandDB db) {
 	    landDB = db;
@@ -31,6 +34,9 @@ public class LandManager {
 	    } else {
 	        iCoLand.info("Found iConomy Tax/Bank account: "+Config.bankName);
 	    }
+	    
+	    posCache = new Cache<BlockLocation, ArrayList<Integer>>(32768);
+	    landCache = new Cache<Integer, Land>(128);
 	}
 	
 	public void close() {
@@ -85,12 +91,24 @@ public class LandManager {
 	}
 	
 	public boolean inLand(Location loc) {
+	    BlockLocation bl = new BlockLocation(loc);
+	    if ( posCache.containsKey(bl) )
+	        return ( posCache.get(bl).size() > 0 );
+	    
 	    ArrayList<Integer> id = landDB.getLandIds(loc);
+	    posCache.put(bl, id);
+        
 	    return (id.size()>0)?true:false;
 	}
 	
 	public ArrayList<Integer> getLandIds(Location loc) {
-	    return landDB.getLandIds(loc);
+        BlockLocation bl = new BlockLocation(loc);
+        if ( posCache.containsKey(bl) )
+            return posCache.get(bl);
+
+        ArrayList<Integer> id = landDB.getLandIds(loc);
+        posCache.put(bl, id);
+        return id;
 	}
 	
 	public ArrayList<Land> getAllLands() {
@@ -350,5 +368,6 @@ public class LandManager {
         
         return updateNoSpawn(id, Land.writeNoSpawnTags(nospawn));
     }
+    
 	
 }

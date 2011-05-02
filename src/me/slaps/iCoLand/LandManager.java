@@ -352,8 +352,13 @@ public class LandManager {
     }
     
     public boolean preventSpawn(int id, Entity ent) {
+        String[] split = ent.getClass().getName().split("\\.");
+        String classname = split[split.length-1].replaceAll("Craft", "").toLowerCase();
+        
         HashSet<String> noSpawn = Land.parseNoSpawnTags(landDB.getLandNoSpawn(id));
-        return noSpawn.contains(ent.getClass().toString().toLowerCase());
+        if (noSpawn.contains(classname)) 
+            iCoLand.info(classname + " removed");        
+        return noSpawn.contains(classname);
     }
     
     public boolean modifyNoSpawnTags(int id, String tags) {

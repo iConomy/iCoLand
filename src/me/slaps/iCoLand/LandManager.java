@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.iConomy;
 
 public class LandManager {
 	
@@ -25,9 +25,9 @@ public class LandManager {
 	public LandManager(LandDB db) {
 	    landDB = db;
 	    
-	    if ( !iConomy.getBank().hasAccount(Config.bankName) ) {
+	    if ( !iConomy.hasAccount(Config.bankName) ) {
 	        iCoLand.info("Creating iConomy Tax/Bank account: "+Config.bankName);
-	        iConomy.getBank().addAccount(Config.bankName);
+	        iConomy.getAccount(Config.bankName);
 	    } else {
 	        iCoLand.info("Found iConomy Tax/Bank account: "+Config.bankName);
 	    }

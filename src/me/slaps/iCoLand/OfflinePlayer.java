@@ -388,4 +388,18 @@ public class OfflinePlayer implements Player {
     public void incrementStatistic(Statistic statistic, Material material, int amount) {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
+
+	public void playNote(Location arg0, byte arg1, byte arg2) {
+        throw new UnsupportedOperationException("Player is offline");
+		
+	}
+
+	public void sendBlockChange(Location arg0, Material arg1, byte arg2) {
+        throw new UnsupportedOperationException("Player is offline");
+		
+	}
+
+	public void sendBlockChange(Location arg0, int arg1, byte arg2) {
+        throw new UnsupportedOperationException("Player is offline");
+	}
 }

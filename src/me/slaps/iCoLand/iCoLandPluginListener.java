@@ -25,12 +25,14 @@ public class iCoLandPluginListener extends ServerListener {
 
 	@Override
 	public void onPluginDisable(PluginDisableEvent event) {
+	    /* no such field error?
 	    if ( event.getPlugin().getDescription().getName().equals("iConomy") ) {
 	        iCoLand.ic = null;
 	    }
 	    
 	    if ( event.getPlugin().getDescription().getName().equals("Permissions") )
 	        iCoLand.perms = null;
+        */
 	}
 	
 

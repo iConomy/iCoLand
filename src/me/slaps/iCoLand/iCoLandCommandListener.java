@@ -13,8 +13,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
+import com.iConomy.iConomy;
+import com.iConomy.system.Account;
 
 public class iCoLandCommandListener implements CommandExecutor {
     
@@ -512,8 +512,8 @@ public class iCoLandCommandListener implements CommandExecutor {
         Land land = iCoLand.landMgr.getLandById(id);
 
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
-            Account acc = iConomy.getBank().getAccount(sender.getName());
-            Account bank = iConomy.getBank().getAccount(Config.bankName);
+            Account acc = iConomy.getAccount(sender.getName());
+            Account bank = iConomy.getAccount(Config.bankName);
             double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getLandById(id).getAddonPrice(addon)));
             
             if ( iCoLand.hasPermission(sender, "admin.nocost") ) {
@@ -521,18 +521,18 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
                 else
                     mess.send("{ERR}Error buying addon");
-            } else if ( acc.getBalance() > price ) {
+            } else if ( acc.getHoldings().balance() > price ) {
                 if ( iCoLand.landMgr.addAddon(id, addon) ) {
-                    acc.subtract(price);
-                    bank.add(price);
+                    acc.getHoldings().subtract(price);
+                    bank.getHoldings().add(price);
                     
                     mess.send("{}Bought addon {PRM}"+addon+"{} for {PRM}"+iCoLand.df.format(price));
-                    mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
+                    mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getHoldings().balance()));
                 } else {
                     mess.send("{ERR}Error buying addon");
                 }
             } else {
-                mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getBalance())+
+                mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getHoldings().balance())+
                         " Price: "+iCoLand.df.format(price)); 
             }
         } else {
@@ -545,8 +545,8 @@ public class iCoLandCommandListener implements CommandExecutor {
         Land land = iCoLand.landMgr.getLandById(id);
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
-            Account acc = iConomy.getBank().getAccount(sender.getName());
-            Account bank = iConomy.getBank().getAccount(Config.bankName);
+            Account acc = iConomy.getAccount(sender.getName());
+            Account bank = iConomy.getAccount(Config.bankName);
             double price = Double.valueOf(iCoLand.df.format(land.getAddonPrice(addon)));
             double sellPrice = price*Config.sellTax;
             
@@ -557,10 +557,10 @@ public class iCoLandCommandListener implements CommandExecutor {
                     mess.send("{ERR}Error selling addon");
             } else {
                 if ( iCoLand.landMgr.removeAddon(id, addon) ) {
-                    acc.add(sellPrice);
-                    bank.subtract(sellPrice);
+                    acc.getHoldings().add(sellPrice);
+                    bank.getHoldings().subtract(sellPrice);
                     mess.send("{}Sold addon {PRM}"+addon+" on land ID# {PRM}"+id+"{} for {PRM}"+price);
-                    mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                    mess.send("{}Bank Balance: {PRM}"+acc.getHoldings().balance());
                 } else {
                     mess.send("{ERR}Error selling addon");
                 }
@@ -575,26 +575,26 @@ public class iCoLandCommandListener implements CommandExecutor {
     public void purchaseLand(Player player, Cuboid newCuboid) {
         Messaging mess = new Messaging(player);
         String playerName = player.getName();
-        Account acc = iConomy.getBank().getAccount(playerName);        
-        Account bank = iConomy.getBank().getAccount(Config.bankName);
+        Account acc = iConomy.getAccount(playerName);        
+        Account bank = iConomy.getAccount(Config.bankName);
         double price = Double.valueOf(iCoLand.df.format(iCoLand.landMgr.getPrice(newCuboid)));
         
-        if ( (acc.getBalance() > price) || iCoLand.hasPermission(player, "admin.nocost") ) {
+        if ( (acc.getHoldings().balance() > price) || iCoLand.hasPermission(player, "admin.nocost") ) {
             if ( iCoLand.landMgr.addLand(newCuboid, playerName, playerName+":t", "") ) {
                 if ( iCoLand.hasPermission(player, "admin.nocost") ) {
                     mess.send("{}Bought selected land for {PRM}0 {BKT}({PRM}"+iCoLand.df.format(price)+"{BKT})");
                 } else {
-                    acc.subtract(price);
-                    bank.add(price);
+                    acc.getHoldings().subtract(price);
+                    bank.getHoldings().add(price);
                     mess.send("{}Bought selected land for {PRM}"+iCoLand.df.format(price));
-                    mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getBalance()));
+                    mess.send("{}Bank Balance: {PRM}"+iCoLand.df.format(acc.getHoldings().balance()));
                 }
                 iCoLand.cmdMap.remove(playerName);
             } else {
                 mess.send("{ERR}Error buying land");
             }
         } else {
-            mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getBalance())+
+            mess.send("{ERR}Not enough in account. Bank: "+iCoLand.df.format(acc.getHoldings().balance())+
                       " Price: "+iCoLand.df.format(price)); 
         }
     }
@@ -602,8 +602,8 @@ public class iCoLandCommandListener implements CommandExecutor {
     public void reactivateLand( Player player, int id ) {
         Messaging mess = new Messaging(player);
         String playerName = player.getName();
-        Account acc = iConomy.getBank().getAccount(playerName);        
-        Account bank = iConomy.getBank().getAccount(Config.bankName);
+        Account acc = iConomy.getAccount(playerName);        
+        Account bank = iConomy.getAccount(Config.bankName);
         Land land = iCoLand.landMgr.getLandById(id);
         double tax = Double.valueOf(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate));
         
@@ -612,9 +612,9 @@ public class iCoLandCommandListener implements CommandExecutor {
             iCoLand.landMgr.updateActive(id, true);
             iCoLand.landMgr.updateTaxTime(id, new Timestamp(System.currentTimeMillis()));
             mess.send("Land bought back for {PRM}0 {}("+iCoLand.df.format(tax)+")");
-        } else if ( acc.hasEnough(tax) ) {
-            acc.subtract(tax);
-            bank.add(tax);
+        } else if ( acc.getHoldings().hasEnough(tax) ) {
+            acc.getHoldings().subtract(tax);
+            bank.getHoldings().add(tax);
             iCoLand.landMgr.updateActive(id, true);
             iCoLand.landMgr.updateTaxTime(id, new Timestamp(System.currentTimeMillis()));
             mess.send("Land bought back for {PRM}"+iCoLand.df.format(tax));
@@ -682,8 +682,8 @@ public class iCoLandCommandListener implements CommandExecutor {
         
         if ( land.owner.equalsIgnoreCase(sender.getName()) ) {
             if ( land.active ) {
-                Account acc = iConomy.getBank().getAccount(sender.getName());
-                Account bank = iConomy.getBank().getAccount(Config.bankName);
+                Account acc = iConomy.getAccount(sender.getName());
+                Account bank = iConomy.getAccount(Config.bankName);
                 double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
                 double sellPrice = Double.valueOf(iCoLand.df.format(price*Config.sellTax));
     
@@ -691,12 +691,12 @@ public class iCoLandCommandListener implements CommandExecutor {
                     iCoLand.landMgr.removeLandById(id);
                     mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}0 {BKT}({PRM}"+sellPrice+"{BKT})");
                 } else {
-                    acc.add(sellPrice);
-                    bank.subtract(sellPrice);
+                    acc.getHoldings().add(sellPrice);
+                    bank.getHoldings().subtract(sellPrice);
                     
                     iCoLand.landMgr.removeLandById(id);
                     mess.send("{}Sold land ID# {PRM}"+id+"{} for {PRM}"+sellPrice);
-                    mess.send("{}Bank Balance: {PRM}"+acc.getBalance());
+                    mess.send("{}Bank Balance: {PRM}"+acc.getHoldings().balance());
                 }
             } else {
                 iCoLand.landMgr.removeLandById(id);

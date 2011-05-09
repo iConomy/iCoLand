@@ -21,7 +21,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.iConomy;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 

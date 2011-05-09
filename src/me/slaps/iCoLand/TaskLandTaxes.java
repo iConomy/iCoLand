@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
 
-import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
+import com.iConomy.iConomy;
+import com.iConomy.system.Account;
 
 
 public class TaskLandTaxes implements Runnable {
@@ -28,8 +28,8 @@ public class TaskLandTaxes implements Runnable {
         for(Land land : lands) {
             double tax = Double.valueOf(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate));
             
-            Account acc = iConomy.getBank().getAccount(land.owner);
-            Account bank = iConomy.getBank().getAccount(Config.bankName);
+            Account acc = iConomy.getAccount(land.owner);
+            Account bank = iConomy.getAccount(Config.bankName);
             
             if ( Config.debugMode1 ) 
                 iCoLand.info("Last tax date for ID#"+land.getID()+" : "+land.dateTax);
@@ -41,11 +41,11 @@ public class TaskLandTaxes implements Runnable {
                 if ( acc == null ) {
                     iCoLand.info("Land ID# "+land.getID()+ " belongs to "+land.owner+", but he does not have an iConomy account!");
                 } else if  ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "admin.notax") ) {
-                    if ( acc.hasEnough(tax) ) {
+                    if ( acc.getHoldings().hasEnough(tax) ) {
     
                         // subtract tax out
-                        acc.subtract(tax);
-                        bank.add(tax);
+                        acc.getHoldings().subtract(tax);
+                        bank.getHoldings().add(tax);
                         
                         int i = playerInList(players, land.owner);
                         if ( i > -1 ) {
@@ -104,8 +104,8 @@ public class TaskLandTaxes implements Runnable {
             iCoLand.info("Starting inactive deletion task...  "+now);
         
         for(Land land : lands) {
-            Account acc = iConomy.getBank().getAccount(land.owner);
-            Account bank = iConomy.getBank().getAccount(Config.bankName);
+            Account acc = iConomy.getAccount(land.owner);
+            Account bank = iConomy.getAccount(Config.bankName);
             double tax = Double.valueOf(iCoLand.df.format(land.location.volume()*Config.pricePerBlock.get("raw")*Config.taxRate));
 
             if ( iCoLand.landMgr.removeLandById(land.getID()) ) {
@@ -119,8 +119,8 @@ public class TaskLandTaxes implements Runnable {
                 
                 Double price = Double.valueOf(iCoLand.df.format(land.getTotalPrice()));
                 if ( !iCoLand.hasPermission(land.location.setLoc1.getWorld().getName(), land.owner, "admin.notax" ) ) {
-                    acc.add(price-tax);
-                    bank.subtract(price-tax);
+                    acc.getHoldings().add(price-tax);
+                    bank.getHoldings().subtract(price-tax);
                 }
 
                 i = playerInList(players, land.owner);
